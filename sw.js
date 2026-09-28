@@ -1,4 +1,4 @@
-const CACHE_NAME = "tea-nho-static-v1";
+const CACHE_NAME = "tea-nho-static-v2";
 const STATIC_ASSETS = [
   "./",
   "./index.html",
@@ -16,6 +16,8 @@ const STATIC_ASSETS = [
   "./js/data/upgrades.js",
   "./js/data/employees.js",
   "./js/data/events.js",
+  "./js/data/noodleMenu.js",
+  "./js/data/bauCua.js",
   "./js/state/initialState.js",
   "./js/state/store.js",
   "./js/state/persistence.js",
@@ -31,6 +33,9 @@ const STATIC_ASSETS = [
   "./js/systems/modifiers.js",
   "./js/systems/dayCycle.js",
   "./js/systems/audioManager.js",
+  "./js/systems/noodleBranch.js",
+  "./js/systems/bauCua.js",
+  "./js/systems/xidach.js",
   "./js/ui/helpers.js",
   "./js/ui/router.js",
   "./js/ui/header.js",
@@ -43,6 +48,9 @@ const STATIC_ASSETS = [
   "./js/ui/gameplayView.js",
   "./js/ui/reviewsView.js",
   "./js/ui/statsView.js",
+  "./js/ui/noodleBranchView.js",
+  "./js/ui/bauCuaView.js",
+  "./js/ui/xidachView.js",
   "./js/backup/backup.js",
 ];
 

@@ -54,6 +54,7 @@ export function consumeIngredients(state, recipe) {
 }
 
 export function purchaseIngredient(state, ingredientId, quantity, currentDay = state.day) {
+  if (state.gameplay.status === "summary") return { success: false, reason: "Chuyển sang ngày tiếp theo rồi hãy mua nguyên liệu." };
   const definition = INGREDIENT_BY_ID[ingredientId];
   const amount = Math.floor(Number(quantity));
   if (!definition || !Number.isFinite(amount) || amount <= 0) return { success: false, reason: "Số lượng mua không hợp lệ." };

@@ -11,6 +11,6 @@ export function renderHeader(state) {
       <span class="header-stat"><small>Ngày</small><strong>${state.day}</strong></span>
       <span class="header-stat"><small>Tiền</small><strong>${formatMoney(state.money)}</strong></span>
       <span class="header-stat"><small>Đánh giá</small><strong>★ ${rating}</strong></span>
-    </div><button class="button button-small button-quiet" data-action="pause-day" ${pauseDisabled ? "disabled" : ""}>${state.gameplay.status === "paused" ? "▶" : "Ⅱ"} <span class="desktop-only">${statusLabel}</span></button>
+    </div><div class="header-mini-games"><button class="button button-small button-quiet" data-navigate="baucua" title="Bầu Cua" aria-label="Bầu Cua">🎲</button><button class="button button-small button-quiet" data-navigate="xidach" title="Xì Dách" aria-label="Xì Dách">🃏</button><button class="button button-small button-quiet" data-navigate="noodles" title="Chi nhánh Mì Cay" aria-label="Mì Cay">🍜</button></div><button class="button button-small button-quiet" data-action="pause-day" ${pauseDisabled ? "disabled" : ""}>${state.gameplay.status === "paused" ? "▶" : "Ⅱ"} <span class="desktop-only">${statusLabel}</span></button>
     <button class="button button-small button-quiet" data-action="settings" aria-label="Cài đặt">⚙️</button></div>`;
 }

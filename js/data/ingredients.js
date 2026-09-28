@@ -6,6 +6,10 @@ export const INGREDIENTS = [
   { id: "blackPearl", name: "Trân châu đen", unit: "phần", purchasePrice: 700, expirationDays: 4, startingQuantity: 18, emoji: "⚫" },
   { id: "whitePearl", name: "Trân châu trắng", unit: "phần", purchasePrice: 800, expirationDays: 4, startingQuantity: 12, emoji: "⚪" },
   { id: "cup", name: "Ly và nắp", unit: "bộ", purchasePrice: 500, expirationDays: 120, startingQuantity: 32, emoji: "🥤" },
+  { id: "noodles", name: "Mì tươi", unit: "phần", purchasePrice: 1_800, expirationDays: 8, startingQuantity: 0, emoji: "🍜" },
+  { id: "spicyBroth", name: "Nước dùng cay", unit: "phần", purchasePrice: 2_200, expirationDays: 4, startingQuantity: 0, emoji: "🌶️" },
+  { id: "beef", name: "Thịt bò", unit: "phần", purchasePrice: 4_500, expirationDays: 3, startingQuantity: 0, emoji: "🥩" },
+  { id: "fishBall", name: "Cá viên", unit: "phần", purchasePrice: 1_500, expirationDays: 5, startingQuantity: 0, emoji: "🍢" },
 ];
 
 export const INGREDIENT_BY_ID = Object.freeze(

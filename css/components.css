@@ -8,6 +8,7 @@ p { color: var(--muted); line-height: 1.55; }
 .brand-copy strong { display: block; font-size: 1.1rem; }
 .brand-copy small { color: var(--muted); }
 .header-actions, .header-stats { display: flex; align-items: center; gap: .65rem; }
+.header-mini-games { display: flex; align-items: center; gap: .35rem; }
 .header-stats { justify-content: flex-end; }
 .header-stat { display: grid; gap: .05rem; padding: .35rem .65rem; border-radius: 12px; background: #fff7f1; white-space: nowrap; }
 .header-stat small { color: var(--muted); font-size: .68rem; }

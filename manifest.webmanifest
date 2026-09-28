@@ -1,7 +1,7 @@
 {
-  "name": "Trà Nhỏ — Quản lý tiệm trà",
-  "short_name": "Trà Nhỏ",
-  "description": "Game quản lý tiệm trà sữa nhỏ: pha trà, đón khách và phát triển cửa tiệm.",
+  "name": "Tiệm Trà Mơ Ước",
+  "short_name": "Trà Mơ Ước",
+  "description": "Quản lý tiệm trà và chi nhánh Mì Cay, dùng chung quỹ tiền.",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",

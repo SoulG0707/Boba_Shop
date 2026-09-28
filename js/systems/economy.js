@@ -38,6 +38,8 @@ export function createDailyStats(state) {
   const rating = getCurrentRating(state);
   state.dailyStats = {
     revenue: 0,
+    noodleRevenue: 0,
+    noodleCustomers: 0,
     ingredientCost: 0,
     stockPurchases: 0,
     salaryCost: 0,

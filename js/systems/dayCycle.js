@@ -10,8 +10,7 @@ import { processEmployeeAutomation } from "./employees.js";
 import { addDepartureReview } from "./reviews.js";
 
 export function startDay(state, now = Date.now()) {
-  if (state.gameplay.status === "running" || state.gameplay.status === "paused") return false;
-  createDailyStats(state);
+  if (state.gameplay.status !== "preparation") return false;
   state.orders = state.orders.filter((order) => !["served", "cancelled"].includes(order.status));
   state.customers = [];
   state.onlineOrders = state.onlineOrders.filter((order) => !["served", "cancelled"].includes(order.status));
@@ -82,6 +81,7 @@ export function nextDay(state) {
   state.day += 1;
   state.gameplay.status = "preparation";
   state.gameplay.elapsedMs = 0;
+  createDailyStats(state);
   return true;
 }
 

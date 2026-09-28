@@ -3,7 +3,7 @@ export const DEBUG = true;
 export const GAME_CONFIG = Object.freeze({
   DAY_DURATION_SECONDS: 240,
   STORAGE_KEY: "tea-shop-game-save-v1",
-  STATE_VERSION: 1,
+  STATE_VERSION: 2,
   INITIAL_MONEY: 400_000,
   MAX_REVIEWS: 40,
   MAX_HISTORY_ENTRIES: 80,
@@ -13,6 +13,9 @@ export const GAME_CONFIG = Object.freeze({
   TAX_RATE: 0.05,
   CUSTOMER_SPAWN_INTERVAL_SECONDS: 9,
   ONLINE_SPAWN_INTERVAL_SECONDS: 27,
+  MIN_MINIGAME_BET: 5_000,
+  MAX_MINIGAME_BET: 100_000,
+  MAX_MINIGAME_ROUND_STAKE: 250_000,
 });
 
 export const ROUTES = Object.freeze([
@@ -23,6 +26,9 @@ export const ROUTES = Object.freeze([
   { id: "prices", label: "Giá bán", icon: "🏷️" },
   { id: "reviews", label: "Đánh giá", icon: "⭐" },
   { id: "stats", label: "Thống kê", icon: "📈" },
+  { id: "noodles", label: "Mì Cay", icon: "🍜" },
+  { id: "baucua", label: "Bầu Cua", icon: "🎲" },
+  { id: "xidach", label: "Xì Dách", icon: "🃏" },
 ]);
 
 export const formatMoney = (value) =>

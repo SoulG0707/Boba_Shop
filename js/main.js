@@ -1,4 +1,4 @@
-import { DEBUG } from "./config.js";
+import { DEBUG, formatMoney } from "./config.js";
 import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp, renderCurrentView, getCurrentRoute } from "./ui/router.js";
@@ -16,6 +16,9 @@ import { triggerEvent } from "./systems/events.js";
 import { escapeHtml } from "./ui/helpers.js";
 import { createBackup, restoreBackup } from "./backup/backup.js";
 import { audioManager } from "./systems/audioManager.js";
+import { sellNoodleBowl } from "./systems/noodleBranch.js";
+import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js";
+import { playXidachHouseRound } from "./systems/xidach.js";
 
 const header = document.querySelector("#header");
 let renderedSecond = -1;
@@ -143,6 +146,46 @@ function handleAction(action, element) {
       updateState((current) => fireEmployee(current, element.dataset.employee));
       refreshUI();
       break;
+    case "sell-noodle": {
+      let result;
+      updateState((current) => { result = sellNoodleBowl(current, element.dataset.noodle); });
+      notifyResult(result, `${result.noodle?.name ?? "Món mì"} đã bán, quỹ chung được cập nhật.`);
+      refreshUI();
+      break;
+    }
+    case "select-bau-stake":
+      updateState((current) => { current.miniGames.bauCua.stake = Number(element.dataset.stake); });
+      refreshUI();
+      break;
+    case "add-bau-bet": {
+      let result;
+      updateState((current) => { result = placeBauCuaBet(current, element.dataset.symbol, current.miniGames.bauCua.stake); });
+      notifyResult(result, `Đã đặt ${formatMoney(result.stake)} vào cửa ${element.dataset.symbol}.`);
+      refreshUI();
+      break;
+    }
+    case "clear-bau-bets":
+      updateState((current) => { clearBauCuaBets(current); });
+      refreshUI();
+      break;
+    case "roll-bau-cua": {
+      let result;
+      updateState((current) => { result = rollBauCua(current); });
+      notifyResult(result, `Lắc xong · ${result.net >= 0 ? "lãi" : "lỗ"} ${formatMoney(Math.abs(result.net))}.`);
+      refreshUI();
+      break;
+    }
+    case "select-xidach-stake":
+      updateState((current) => { current.miniGames.xiDach.stake = Number(element.dataset.stake); });
+      refreshUI();
+      break;
+    case "play-xidach": {
+      let result;
+      updateState((current) => { result = playXidachHouseRound(current, current.miniGames.xiDach.stake); });
+      notifyResult(result, result.outcome === "house" ? `Nhà cái thắng ${formatMoney(result.net)}.` : result.outcome === "visitor" ? `Khách thắng ${formatMoney(Math.abs(result.net))}.` : "Hai bên hòa, tiền bảo chứng được hoàn lại.");
+      refreshUI();
+      break;
+    }
     case "prepare-order":
       updateState((current) => setOrderStatus(current, element.dataset.order, "preparing"));
       refreshUI();

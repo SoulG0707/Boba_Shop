@@ -28,14 +28,26 @@
 .summary-item strong { font-size: 1.05rem; }
 .setting-line { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 0; border-bottom: 1px solid var(--line); }
 .switch { width: 46px; height: 26px; accent-color: var(--pink-dark); }
+.minigame-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; margin: 1rem 0; }
+.minigame-tile { display: grid; justify-items: center; gap: .45rem; border: 1px solid var(--line); color: var(--ink); text-align: center; cursor: pointer; }
+.minigame-tile:hover, .minigame-tile.is-selected { border-color: var(--pink); background: #fff0e8; }
+.minigame-tile small { color: var(--muted); }
+.minigame-emoji { font-size: 2rem; }
+.dice-result { display: flex; align-items: center; gap: .7rem; margin: .5rem 0; font-size: 2.4rem; }
+.playing-cards { display: flex; gap: .45rem; margin: .5rem 0; }
+.playing-card { display: grid; width: 55px; height: 72px; place-content: center; gap: .15rem; border: 1px solid var(--line); border-radius: 10px; background: white; box-shadow: 0 4px 10px #00000010; font-size: 1.15rem; font-weight: 800; text-align: center; }
+.playing-card small { font-size: 1.05rem; }
+.playing-card.is-red { color: #c94f5a; }
 @media (max-width: 700px) {
   .header-stats .header-stat:nth-child(3) { display: none; }
   .header-stat { padding: .3rem .45rem; }
   .brand { min-width: 0; }
   .brand-copy small { display: none; }
   .queue-grid { grid-template-columns: 1fr; }
+  .minigame-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .game-top { grid-template-columns: 1fr auto; }
   .game-top .progress-track { grid-column: 1 / -1; grid-row: 2; }
   .price-row { grid-template-columns: minmax(100px, 1fr) auto; }
   .price-row .price-note { grid-column: 1 / -1; }
 }
+@media (max-width: 600px) { .header-mini-games { display: none; } }

@@ -6,6 +6,9 @@ import { renderUpgradesView } from "./upgradesView.js";
 import { renderPricesView } from "./pricesView.js";
 import { renderReviewsView } from "./reviewsView.js";
 import { renderStatsView } from "./statsView.js";
+import { renderNoodleBranchView } from "./noodleBranchView.js";
+import { renderBauCuaView } from "./bauCuaView.js";
+import { renderXidachView } from "./xidachView.js";
 
 const VIEWS = {
   dashboard: renderDashboard,
@@ -15,6 +18,9 @@ const VIEWS = {
   prices: renderPricesView,
   reviews: renderReviewsView,
   stats: renderStatsView,
+  noodles: renderNoodleBranchView,
+  baucua: renderBauCuaView,
+  xidach: renderXidachView,
 };
 
 let currentRoute = "dashboard";
