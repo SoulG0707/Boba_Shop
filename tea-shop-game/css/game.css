@@ -1,0 +1,41 @@
+.hero-card { position: relative; overflow: hidden; padding: clamp(1.4rem, 4vw, 2.2rem); background: linear-gradient(130deg, #fff0e4, #ffe3de 66%, #f8e9ff); }
+.hero-card::after { position: absolute; right: 5%; bottom: -2rem; content: "🧋"; font-size: clamp(5rem, 12vw, 9rem); opacity: .25; transform: rotate(-12deg); }
+.hero-card > * { position: relative; z-index: 1; max-width: 38rem; }
+.hero-card p { max-width: 32rem; }
+.ingredient-card, .upgrade-card, .product-card, .employee-card, .order-card, .review-card { display: grid; gap: .85rem; }
+.ingredient-title, .product-title { display: flex; align-items: center; gap: .7rem; }
+.ingredient-emoji, .product-emoji { display: grid; width: 44px; height: 44px; place-items: center; border-radius: 14px; background: #fff3e6; font-size: 1.45rem; }
+.ingredient-meta, .product-meta { display: flex; justify-content: space-between; gap: .5rem; color: var(--muted); font-size: .86rem; }
+.upgrade-card { align-content: start; min-height: 235px; }
+.upgrade-icon { font-size: 1.7rem; }
+.upgrade-level { display: flex; gap: .28rem; }
+.level-dot { width: 14px; height: 8px; border-radius: 999px; background: #efe4dc; }
+.level-dot.is-filled { background: var(--pink); }
+.price-row { display: grid; grid-template-columns: minmax(150px, 1fr) auto auto; align-items: center; gap: .8rem; padding: .9rem 0; border-bottom: 1px solid var(--line); }
+.price-row:last-child { border-bottom: 0; }
+.game-top { display: grid; grid-template-columns: auto minmax(160px, 1fr) auto; align-items: center; gap: 1rem; }
+.timer { min-width: 100px; font-size: 1.65rem; font-weight: 800; font-variant-numeric: tabular-nums; text-align: center; }
+.event-banner { display: flex; align-items: center; gap: .85rem; padding: .95rem 1rem; border: 1px solid #f3dca9; border-radius: var(--radius-md); background: #fff9df; }
+.queue-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem; }
+.customer-avatar { display: grid; width: 42px; height: 42px; flex: 0 0 auto; place-items: center; border-radius: 50%; background: var(--mint); font-size: 1.25rem; }
+.order-main { display: flex; align-items: center; gap: .7rem; }
+.order-actions { display: flex; flex-wrap: wrap; gap: .5rem; }
+.review-stars { color: #e7a827; letter-spacing: .08em; }
+.table-scroll { overflow-x: auto; }
+.summary-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .7rem; margin: 1rem 0 1.3rem; }
+.summary-item { display: grid; gap: .3rem; padding: .8rem; border-radius: 13px; background: #fff6ef; }
+.summary-item small { color: var(--muted); }
+.summary-item strong { font-size: 1.05rem; }
+.setting-line { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: .8rem 0; border-bottom: 1px solid var(--line); }
+.switch { width: 46px; height: 26px; accent-color: var(--pink-dark); }
+@media (max-width: 700px) {
+  .header-stats .header-stat:nth-child(3) { display: none; }
+  .header-stat { padding: .3rem .45rem; }
+  .brand { min-width: 0; }
+  .brand-copy small { display: none; }
+  .queue-grid { grid-template-columns: 1fr; }
+  .game-top { grid-template-columns: 1fr auto; }
+  .game-top .progress-track { grid-column: 1 / -1; grid-row: 2; }
+  .price-row { grid-template-columns: minmax(100px, 1fr) auto; }
+  .price-row .price-note { grid-column: 1 / -1; }
+}

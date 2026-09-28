@@ -1,0 +1,10 @@
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html { min-width: 320px; background: #fff8f1; scroll-behavior: smooth; }
+body { margin: 0; min-height: 100vh; font-family: "Trebuchet MS", "Segoe UI", sans-serif; color: #3a3030; }
+button, input, select { font: inherit; }
+button { color: inherit; }
+button:focus-visible, a:focus-visible, input:focus-visible { outline: 3px solid #7fb39b; outline-offset: 2px; }
+img, svg { display: block; max-width: 100%; }

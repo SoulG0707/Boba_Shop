@@ -1,0 +1,15 @@
+{
+  "name": "Trà Nhỏ — Quản lý tiệm trà",
+  "short_name": "Trà Nhỏ",
+  "description": "Game quản lý tiệm trà sữa nhỏ: pha trà, đón khách và phát triển cửa tiệm.",
+  "lang": "vi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#fff8f1",
+  "theme_color": "#ef8e91",
+  "icons": [
+    { "src": "./img/tea-cup.svg", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
