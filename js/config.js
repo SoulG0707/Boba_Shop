@@ -19,14 +19,14 @@ export const GAME_CONFIG = Object.freeze({
 });
 
 export const ROUTES = Object.freeze([
-  { id: "dashboard", label: "Tổng quan", icon: "🏠" },
-  { id: "gameplay", label: "Chuẩn bị", icon: "🧋" },
-  { id: "inventory", label: "Kho", icon: "📦" },
-  { id: "upgrades", label: "Nâng cấp", icon: "✨" },
-  { id: "prices", label: "Giá bán", icon: "🏷️" },
-  { id: "reviews", label: "Đánh giá", icon: "⭐" },
-  { id: "stats", label: "Thống kê", icon: "📈" },
-  { id: "noodles", label: "Mì Cay", icon: "🍜" },
+  { id: "dashboard", label: "Tiệm", icon: "prep" },
+  { id: "inventory", label: "Kho", icon: "inventory" },
+  { id: "upgrades", label: "Nâng cấp", icon: "upgrades" },
+  { id: "prices", label: "Giá", icon: "prices" },
+  { id: "employees", label: "Nhân viên", icon: "employees" },
+  { id: "reviews", label: "Đánh giá", icon: "reviews" },
+  { id: "stats", label: "Thống kê", icon: "stats" },
+  { id: "noodles", label: "Mì Cay", icon: "noodles" },
   { id: "baucua", label: "Bầu Cua", icon: "🎲" },
   { id: "xidach", label: "Xì Dách", icon: "🃏" },
 ]);

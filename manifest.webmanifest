@@ -1,14 +1,14 @@
 {
   "name": "Tiệm Trà Mơ Ước",
   "short_name": "Trà Mơ Ước",
-  "description": "Quản lý tiệm trà và chi nhánh Mì Cay, dùng chung quỹ tiền.",
+  "description": "Game quản lý tiệm trà, pha chế cho khách và nâng cấp cửa tiệm.",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#fff8f1",
-  "theme_color": "#ef8e91",
+  "background_color": "#fdf3e4",
+  "theme_color": "#fdf3e4",
   "icons": [
     { "src": "./img/tea-cup.svg", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable" }
   ]

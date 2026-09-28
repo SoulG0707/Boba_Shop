@@ -1,8 +1,10 @@
 import { DEBUG, formatMoney } from "./config.js";
 import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
-import { navigate, renderApp, renderCurrentView, getCurrentRoute } from "./ui/router.js";
+import { navigate, renderApp } from "./ui/router.js";
 import { renderHeader } from "./ui/header.js";
+import { renderSplashView } from "./ui/splashView.js";
+import { getDefaultCupVisual } from "./ui/gameplayView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
 import { showToast } from "./ui/toast.js";
 import { purchaseIngredient } from "./systems/inventory.js";
@@ -21,22 +23,74 @@ import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js
 import { playXidachHouseRound } from "./systems/xidach.js";
 
 const header = document.querySelector("#header");
+const appShell = document.querySelector("#app-shell");
+const splash = document.querySelector("#splash");
 let renderedSecond = -1;
 let summaryShownForDay = null;
+let splashVisible = true;
+let selectedCustomerId = null;
+let visualCup = { orderId: null, ingredients: {} };
+let serveFeedback = null;
+let serveFeedbackTimer = null;
 
-function refreshUI({ full = false } = {}) {
+function refreshUI() {
   const state = getState();
   document.body.dataset.theme = state.settings.theme ?? "peach";
+  if (splashVisible) {
+    appShell.hidden = true;
+    appShell.setAttribute("aria-hidden", "true");
+    splash.hidden = false;
+    splash.innerHTML = renderSplashView(state);
+    return;
+  }
+
+  splash.hidden = true;
+  appShell.hidden = false;
+  appShell.setAttribute("aria-hidden", "false");
   header.innerHTML = renderHeader(state);
-  if (full) renderApp(state);
-  else document.querySelector("#view").innerHTML = renderCurrentView(state);
+  renderApp(state, { selectedCustomerId, visualCup, feedback: serveFeedback });
+}
+
+function enterGame() {
+  splashVisible = false;
+  let state = getState();
+  if (state.gameplay.status === "running") {
+    updateState((current) => { current.gameplay.lastTickAt = Date.now(); });
+    state = getState();
+    saveGame(state);
+  }
+  syncSelectedCustomer(state);
+  navigate(["running", "paused"].includes(state.gameplay.status) ? "gameplay" : "dashboard");
+  refreshUI();
+  if (state.gameplay.status === "summary") {
+    summaryShownForDay = state.day;
+    showEndDayModal(state.dailyStats, state.day);
+  }
+}
+
+function syncSelectedCustomer(state) {
+  const customer = selectedCustomerId && state.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+  if (customer) return;
+  const nextCustomer = state.customers.find((candidate) => candidate.status === "waiting");
+  selectedCustomerId = nextCustomer?.id ?? null;
+  const order = nextCustomer && state.orders.find((candidate) => candidate.id === nextCustomer.orderId && candidate.status !== "cancelled");
+  visualCup = { orderId: order?.id ?? null, ingredients: order ? getDefaultCupVisual(order) : {} };
+}
+
+function selectCustomer(customerId) {
+  const state = getState();
+  const customer = state.customers.find((candidate) => candidate.id === customerId);
+  const order = customer && state.orders.find((candidate) => candidate.id === customer.orderId);
+  if (!order) return;
+  selectedCustomerId = customerId;
+  visualCup = { orderId: order.id, ingredients: getDefaultCupVisual(order) };
+  refreshUI();
 }
 
 function openSettings() {
   const state = getState();
   const body = `<div class="setting-line"><span><strong>Nhạc nền</strong><div class="tiny muted">Phát nhạc sau thao tác đầu tiên</div></span><input class="switch" type="checkbox" data-setting="music" ${state.settings.music ? "checked" : ""}></div>
     <div class="setting-line"><span><strong>Hiệu ứng âm thanh</strong><div class="tiny muted">Chuông và âm thanh pha chế</div></span><input class="switch" type="checkbox" data-setting="sound" ${state.settings.sound ? "checked" : ""}></div>
-    <div class="setting-line"><label for="theme-setting">Màu giao diện</label><select id="theme-setting" class="text-input" style="max-width:180px" data-setting="theme"><option value="peach" ${state.settings.theme === "peach" ? "selected" : ""}>Đào sữa</option><option value="mint" ${state.settings.theme === "mint" ? "selected" : ""}>Trà xanh</option></select></div>
     <div class="setting-line"><label for="music-volume">Âm lượng nhạc</label><input id="music-volume" type="range" min="0" max="100" value="50" data-setting-volume="music"></div><div class="setting-line"><label for="sfx-volume">Âm lượng hiệu ứng</label><input id="sfx-volume" type="range" min="0" max="100" value="65" data-setting-volume="sound"></div>
     <div class="divider"></div><strong>Sao lưu tiến trình</strong><p class="tiny">Backup được tạo trên thiết bị này, có checksum SHA-256 để phát hiện dữ liệu sai.</p><div class="button-row"><button class="button button-quiet" data-action="export-backup">Tạo backup</button><button class="button button-primary" data-action="restore-backup">Khôi phục</button></div><textarea id="backup-text" class="text-input" rows="4" style="margin-top:.65rem;resize:vertical" placeholder="Dán mã TEASHOP1... vào đây để khôi phục"></textarea>
     <div class="button-row" style="margin-top:1rem"><button class="button button-quiet" data-action="edit-shop-name">Đổi tên tiệm</button><button class="button button-danger" data-action="confirm-reset">Chơi lại từ đầu</button></div>`;
@@ -61,6 +115,22 @@ function notifyResult(result, successMessage) {
 function handleAction(action, element) {
   const state = getState();
   switch (action) {
+    case "splash-start":
+    case "splash-continue":
+      enterGame();
+      break;
+    case "select-customer":
+      selectCustomer(element.dataset.customer);
+      break;
+    case "toggle-cup-ingredient": {
+      const customer = getState().customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+      const order = customer && getState().orders.find((candidate) => candidate.id === customer.orderId);
+      if (!order) break;
+      if (visualCup.orderId !== order.id) visualCup = { orderId: order.id, ingredients: getDefaultCupVisual(order) };
+      visualCup.ingredients[element.dataset.ingredient] = !visualCup.ingredients[element.dataset.ingredient];
+      refreshUI();
+      break;
+    }
     case "close-modal":
       hideModal();
       break;
@@ -91,7 +161,7 @@ function handleAction(action, element) {
       restoreBackup(backupText).then((restoredState) => {
         replaceState(restoredState);
         hideModal();
-        refreshUI({ full: true });
+        refreshUI();
         showToast("Đã khôi phục tiến trình từ backup.", "success");
       }).catch((error) => showToast(error.message, "error", 4200));
       break;
@@ -100,7 +170,7 @@ function handleAction(action, element) {
       replaceState(resetGame());
       hideModal();
       navigate("dashboard");
-      refreshUI({ full: true });
+      refreshUI();
       showToast("Tiệm mới đã sẵn sàng!", "success");
       break;
     case "pause-day":
@@ -114,8 +184,7 @@ function handleAction(action, element) {
     case "start-day":
       updateState((current) => startDay(current));
       navigate("gameplay");
-      refreshUI({ full: true });
-      showToast("Cửa tiệm đã mở cửa. Chúc bạn buôn may bán đắt!", "success");
+      refreshUI();
       break;
     case "show-summary":
       showEndDayModal(state.dailyStats, state.day);
@@ -125,7 +194,7 @@ function handleAction(action, element) {
       updateState((current) => nextDay(current));
       summaryShownForDay = null;
       navigate("dashboard");
-      refreshUI({ full: true });
+      refreshUI();
       break;
     case "buy-stock":
       updateState((current) => {
@@ -193,7 +262,21 @@ function handleAction(action, element) {
     case "serve-order": {
       let result;
       updateState((current) => { result = serveOrder(current, element.dataset.order); });
-      notifyResult(result, "Đơn đã phục vụ! Khách vui vẻ rời tiệm.");
+      if (!result?.success) notifyResult(result, "");
+      if (result?.success) {
+        serveFeedback = {
+          revenue: result.revenue ?? result.order?.totalPrice ?? 0,
+          rating: result.review?.rating ?? 5,
+          customerType: result.review?.customerType ?? "regular",
+          createdAt: Date.now(),
+        };
+        if (serveFeedbackTimer) window.clearTimeout(serveFeedbackTimer);
+        serveFeedbackTimer = window.setTimeout(() => {
+          serveFeedback = null;
+          refreshUI();
+        }, 2_000);
+        syncSelectedCustomer(getState());
+      }
       refreshUI();
       break;
     }
@@ -225,7 +308,7 @@ document.addEventListener("click", (event) => {
     return;
   }
   const routeButton = event.target.closest("[data-navigate]");
-  if (routeButton && navigate(routeButton.dataset.navigate)) refreshUI({ full: true });
+  if (routeButton && navigate(routeButton.dataset.navigate)) refreshUI();
   if (event.target.id === "modal") hideModal();
 });
 
@@ -279,18 +362,20 @@ document.addEventListener("pointerdown", () => {
 
 function runGameLoop() {
   const state = getState();
-  if (state.gameplay.status !== "running") return;
+  if (splashVisible || state.gameplay.status !== "running") return;
   const now = Date.now();
   tickDay(state, now);
   saveGame(state);
   const currentSecond = Math.floor(state.gameplay.elapsedMs / 1000);
   if (currentSecond !== renderedSecond) {
     renderedSecond = currentSecond;
-    header.innerHTML = renderHeader(state);
-    if (getCurrentRoute() === "gameplay") document.querySelector("#view").innerHTML = renderCurrentView(state);
+    syncSelectedCustomer(state);
+    refreshUI();
   }
   if (state.gameplay.status === "summary" && summaryShownForDay !== state.day) {
     summaryShownForDay = state.day;
+    navigate("dashboard");
+    refreshUI();
     showEndDayModal(state.dailyStats, state.day);
     saveGame(state);
   }
@@ -309,7 +394,7 @@ function enableDebugTools() {
         if (state.gameplay.status !== "summary") endDay(state);
         nextDay(state);
       });
-      refreshUI({ full: true });
+      refreshUI();
     },
     spawnCustomer() {
       updateState((state) => {
@@ -317,7 +402,7 @@ function enableDebugTools() {
         if (customer) createOrder(state, customer);
       });
       navigate("gameplay");
-      refreshUI({ full: true });
+      refreshUI();
     },
     triggerEvent(id) {
       updateState((state) => triggerEvent(state, id));
@@ -326,16 +411,10 @@ function enableDebugTools() {
   };
 }
 
-renderApp(getState());
-header.innerHTML = renderHeader(getState());
-document.body.dataset.theme = getState().settings.theme ?? "peach";
+refreshUI();
 enableDebugTools();
 audioManager.setSfxEnabled(getState().settings.sound);
 if ("serviceWorker" in navigator && location.protocol !== "file:") {
   navigator.serviceWorker.register("./sw.js").catch((error) => console.warn("Service worker chưa được đăng ký.", error));
-}
-if (getState().gameplay.status === "summary") {
-  summaryShownForDay = getState().day;
-  showEndDayModal(getState().dailyStats, getState().day);
 }
 window.setInterval(runGameLoop, 500);

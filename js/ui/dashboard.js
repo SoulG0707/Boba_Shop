@@ -1,19 +1,19 @@
-import { formatMoney } from "../config.js";
-import { EMPLOYEE_ROLES } from "../data/employees.js";
-import { getAverageRating } from "../systems/reviews.js";
-import { escapeHtml, renderPageHeading, renderStatCard } from "./helpers.js";
+import { INGREDIENTS } from "../data/ingredients.js";
+import { escapeHtml } from "./helpers.js";
 
 export function renderDashboard(state) {
-  const rating = getAverageRating(state);
-  const staff = EMPLOYEE_ROLES.map((role) => {
-    const employee = state.employees.find((candidate) => candidate.role === role.id);
-    return `<div class="list-row"><div><strong>${escapeHtml(role.name)}</strong><div class="tiny muted">${escapeHtml(role.description)}</div></div>${employee
-      ? `<button class="button button-small button-quiet" data-action="fire-employee" data-employee="${employee.id}">Đang làm · Nghỉ việc</button>`
-      : `<button class="button button-small" data-action="hire-employee" data-role="${role.id}">Tuyển · ${formatMoney(role.hireCost)}</button>`}</div>`;
-  }).join("");
-  return `${renderPageHeading("Tiệm trà của bạn", "Mỗi ngày là một cơ hội để phục vụ thêm khách và làm tiệm tốt hơn.")}
-    <div class="page-content"><section class="card hero-card"><span class="pill">Ngày ${state.day} · ${state.gameplay.status === "preparation" ? "Sẵn sàng mở cửa" : "Bán hàng đang diễn ra"}</span><h2 style="font-size:clamp(1.5rem,4vw,2.4rem);margin:.75rem 0">Chào mừng bạn đến với ${escapeHtml(state.shopName)}!</h2><p>Pha một ly trà ngon, chăm chút kho nguyên liệu và để khách quen truyền tin vui khắp khu phố.</p><button class="button button-primary" data-navigate="gameplay">${state.gameplay.status === "preparation" ? "Mở cửa bán hàng →" : "Quay lại quầy →"}</button></section>
-    <div class="grid-4">${renderStatCard("💰", "Số dư hiện tại", formatMoney(state.money))}${renderStatCard("⭐", "Đánh giá tiệm", `${rating.toFixed(1)} / 5`, `${state.reviews.length} lượt đánh giá gần đây`)}${renderStatCard("🧋", "Khách đã phục vụ", state.customersServed.toLocaleString("vi-VN"))}${renderStatCard("📈", "Doanh thu hôm nay", formatMoney(state.dailyStats.revenue))}</div>
-    <div class="grid-2"><section class="card"><div class="card-head"><h2>Hôm nay ở tiệm</h2><span class="pill">Ngày ${state.day}</span></div><div class="list-row"><span class="muted">Khách phục vụ</span><strong>${state.dailyStats.customersServed}</strong></div><div class="list-row"><span class="muted">Doanh thu Mì Cay</span><strong>${formatMoney(state.dailyStats.noodleRevenue ?? 0)}</strong></div><div class="list-row"><span class="muted">Đơn online</span><strong>${state.dailyStats.onlineOrders}</strong></div><div class="list-row"><span class="muted">Lợi nhuận tạm tính</span><strong>${formatMoney(state.dailyStats.revenue - state.dailyStats.ingredientCost)}</strong></div><div class="button-row" style="margin-top:1rem"><button class="button button-quiet" data-navigate="inventory">Kiểm tra kho</button><button class="button button-quiet" data-navigate="prices">Chỉnh giá món</button><button class="button button-quiet" data-navigate="noodles">Mở chi nhánh Mì Cay</button></div></section>
-    <section class="card"><div class="card-head"><h2>Đội ngũ tiệm</h2><span class="pill">${state.employees.length} / ${EMPLOYEE_ROLES.length}</span></div>${staff}</section></div></div>`;
+  const stockedIngredients = INGREDIENTS.filter((ingredient) => (state.stock[ingredient.id]?.quantity ?? 0) > 0).length;
+  const openAction = state.gameplay.status === "summary"
+    ? `<button class="button button-primary" data-action="show-summary">Xem tổng kết ngày</button>`
+    : `<button class="button button-primary" data-action="start-day">Mở cửa tiệm</button>`;
+  const headline = state.gameplay.status === "summary" ? "Ngày bán hàng đã khép lại" : "Mọi thứ đã sẵn sàng?";
+  const description = state.gameplay.status === "summary"
+    ? `Ngày ${state.day} đã hoàn thành. Xem sổ cuối ngày rồi chuẩn bị cho ngày mới.`
+    : `Kiểm tra ${stockedIngredients} loại nguyên liệu đang có trong kho, rồi mở cửa đón khách.`;
+
+  return `<section class="prep-home">
+    <div class="prep-welcome"><span class="welcome-teacup" aria-hidden="true">🧋</span><div><span class="welcome-kicker">Ngày ${state.day} tại tiệm</span><h2>${headline}</h2><p>${description}</p></div></div>
+    <div class="prep-start-row"><div><strong>${escapeHtml(state.shopName)}</strong><small>Quán nhỏ, một ngày mới và những vị khách quen.</small></div>${openAction}</div>
+    <div class="prep-shortcuts"><button data-navigate="inventory"><img src="./img/icons/inventory.png" alt=""><span>Kiểm tra kho</span></button><button data-navigate="employees"><img src="./img/icons/employees.png" alt=""><span>Đội ngũ</span></button><button data-navigate="reviews"><img src="./img/icons/reviews.png" alt=""><span>Lời khách</span></button></div>
+  </section>`;
 }

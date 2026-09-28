@@ -92,3 +92,9 @@ TEASHOP1.<base64(mode + JSON hoặc gzip(JSON))>.<sha256-hex>
 ## Phân tích tham chiếu
 
 HAR tham chiếu ghi nhận trang PWA tiếng Việt, tài nguyên giao diện cho kho/giá/nâng cấp/khách/đơn và âm thanh theo mùa. Frontend có một script inline bị làm rối; project này không giải mã hay sao chép script đó. HAR cũng có request lưu tới backend riêng trả 500; bản tái triển khai không gọi hoặc phụ thuộc endpoint đó. Trang công khai còn hiển thị Bầu Cua dùng quỹ tiền chung, Xì Dách với tiệm làm nhà cái và chi nhánh Mì Cay. Đây là các tính năng được viết lại độc lập trong các module riêng.
+
+## Giao diện
+
+Trang mở đầu dẫn vào hai không gian: phần chuẩn bị trong khung cửa tiệm rộng tối đa 560px, và sân khấu bán hàng toàn màn hình. Phần chuẩn bị có bảng menu phấn, thanh mục dạng ngang, rồi các hàng gọn cho kho, giá bán, nâng cấp, nhân viên, đánh giá và sổ ngày. Trong ca bán, khách đứng thành hàng, chọn khách để xem món gọi; khu quầy minh họa ly trà và các thao tác pha chế/phục vụ vẫn chạy qua hệ thống đơn hiện có.
+
+Tài nguyên hình và font dùng trong giao diện được lưu cục bộ ở `img/` và `fonts/`; game không tải hình hay font trực tiếp từ trang tham chiếu. `VISUAL_GAP_ANALYSIS.md` ghi lại số liệu HAR, khác biệt giao diện ban đầu và những thay đổi đã áp dụng. Service worker dùng cache phiên bản mới để tránh giữ CSS và JavaScript giao diện cũ sau cập nhật.

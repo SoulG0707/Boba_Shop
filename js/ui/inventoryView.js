@@ -1,13 +1,21 @@
 import { INGREDIENTS } from "../data/ingredients.js";
 import { formatMoney } from "../config.js";
-import { escapeHtml, renderPageHeading } from "./helpers.js";
+import { escapeHtml } from "./helpers.js";
 
 export function renderInventoryView(state) {
-  const cards = INGREDIENTS.map((ingredient) => {
+  const rows = INGREDIENTS.map((ingredient) => {
     const stock = state.stock[ingredient.id];
     const firstExpiry = stock.batches.length ? Math.min(...stock.batches.map((batch) => batch.expireDay)) : null;
-    const expiryText = firstExpiry == null ? "Chưa có lô hàng" : firstExpiry <= state.day + 1 ? `Sắp hết hạn · ngày ${firstExpiry}` : `Hạn gần nhất · ngày ${firstExpiry}`;
-    return `<article class="card ingredient-card"><div class="ingredient-title"><span class="ingredient-emoji">${ingredient.emoji}</span><div><h3>${escapeHtml(ingredient.name)}</h3><span class="tiny muted">${escapeHtml(ingredient.unit)}</span></div></div><div class="ingredient-meta"><span>Trong kho</span><strong>${stock.quantity}</strong></div><div class="ingredient-meta"><span>Giá nhập</span><strong>${formatMoney(ingredient.purchasePrice)} / ${escapeHtml(ingredient.unit)}</strong></div><div class="ingredient-meta"><span>Hạn dùng</span><strong>${ingredient.expirationDays} ngày</strong></div><span class="pill ${firstExpiry != null && firstExpiry <= state.day + 1 ? "pill-yellow" : ""}">⌛ ${expiryText}</span><div class="button-row"><button class="button button-small button-quiet" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="10">Mua 10 · ${formatMoney(ingredient.purchasePrice * 10)}</button><button class="button button-small" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="50">Mua 50</button></div></article>`;
+    const daysLeft = firstExpiry == null ? null : Math.max(0, firstExpiry - state.day);
+    const shelfLife = daysLeft == null ? "Chưa nhập hàng" : daysLeft === 0 ? "Hết hạn cuối ngày" : `HSD ${daysLeft} ngày`;
+    const shortage = stock.quantity < 4;
+    return `<div class="prep-row inventory-row">
+      <span class="row-emoji">${ingredient.emoji}</span>
+      <div class="row-copy"><strong>${escapeHtml(ingredient.name)}</strong><small>Còn ${stock.quantity} ${escapeHtml(ingredient.unit)} · ${shelfLife} · ${formatMoney(ingredient.purchasePrice)} / ${escapeHtml(ingredient.unit)}</small></div>
+      <div class="row-actions"><button class="button button-small button-cream" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="10" aria-label="Mua 10 ${escapeHtml(ingredient.name)}" ${state.money < ingredient.purchasePrice * 10 ? "disabled" : ""}>+10</button><button class="button button-small button-cream" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="50" aria-label="Mua 50 ${escapeHtml(ingredient.name)}" ${state.money < ingredient.purchasePrice * 50 ? "disabled" : ""}>+50</button></div>
+      ${shortage ? `<span class="stock-low" title="Sắp hết">!</span>` : ""}
+    </div>`;
   }).join("");
-  return `${renderPageHeading("Kho nguyên liệu", "Các lô được dùng theo hạn gần nhất để hạn chế thất thoát.")}<div class="page-content"><div class="grid-3">${cards}</div></div>`;
+
+  return `<div class="page-heading"><div><h2>Kho nguyên liệu</h2><p>Lô gần hết hạn sẽ được dùng trước.</p></div><span class="pill">${INGREDIENTS.length} loại</span></div><div class="prep-list">${rows}</div>`;
 }

@@ -1,20 +1,23 @@
 import { UPGRADES } from "../data/upgrades.js";
 import { getUpgradeCost } from "../systems/upgrades.js";
 import { formatMoney } from "../config.js";
-import { escapeHtml, renderPageHeading } from "./helpers.js";
+import { escapeHtml } from "./helpers.js";
 
 const UPGRADE_ICONS = { sealer: "🥤", ledSign: "💡", chairs: "🪑", advertising: "📣", counter: "🧰", airConditioner: "❄️" };
 
 export function renderUpgradesView(state) {
-  const cards = UPGRADES.map((upgrade) => {
+  const rows = UPGRADES.map((upgrade) => {
     const level = state.upgrades[upgrade.id] ?? 0;
     const cost = getUpgradeCost(state, upgrade.id);
     const effects = Object.entries(upgrade.effects).map(([key, value]) => `${effectName(key)} +${Math.round(value * 100)}%`).join(" · ");
-    return `<article class="card upgrade-card"><div class="card-head"><span class="upgrade-icon">${UPGRADE_ICONS[upgrade.id]}</span><span class="pill">Cấp ${level} / ${upgrade.maxLevel}</span></div><div><h3>${escapeHtml(upgrade.name)}</h3><p class="tiny">${escapeHtml(upgrade.description)}</p></div><div class="upgrade-level">${Array.from({ length: upgrade.maxLevel }, (_, index) => `<span class="level-dot ${index < level ? "is-filled" : ""}"></span>`).join("")}</div><span class="tiny muted">${effects}</span><button class="button ${level >= upgrade.maxLevel ? "button-quiet" : "button-primary"}" data-action="buy-upgrade" data-upgrade="${upgrade.id}" ${level >= upgrade.maxLevel || state.money < cost ? "disabled" : ""}>${level >= upgrade.maxLevel ? "Đã tối đa" : `Nâng cấp · ${formatMoney(cost)}`}</button></article>`;
+    const dots = Array.from({ length: upgrade.maxLevel }, (_, index) => `<i class="level-dot ${index < level ? "is-filled" : ""}"></i>`).join("");
+    const buttonText = level >= upgrade.maxLevel ? "Đã tối đa" : `Nâng · ${formatMoney(cost)}`;
+    return `<div class="prep-row upgrade-row"><span class="row-emoji">${UPGRADE_ICONS[upgrade.id] ?? "✨"}</span><div class="row-copy"><strong>${escapeHtml(upgrade.name)} <small class="upgrade-level-label">${level}/${upgrade.maxLevel}</small></strong><small>${escapeHtml(upgrade.description)}</small><small class="upgrade-effects">${escapeHtml(effects)}</small><span class="upgrade-level">${dots}</span></div><div class="row-actions"><button class="button button-small button-primary" data-action="buy-upgrade" data-upgrade="${upgrade.id}" ${level >= upgrade.maxLevel || state.money < cost ? "disabled" : ""}>${buttonText}</button></div></div>`;
   }).join("");
-  return `${renderPageHeading("Nâng cấp tiệm", "Đầu tư vừa sức để phục vụ nhanh hơn và thu hút thêm khách.")}<div class="page-content"><div class="grid-3">${cards}</div></div>`;
+
+  return `<div class="page-heading"><div><h2>Nâng cấp tiệm</h2><p>Đầu tư từng chút để quầy phục vụ nhanh hơn.</p></div><span class="pill">${UPGRADES.reduce((sum, upgrade) => sum + (state.upgrades[upgrade.id] ?? 0), 0)} cấp</span></div><div class="prep-list">${rows}</div>`;
 }
 
 function effectName(key) {
-  return ({ serviceSpeed: "Tốc độ phục vụ", customerSpawn: "Lượng khách", patience: "Kiên nhẫn", onlineOrders: "Đơn online", rating: "Đánh giá", capacity: "Sức chứa" })[key] ?? key;
+  return ({ serviceSpeed: "Tốc độ", customerSpawn: "Khách", patience: "Kiên nhẫn", onlineOrders: "Đơn online", rating: "Rating", capacity: "Sức chứa" })[key] ?? key;
 }

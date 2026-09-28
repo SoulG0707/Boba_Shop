@@ -18,7 +18,7 @@ export function hideModal() {
 
 export function showEndDayModal(stats, day) {
   const profitClass = stats.profit >= 0 ? "pill-green" : "pill-yellow";
-  const body = `<div class="summary-grid">
+  const body = `<div class="endday-summary"><div class="summary-ribbon"><img src="./img/icons/calendar.png" alt=""><span>SỔ CUỐI NGÀY · NGÀY ${day}</span></div><div class="summary-grid">
     <div class="summary-item"><small>Doanh thu</small><strong>${formatMoney(stats.revenue)}</strong></div>
     <div class="summary-item"><small>Trong đó Mì Cay</small><strong>${formatMoney(stats.noodleRevenue ?? 0)}</strong></div>
     <div class="summary-item"><small>Chi phí vận hành</small><strong>${formatMoney(stats.ingredientCost + stats.salaryCost + stats.rent + stats.utilities + stats.marketingCost + stats.expiredStockCost + stats.tax)}</strong></div>
@@ -29,6 +29,6 @@ export function showEndDayModal(stats, day) {
     <div class="summary-item"><small>Tiền mua tồn kho</small><strong>${formatMoney(stats.stockPurchases ?? 0)}</strong></div>
     <div class="summary-item"><small>Đánh giá</small><strong>${formatStars(stats.ratingEnd)} ${stats.ratingEnd.toFixed(1)}</strong></div>
     <div class="summary-item"><small>Thay đổi rating</small><strong>${stats.ratingEnd - stats.ratingStart >= 0 ? "+" : ""}${(stats.ratingEnd - stats.ratingStart).toFixed(1)}</strong></div>
-  </div><button class="button button-primary" data-action="next-day">Chuẩn bị ngày ${day + 1} →</button>`;
+  </div><button class="button button-primary" data-action="next-day">Chuẩn bị ngày ${day + 1} →</button></div>`;
   showModal(`Tổng kết ngày ${day}`, body, "Một ngày ở tiệm đã khép lại. Xem kết quả và chuẩn bị cho ngày mai nhé.");
 }

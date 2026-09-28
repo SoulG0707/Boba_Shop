@@ -2,15 +2,24 @@ import { formatMoney } from "../config.js";
 import { getAverageRating } from "../systems/reviews.js";
 import { escapeHtml } from "./helpers.js";
 
+const STATUS_LABELS = Object.freeze({
+  preparation: "Chuẩn bị",
+  running: "Đang bán",
+  paused: "Tạm nghỉ",
+  summary: "Tổng kết ngày",
+});
+
 export function renderHeader(state) {
-  const rating = getAverageRating(state).toFixed(1).replace(".", ",");
-  const statusLabel = state.gameplay.status === "running" ? "Tạm dừng" : state.gameplay.status === "paused" ? "Tiếp tục" : "Bán hàng";
-  const pauseDisabled = !["running", "paused"].includes(state.gameplay.status);
-  return `<div class="brand"><span class="brand-mark">🧋</span><span class="brand-copy"><strong>${escapeHtml(state.shopName)}</strong><small>Tiệm trà nhỏ của bạn</small></span></div>
-    <div class="header-actions"><div class="header-stats">
-      <span class="header-stat"><small>Ngày</small><strong>${state.day}</strong></span>
-      <span class="header-stat"><small>Tiền</small><strong>${formatMoney(state.money)}</strong></span>
-      <span class="header-stat"><small>Đánh giá</small><strong>★ ${rating}</strong></span>
-    </div><div class="header-mini-games"><button class="button button-small button-quiet" data-navigate="baucua" title="Bầu Cua" aria-label="Bầu Cua">🎲</button><button class="button button-small button-quiet" data-navigate="xidach" title="Xì Dách" aria-label="Xì Dách">🃏</button><button class="button button-small button-quiet" data-navigate="noodles" title="Chi nhánh Mì Cay" aria-label="Mì Cay">🍜</button></div><button class="button button-small button-quiet" data-action="pause-day" ${pauseDisabled ? "disabled" : ""}>${state.gameplay.status === "paused" ? "▶" : "Ⅱ"} <span class="desktop-only">${statusLabel}</span></button>
-    <button class="button button-small button-quiet" data-action="settings" aria-label="Cài đặt">⚙️</button></div>`;
+  const rating = getAverageRating(state);
+  const pauseLabel = state.gameplay.status === "paused" ? "Tiếp tục ngày" : "Tạm dừng ngày";
+  const pauseIcon = state.gameplay.status === "paused" ? "▶" : "Ⅱ";
+  const canPause = ["running", "paused"].includes(state.gameplay.status);
+
+  return `<div class="header-left">
+      <button class="round-action" data-action="pause-day" aria-label="${pauseLabel}" title="${pauseLabel}" ${canPause ? "" : "disabled"}>${pauseIcon}</button>
+      <button class="round-action" data-action="settings" aria-label="Cài đặt" title="Cài đặt"><img src="./img/icons/settings.png" alt=""></button>
+      <div class="header-day"><strong>Ngày ${state.day}</strong><small>${STATUS_LABELS[state.gameplay.status] ?? "Chuẩn bị"}</small></div>
+    </div>
+    <div class="header-center"><strong>${escapeHtml(state.shopName)}</strong><b>${formatMoney(state.money)}</b></div>
+    <div class="header-rating"><span aria-label="${rating.toFixed(1)} trên 5 sao">${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}</span><strong>${rating.toFixed(1).replace(".", ",")}</strong></div>`;
 }

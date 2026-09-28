@@ -1,28 +1,53 @@
-:root {
-  color-scheme: light;
-  --ink: #3a3030;
-  --muted: #837575;
-  --pink: #ef8e91;
-  --pink-dark: #d96d78;
-  --peach: #ffc08e;
-  --cream: #fff8f1;
-  --paper: #fffdfb;
-  --mint: #dff1e6;
-  --green: #51886f;
-  --yellow: #ffdf93;
-  --line: #f0dfd4;
-  --shadow: 0 12px 32px rgba(100, 65, 48, .09);
-  --radius-lg: 24px;
-  --radius-md: 17px;
-  --radius-sm: 12px;
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("../fonts/Baloo2-latin.woff2") format("woff2");
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("../fonts/Baloo2-latin-ext.woff2") format("woff2");
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: "Baloo 2";
+  font-style: normal;
+  font-weight: 500 800;
+  font-display: swap;
+  src: url("../fonts/Baloo2-vietnamese.woff2") format("woff2");
+  unicode-range: U+0102-0103, U+0110-0111, U+0128-0129, U+0168-0169, U+01A0-01A1, U+01AF-01B0, U+0300-0301, U+0303-0304, U+0308-0309, U+0323, U+0329, U+1EA0-1EF9, U+20AB;
 }
 
-body[data-theme="mint"] {
-  --pink: #7fb79b;
-  --pink-dark: #5f9c7f;
-  --peach: #b8dfc8;
-  --cream: #f3faf4;
-  --paper: #fdfffd;
-  --line: #dcece0;
-  --mint: #e1f3e6;
+:root {
+  color-scheme: light;
+  --bg: #fdf3e4;
+  --ink: #3a2317;
+  --soft: #7a5a48;
+  --panel: #fffaf2;
+  --line: #ead7bd;
+  --counter: #8a5a3b;
+  --counter-top: #a8714c;
+  --pink: #ef6f8e;
+  --pink-dark: #c24c69;
+  --mint: #4fa883;
+  --warning: #e2574c;
+  --gold: #f0b43c;
+  --chalk: #2f4a3a;
+  --chalk-ink: #f4efe2;
+  --cream: var(--bg);
+  --paper: var(--panel);
+  --muted: var(--soft);
+  --green: var(--mint);
+  --yellow: var(--gold);
+  --peach: #e8b07f;
+  --shadow: 0 3px 0 rgba(58, 35, 23, .12);
+  --radius-lg: 16px;
+  --radius-md: 13px;
+  --radius-sm: 10px;
+  --app-width: 560px;
 }
