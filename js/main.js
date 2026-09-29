@@ -2,6 +2,7 @@ import { DEBUG } from "./config.js";
 import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
+import { setInventoryCategory } from "./ui/inventoryView.js";
 import { renderHeader } from "./ui/header.js";
 import { renderSplashView } from "./ui/splashView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
@@ -19,6 +20,7 @@ import { createBackup, restoreBackup } from "./backup/backup.js";
 import { audioManager } from "./systems/audioManager.js";
 import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js";
 import { playXidachHouseRound } from "./systems/xidach.js";
+import { getShopPreparationStatus } from "./systems/preparation.js";
 
 const header = document.querySelector("#header");
 const appShell = document.querySelector("#app-shell");
@@ -62,7 +64,7 @@ function enterGame() {
     saveGame(state);
   }
   syncSelectedCustomer(state);
-  navigate(["running", "paused"].includes(state.gameplay.status) ? "gameplay" : "dashboard");
+  navigate("inventory");
   refreshUI();
   if (migrationNotice) showToast(migrationNotice, "info", 7000);
   if (state.gameplay.status === "summary") {
@@ -206,7 +208,7 @@ function handleAction(action, element) {
     case "reset-game":
       replaceState(resetGame());
       hideModal();
-      navigate("dashboard");
+      navigate("inventory");
       refreshUI();
       showToast("Tiệm mới đã sẵn sàng!", "success");
       break;
@@ -219,8 +221,11 @@ function handleAction(action, element) {
       if (getState().gameplay.status === "summary") showEndDayModal(getState().dailyStats, getState().day);
       break;
     case "start-day":
-      updateState((current) => startDay(current));
-      navigate("gameplay");
+      {
+        let started = false;
+        updateState((current) => { started = startDay(current); });
+        if (!started) showToast(getShopPreparationStatus(getState()).message, "error");
+      }
       refreshUI();
       break;
     case "show-summary":
@@ -230,13 +235,23 @@ function handleAction(action, element) {
       hideModal();
       updateState((current) => nextDay(current));
       summaryShownForDay = null;
-      navigate("dashboard");
+      navigate("inventory");
+      refreshUI();
+      break;
+    case "focus-inventory-list": {
+      const list = document.querySelector("#ingredient-list");
+      list?.scrollIntoView({ behavior: "smooth", block: "start" });
+      list?.focus({ preventScroll: true });
+      break;
+    }
+    case "inventory-category":
+      setInventoryCategory(element.dataset.category);
       refreshUI();
       break;
     case "buy-stock":
       updateState((current) => {
         const result = purchaseIngredient(current, element.dataset.ingredient, Number(element.dataset.quantity));
-        notifyResult(result, `Đã thêm ${result.quantity ?? ""} nguyên liệu vào kho.`);
+        if (!result.success) showToast(result.reason ?? "Không thể nhập nguyên liệu.", "error");
       });
       refreshUI();
       break;
@@ -401,7 +416,7 @@ function runGameLoop() {
   }
   if (state.gameplay.status === "summary" && summaryShownForDay !== state.day) {
     summaryShownForDay = state.day;
-    navigate("dashboard");
+    navigate("inventory");
     refreshUI();
     showEndDayModal(state.dailyStats, state.day);
     saveGame(state);
@@ -428,7 +443,6 @@ function enableDebugTools() {
         const customer = spawnCustomer(state);
         if (customer) createOrder(state, customer);
       });
-      navigate("gameplay");
       refreshUI();
     },
     triggerEvent(id) {

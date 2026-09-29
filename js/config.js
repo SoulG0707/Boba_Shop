@@ -20,7 +20,6 @@ export const GAME_CONFIG = Object.freeze({
 });
 
 export const ROUTES = Object.freeze([
-  { id: "dashboard", label: "Tiệm", icon: "prep" },
   { id: "inventory", label: "Kho", icon: "inventory" },
   { id: "upgrades", label: "Nâng cấp", icon: "upgrades" },
   { id: "prices", label: "Giá bán", icon: "prices" },

@@ -8,9 +8,11 @@ import { startRandomEvent } from "./events.js";
 import { getGameplayModifiers } from "./modifiers.js";
 import { processEmployeeAutomation } from "./employees.js";
 import { addDepartureReview } from "./reviews.js";
+import { getShopPreparationStatus } from "./preparation.js";
 
 export function startDay(state, now = Date.now()) {
   if (state.gameplay.status !== "preparation") return false;
+  if (!getShopPreparationStatus(state).canOpen) return false;
   state.orders = state.orders.filter((order) => !["served", "cancelled"].includes(order.status));
   state.customers = [];
   state.onlineOrders = state.onlineOrders.filter((order) => !["served", "cancelled"].includes(order.status));

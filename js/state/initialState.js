@@ -1,16 +1,15 @@
 import { GAME_CONFIG } from "../config.js";
-import { INGREDIENTS, STARTING_STOCK } from "../data/ingredients.js";
+import { INGREDIENTS } from "../data/ingredients.js";
 import { PRODUCTS } from "../data/products.js";
 import { UPGRADES } from "../data/upgrades.js";
 
 function createInitialStock() {
   return Object.fromEntries(INGREDIENTS.map((ingredient) => {
-    const quantity = STARTING_STOCK[ingredient.id];
     return [ingredient.id, {
-      quantity,
+      quantity: 0,
       purchasePrice: ingredient.purchasePrice,
       expirationDays: ingredient.expirationDays,
-      batches: quantity > 0 ? [{ quantity, boughtDay: 1, expireDay: 1 + ingredient.expirationDays, unitPrice: ingredient.purchasePrice }] : [],
+      batches: [],
     }];
   }));
 }

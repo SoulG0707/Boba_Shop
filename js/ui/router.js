@@ -1,5 +1,5 @@
 import { ROUTES } from "../config.js";
-import { renderDashboard } from "./dashboard.js";
+import { getShopPreparationStatus } from "../systems/preparation.js";
 import { renderGameplayView } from "./gameplayView.js";
 import { renderInventoryView } from "./inventoryView.js";
 import { renderUpgradesView } from "./upgradesView.js";
@@ -12,8 +12,6 @@ import { renderXidachView } from "./xidachView.js";
 import { renderPreparationAction, renderPreparationShell } from "./preparationShell.js";
 
 const VIEWS = {
-  dashboard: renderDashboard,
-  gameplay: renderGameplayView,
   inventory: renderInventoryView,
   upgrades: renderUpgradesView,
   prices: renderPricesView,
@@ -24,8 +22,7 @@ const VIEWS = {
   xidach: renderXidachView,
 };
 
-let currentRoute = "dashboard";
-const PRIMARY_ROUTE_IDS = new Set(["dashboard", "inventory", "upgrades", "prices", "reviews", "stats"]);
+let currentRoute = "inventory";
 
 export function navigate(routeId) {
   if (!VIEWS[routeId]) return false;
@@ -38,37 +35,27 @@ export function getCurrentRoute() {
 }
 
 export function renderNavigation() {
-  const primary = ROUTES.filter((route) => PRIMARY_ROUTE_IDS.has(route.id)).map(renderRouteButton).join("");
-  const extras = ROUTES.filter((route) => !PRIMARY_ROUTE_IDS.has(route.id));
-  const moreIsActive = extras.some((route) => route.id === currentRoute);
-  const moreItems = extras.map((route) => {
+  const options = ROUTES.map((route) => {
     const active = route.id === currentRoute;
-    return `<button class="prep-more-option ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}><span>${renderRouteIcon(route)}</span><strong>${route.label}</strong></button>`;
+    const icon = ["inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
+      ? `<img src="./img/icons/${route.icon}.png" alt="">`
+      : `<span aria-hidden="true">${route.icon}</span>`;
+    return `<button class="prep-route-option ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}>${icon}<span>${route.label}</span></button>`;
   }).join("");
-
-  return `<nav class="prep-tabs" aria-label="Các phần trong tiệm">${primary}<details class="prep-more"><summary class="prep-tab prep-more-trigger ${moreIsActive ? "is-active" : ""}"><span class="tab-icon" aria-hidden="true">•••</span><span>Thêm</span></summary><div class="prep-more-menu">${moreItems}</div></details></nav>`;
-}
-
-function renderRouteButton(route) {
-  const active = route.id === currentRoute;
-  return `<button class="prep-tab ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}><span class="tab-icon">${renderRouteIcon(route)}</span><span>${route.label}</span></button>`;
-}
-
-function renderRouteIcon(route) {
-  return ["prep", "inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
-    ? `<img src="./img/icons/${route.icon === "prep" ? "preparation" : route.icon}.png" alt="">`
-    : route.icon;
+  return `<details class="prep-route-menu"><summary aria-label="Mở các màn khác"><span aria-hidden="true">•••</span></summary><nav aria-label="Các màn trong tiệm">${options}</nav></details>`;
 }
 
 export function renderCurrentView(state, presentation = {}) {
-  return VIEWS[currentRoute](state, presentation);
+  const render = VIEWS[currentRoute] ?? renderInventoryView;
+  return render(state, presentation);
 }
 
 export function renderApp(state, presentation = {}) {
   const selling = ["running", "paused"].includes(state.gameplay.status);
-  document.body.classList.toggle("is-selling", selling);
-  document.querySelector("#app-shell").classList.toggle("is-selling", selling);
+  const appShell = document.querySelector("#app-shell");
   const prepActionRoot = document.querySelector("#prep-action-root");
+  document.body.classList.toggle("is-selling", selling);
+  appShell.classList.toggle("is-selling", selling);
 
   if (selling) {
     prepActionRoot.hidden = true;
@@ -77,10 +64,15 @@ export function renderApp(state, presentation = {}) {
     return;
   }
 
+  const preparation = getShopPreparationStatus(state);
   prepActionRoot.hidden = false;
-  prepActionRoot.innerHTML = renderPreparationAction(state);
-
-  if (currentRoute === "gameplay") currentRoute = "dashboard";
-  const content = renderCurrentView(state, presentation);
-  document.querySelector("#view").innerHTML = renderPreparationShell(state, renderNavigation(), content);
+  prepActionRoot.innerHTML = renderPreparationAction(state, preparation);
+  const content = renderCurrentView(state, { ...presentation, preparation });
+  document.querySelector("#view").innerHTML = renderPreparationShell(
+    state,
+    renderNavigation(),
+    content,
+    preparation,
+    currentRoute,
+  );
 }
