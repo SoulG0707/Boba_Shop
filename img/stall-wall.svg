@@ -1,103 +1,158 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 900" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 1100" fill="none">
   <defs>
-    <linearGradient id="wall" x1="280" y1="0" x2="280" y2="900" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#f8e7ca"/>
-      <stop offset="1" stop-color="#f1d6aa"/>
+    <linearGradient id="wall" x1="800" y1="0" x2="800" y2="1100" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#fff4dc"/>
+      <stop offset=".58" stop-color="#ffeac4"/>
+      <stop offset="1" stop-color="#f5d29e"/>
     </linearGradient>
-    <linearGradient id="wood" x1="0" y1="0" x2="560" y2="0" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#875333"/>
-      <stop offset=".18" stop-color="#b77a4b"/>
-      <stop offset=".53" stop-color="#d4a36b"/>
-      <stop offset=".82" stop-color="#b77a4b"/>
-      <stop offset="1" stop-color="#875333"/>
+    <linearGradient id="wood" x1="0" y1="0" x2="1" y2="1">
+      <stop stop-color="#bd7a41"/>
+      <stop offset=".48" stop-color="#8a4e2b"/>
+      <stop offset="1" stop-color="#6d3d26"/>
     </linearGradient>
     <linearGradient id="glass" x1="0" y1="0" x2="0" y2="1">
-      <stop stop-color="#fff7e6" stop-opacity=".84"/>
-      <stop offset="1" stop-color="#d4a36b" stop-opacity=".38"/>
+      <stop stop-color="#f5ca62" stop-opacity=".65"/>
+      <stop offset="1" stop-color="#e98c3a" stop-opacity=".25"/>
     </linearGradient>
-    <pattern id="paper" width="28" height="28" patternUnits="userSpaceOnUse">
-      <circle cx="5" cy="7" r="1.2" fill="#a8714c" fill-opacity=".12"/>
-      <circle cx="21" cy="21" r="1" fill="#a8714c" fill-opacity=".1"/>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="160%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation="9"/>
+      <feOffset dy="8"/>
+      <feComponentTransfer><feFuncA type="linear" slope=".17"/></feComponentTransfer>
+      <feMerge><feMergeNode/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <pattern id="wallgrain" width="38" height="38" patternUnits="userSpaceOnUse">
+      <circle cx="6" cy="9" r="1.2" fill="#c37a40" fill-opacity=".12"/>
+      <circle cx="26" cy="28" r="1" fill="#6f4328" fill-opacity=".08"/>
     </pattern>
+    <g id="bulb">
+      <path d="M0 0v17" stroke="#69432d" stroke-width="3"/>
+      <path d="M-7 21a7 7 0 1 1 14 0c0 3-2 4-3 6h-8c-1-2-3-3-3-6Z" fill="#fff5bb" stroke="#69432d" stroke-width="2"/>
+      <path d="M-3 30h6" stroke="#69432d" stroke-width="2" stroke-linecap="round"/>
+    </g>
+    <g id="jar">
+      <rect x="3" y="14" width="54" height="65" rx="11" fill="#fffbec" stroke="#72462c" stroke-width="4"/>
+      <path d="M9 49h42v22H9z" fill="#f4c44d"/>
+      <path d="M0 13h60v10H0z" rx="4" fill="#a95c31" stroke="#72462c" stroke-width="3"/>
+      <path d="M18 34c8-5 22-5 30 0" stroke="#fff" stroke-opacity=".72" stroke-width="4" stroke-linecap="round"/>
+    </g>
   </defs>
-  <rect width="560" height="900" fill="url(#wall)"/>
-  <rect width="560" height="900" fill="url(#paper)"/>
-  <path d="M20 0v900M540 0v900" stroke="#8a5a3b" stroke-opacity=".15" stroke-width="8"/>
 
-  <g opacity=".78" stroke="#8a5a3b" stroke-width="5">
-    <path d="M40 18h480v137H40z" fill="#fdf3e4" fill-opacity=".24"/>
-    <path d="M280 18v137M40 87h480" stroke-opacity=".28"/>
-  </g>
-  <path d="M24 148h512v16H24z" fill="url(#wood)"/>
-  <path d="M24 164h512v6H24z" fill="#70462f" fill-opacity=".36"/>
+  <rect width="1600" height="1100" fill="url(#wall)"/>
+  <rect width="1600" height="1100" fill="url(#wallgrain)"/>
+  <path d="M0 834h1600v266H0z" fill="#f6dfb7"/>
+  <path d="M0 834h1600v22H0z" fill="url(#wood)"/>
+  <path d="M0 856h1600v244H0z" fill="#efcf9f" fill-opacity=".55"/>
+  <path d="M0 1050 210 856m130 244 198-244m103 244 191-244m113 244 180-244m118 244 174-244m120 244 165-244" stroke="#a96939" stroke-opacity=".2" stroke-width="7"/>
 
-  <g opacity=".84" stroke="#8a5a3b" stroke-width="2">
-    <path d="M0 286h560v12H0z" fill="url(#wood)" stroke="none"/>
-    <path d="M32 282V213h496v69" stroke-opacity=".44"/>
-    <path d="M54 217h452v61H54z" fill="#f6e2bf" fill-opacity=".3"/>
-    <path d="M125 218v60M218 218v60M311 218v60M404 218v60" stroke-opacity=".28"/>
+  <!-- Window and potted herbs on the left wall -->
+  <g filter="url(#shadow)" stroke="#75462a" stroke-width="8" stroke-linejoin="round">
+    <rect x="76" y="144" width="330" height="300" rx="10" fill="#fff4dc"/>
+    <rect x="98" y="166" width="286" height="256" fill="url(#glass)" stroke-width="4"/>
+    <path d="M241 167v254M99 296h284" stroke-width="6"/>
+    <path d="M73 444h337v19H73z" fill="url(#wood)" stroke-width="4"/>
   </g>
+  <path d="M111 237c54-41 115-29 143 0s75 26 111-4" stroke="#fff6dd" stroke-opacity=".8" stroke-width="17" stroke-linecap="round"/>
+  <g stroke="#52763d" stroke-width="9" stroke-linecap="round">
+    <path d="M144 545v-83m0 42-31-35m31 48 29-39m127 67v-91m0 48-35-32m35 50 34-38"/>
+  </g>
+  <g fill="#71964c" stroke="#52763d" stroke-width="3">
+    <ellipse cx="113" cy="500" rx="12" ry="28" transform="rotate(-38 113 500)"/>
+    <ellipse cx="174" cy="507" rx="12" ry="28" transform="rotate(32 174 507)"/>
+    <ellipse cx="267" cy="497" rx="13" ry="30" transform="rotate(-40 267 497)"/>
+    <ellipse cx="325" cy="505" rx="12" ry="27" transform="rotate(34 325 505)"/>
+  </g>
+  <path d="M100 546h91l-11 70h-69z" fill="#c75f35" stroke="#75462a" stroke-width="5"/>
+  <path d="M252 546h91l-11 70h-69z" fill="#e8b447" stroke="#75462a" stroke-width="5"/>
 
-  <g opacity=".78" stroke="#70462f" stroke-width="2">
-    <path d="M54 270h42l-4 26H58z" fill="#c88f58"/>
-    <path d="M58 262h34v10H58z" fill="#fff4de"/>
-    <path d="M103 242h32v54h-32z" fill="url(#glass)"/>
-    <path d="M106 238h26v7h-26z" fill="#a8714c"/>
-    <path d="M422 266h42l-4 30h-34z" fill="#c98f53"/>
-    <path d="M427 259h32v9h-32z" fill="#fff4de"/>
-    <path d="M467 234h28v62h-28z" fill="url(#glass)"/>
-    <path d="M470 230h22v7h-22z" fill="#a8714c"/>
-  </g>
-
-  <g stroke="#8a5a3b" stroke-width="3" stroke-linejoin="round" opacity=".72">
-    <path d="M0 424h560v17H0z" fill="url(#wood)" stroke="none"/>
-    <path d="M33 420V344h494v76" stroke-opacity=".42"/>
-    <path d="M69 347h424v69H69z" fill="#f9e9cd" fill-opacity=".24"/>
-  </g>
-  <g opacity=".72" stroke="#70462f" stroke-width="2">
-    <path d="M74 391h50l-5 27H79z" fill="#e6bc78"/>
-    <path d="M80 383h38v9H80z" fill="#fff4de"/>
-    <path d="M131 377h45v41h-45z" fill="url(#glass)"/>
-    <path d="M136 370h35v8h-35z" fill="#a8714c"/>
-    <path d="M385 389h50l-5 29h-40z" fill="#b77a4b"/>
-    <path d="M391 381h38v9h-38z" fill="#fff4de"/>
-    <path d="M441 369h41v49h-41z" fill="url(#glass)"/>
-    <path d="M446 363h31v7h-31z" fill="#a8714c"/>
-  </g>
-
-  <g opacity=".74" stroke="#70462f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round">
-    <path d="M14 604h532v18H14z" fill="url(#wood)" stroke="none"/>
-    <path d="M28 622h504v144H28z" fill="#ead2ad"/>
-    <path d="M45 637h470v102H45z" fill="url(#glass)" stroke-width="2"/>
-    <path d="M45 684h470" stroke-opacity=".32" stroke-width="3"/>
-    <path d="M162 638v100M280 638v100M398 638v100" stroke-opacity=".34" stroke-width="3"/>
-  </g>
-  <g opacity=".78" stroke="#8a5a3b" stroke-width="2">
-    <path d="M62 661h72l-6 23H68z" fill="#dfbd87"/>
-    <path d="M72 652h52v10H72z" fill="#fff4de"/>
-    <path d="M179 663h74l-5 21h-64z" fill="#dc9e7c"/>
-    <path d="M189 653h53v10h-53z" fill="#fff4de"/>
-    <path d="M296 660h72l-6 24h-60z" fill="#adc08a"/>
-    <path d="M306 651h52v10h-52z" fill="#fff4de"/>
-    <path d="M416 663h73l-6 21h-61z" fill="#e0b978"/>
-    <path d="M425 653h54v10h-54z" fill="#fff4de"/>
+  <!-- String lights across the stall -->
+  <path d="M0 70c198 124 356 12 572 73s409 80 630 0 296 12 398 58" stroke="#75462a" stroke-width="5"/>
+  <g>
+    <use href="#bulb" x="81" y="113"/>
+    <use href="#bulb" x="215" y="139"/>
+    <use href="#bulb" x="352" y="141"/>
+    <use href="#bulb" x="494" y="149"/>
+    <use href="#bulb" x="650" y="180"/>
+    <use href="#bulb" x="808" y="194"/>
+    <use href="#bulb" x="971" y="183"/>
+    <use href="#bulb" x="1132" y="144"/>
+    <use href="#bulb" x="1280" y="139"/>
+    <use href="#bulb" x="1434" y="163"/>
+    <use href="#bulb" x="1540" y="193"/>
   </g>
 
-  <g stroke="#4f7651" stroke-width="5" stroke-linecap="round" opacity=".7">
-    <path d="M15 544c21-35 35-48 50-63M23 552c-2-33-12-52-23-67M35 534c2-32 17-47 34-56M544 542c-19-31-34-44-50-58M536 551c1-30 12-49 24-65M526 533c-3-28-17-44-33-53"/>
+  <!-- Ingredient shelves on the right wall -->
+  <g filter="url(#shadow)">
+    <path d="M1116 273h426v22h-426z" fill="url(#wood)"/>
+    <path d="M1140 194h380v79h-380z" fill="#fff8e8" fill-opacity=".74" stroke="#75462a" stroke-width="5"/>
+    <path d="M1124 520h448v23h-448z" fill="url(#wood)"/>
+    <path d="M1140 414h400v106h-400z" fill="#fff8e8" fill-opacity=".75" stroke="#75462a" stroke-width="5"/>
+    <path d="M1124 730h448v23h-448z" fill="url(#wood)"/>
   </g>
-  <g fill="#6c9658" fill-opacity=".74">
-    <ellipse cx="20" cy="500" rx="9" ry="19" transform="rotate(-38 20 500)"/>
-    <ellipse cx="47" cy="490" rx="8" ry="20" transform="rotate(28 47 490)"/>
-    <ellipse cx="13" cy="529" rx="8" ry="17" transform="rotate(-52 13 529)"/>
-    <ellipse cx="540" cy="496" rx="9" ry="19" transform="rotate(38 540 496)"/>
-    <ellipse cx="513" cy="487" rx="8" ry="20" transform="rotate(-28 513 487)"/>
-    <ellipse cx="547" cy="527" rx="8" ry="17" transform="rotate(52 547 527)"/>
+  <g transform="translate(1150 191) scale(.72)">
+    <use href="#jar" x="0" y="0"/>
+    <use href="#jar" x="87" y="0"/>
+    <use href="#jar" x="174" y="0"/>
+    <use href="#jar" x="261" y="0"/>
+    <use href="#jar" x="348" y="0"/>
+  </g>
+  <g transform="translate(1142 414) scale(.84)">
+    <use href="#jar" x="0" y="0"/>
+    <use href="#jar" x="72" y="0"/>
+    <use href="#jar" x="144" y="0"/>
+    <use href="#jar" x="216" y="0"/>
+    <use href="#jar" x="288" y="0"/>
+  </g>
+  <g stroke="#74462b" stroke-width="4" stroke-linejoin="round">
+    <path d="M1168 237h32v29h-32z" fill="#df5635"/>
+    <path d="M1250 237h32v29h-32z" fill="#f1bd3a"/>
+    <path d="M1333 237h32v29h-32z" fill="#6d9249"/>
+    <path d="M1416 237h32v29h-32z" fill="#a34b2b"/>
+    <path d="M1499 237h32v29h-32z" fill="#ed8c33"/>
+    <path d="M1160 465h34v42h-34z" fill="#d64b32"/>
+    <path d="M1240 465h34v42h-34z" fill="#e8b43e"/>
+    <path d="M1322 465h34v42h-34z" fill="#708e47"/>
+    <path d="M1404 465h34v42h-34z" fill="#a85930"/>
+    <path d="M1486 465h34v42h-34z" fill="#e38337"/>
   </g>
 
-  <path d="M0 775h560v14H0z" fill="#875333" fill-opacity=".48"/>
-  <path d="M0 789h560v111H0z" fill="#f8e7ca" fill-opacity=".56"/>
-  <g fill="#ef6f8e" fill-opacity=".28">
-    <circle cx="38" cy="824" r="4"/><circle cx="56" cy="842" r="3"/><circle cx="518" cy="817" r="4"/><circle cx="500" cy="838" r="3"/>
+  <!-- Rolling bánh tráng cart on the left -->
+  <g filter="url(#shadow)" stroke="#75462a" stroke-width="8" stroke-linejoin="round">
+    <path d="M38 703h391l-31 167H69z" fill="url(#wood)"/>
+    <path d="M65 671h340v45H65z" fill="#fff7e5"/>
+    <path d="M96 653h285v18H96z" fill="#d85234"/>
+    <path d="M91 701h291v125H91z" fill="#e8b64b"/>
+    <path d="M114 735h244v67H114z" fill="#fff0d4" stroke-width="5"/>
   </g>
+  <text x="236" y="785" fill="#713d25" font-family="sans-serif" font-size="29" font-weight="800" text-anchor="middle">BÁNH TRÁNG</text>
+  <circle cx="126" cy="891" r="39" fill="#4c392d" stroke="#f3d8a9" stroke-width="11"/>
+  <circle cx="348" cy="891" r="39" fill="#4c392d" stroke="#f3d8a9" stroke-width="11"/>
+  <path d="M75 641c18-48 58-73 105-74m7 74c-9-48 7-76 37-93m25 93c-1-42 18-72 56-94m11 94c13-43 43-65 80-63" stroke="#52763d" stroke-width="11" stroke-linecap="round"/>
+  <g fill="#74974a">
+    <ellipse cx="178" cy="583" rx="14" ry="31" transform="rotate(-38 178 583)"/>
+    <ellipse cx="221" cy="562" rx="14" ry="30" transform="rotate(34 221 562)"/>
+    <ellipse cx="306" cy="571" rx="14" ry="31" transform="rotate(-38 306 571)"/>
+    <ellipse cx="380" cy="577" rx="14" ry="30" transform="rotate(34 380 577)"/>
+  </g>
+
+  <!-- Lower topping jars and small herbs on both sides -->
+  <g filter="url(#shadow)" stroke="#75462a" stroke-width="5" stroke-linejoin="round">
+    <path d="M458 814h97v82h-97z" rx="17" fill="#fff5df"/>
+    <path d="M470 843h73v39h-73z" fill="#e77c33"/>
+    <path d="M450 805h112v16H450z" fill="#a75e34"/>
+    <path d="M1007 803h97v92h-97z" fill="#fff5df"/>
+    <path d="M1019 838h73v45h-73z" fill="#d95036"/>
+    <path d="M999 794h112v16H999z" fill="#a75e34"/>
+  </g>
+  <g stroke="#52763d" stroke-width="9" stroke-linecap="round">
+    <path d="M1474 879v-91m0 45-31-29m31 43 31-34M1420 881v-66m0 33-27-23m27 38 26-28"/>
+  </g>
+  <g fill="#71964c">
+    <ellipse cx="1442" cy="813" rx="11" ry="26" transform="rotate(-38 1442 813)"/>
+    <ellipse cx="1506" cy="816" rx="11" ry="26" transform="rotate(36 1506 816)"/>
+    <ellipse cx="1395" cy="848" rx="11" ry="24" transform="rotate(-40 1395 848)"/>
+    <ellipse cx="1446" cy="851" rx="11" ry="24" transform="rotate(38 1446 851)"/>
+  </g>
+  <path d="M1383 879h75l-8 72h-59z" fill="#d97839" stroke="#75462a" stroke-width="5"/>
+  <path d="M1465 879h75l-8 72h-59z" fill="#e9b842" stroke="#75462a" stroke-width="5"/>
+  <path d="M0 960h1600v13H0z" fill="#92572f" fill-opacity=".25"/>
 </svg>

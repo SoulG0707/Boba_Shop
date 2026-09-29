@@ -5,7 +5,7 @@ const baseProducts = [
     id: "traditional",
     name: "Bánh tráng trộn truyền thống",
     category: "Truyền thống",
-    emoji: "🥗",
+    icon: "product_traditional",
     basePrice: 25_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, ...foodBox },
     description: "Vị chua cay quen thuộc, thơm xoài xanh và rau răm.",
@@ -15,7 +15,7 @@ const baseProducts = [
     id: "beef",
     name: "Bánh tráng trộn khô bò",
     category: "Khô bò",
-    emoji: "🥩",
+    icon: "product_beef",
     basePrice: 32_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, beef_jerky: 1, ...foodBox },
     description: "Thêm khô bò dai thơm, đậm đà.",
@@ -25,7 +25,7 @@ const baseProducts = [
     id: "chicken",
     name: "Bánh tráng trộn khô gà",
     category: "Khô gà",
-    emoji: "🍗",
+    icon: "product_chicken",
     basePrice: 32_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, chicken_jerky: 1, ...foodBox },
     description: "Khô gà lá chanh thơm nhẹ, cay vừa.",
@@ -35,7 +35,7 @@ const baseProducts = [
     id: "special",
     name: "Bánh tráng trộn đặc biệt",
     category: "Đặc biệt",
-    emoji: "✨",
+    icon: "product_special",
     basePrice: 40_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, tamarind_sauce: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, quail_egg: 1, beef_jerky: 1, dried_shrimp: 1, ...foodBox },
     description: "Đủ vị sốt me, trứng cút, khô bò và tép khô.",
@@ -46,7 +46,7 @@ const baseProducts = [
 export const PRODUCT_OPTIONS = Object.freeze({
   sizes: {
     M: { label: "SIZE M", ingredientMultiplier: 1, priceModifier: 0 },
-    L: { label: "SIZE L", ingredientMultiplier: 1.4, priceModifier: 7_000 },
+    L: { label: "SIZE L", ingredientMultiplier: 1.4, priceModifier: 8_000 },
   },
 });
 

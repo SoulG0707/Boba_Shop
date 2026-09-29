@@ -3,6 +3,7 @@ import { INGREDIENTS, INGREDIENT_BY_ID } from "../data/ingredients.js";
 import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getProductRecipe } from "../data/products.js";
 import { getRemainingSeconds } from "../systems/dayCycle.js";
 import { escapeHtml, formatMoneyCompact } from "./helpers.js";
+import { renderFoodAsset } from "./foodAssets.js";
 
 const CUSTOMER_SPRITES = Object.freeze({
   regular: { row: 0, column: 0 },
@@ -25,7 +26,7 @@ export function renderGameplayView(state, presentation = {}) {
 
   return `<section class="selling-scene ${state.gameplay.status === "paused" ? "is-paused" : ""}" aria-label="Quầy bánh tráng trộn">
     <div class="scene-topline"><div class="scene-clock"><strong>${formatDuration(remaining)}</strong><span>Ngày ${state.day} · ${state.gameplay.status === "paused" ? "Tạm nghỉ" : "Đang bán"}</span></div><div class="scene-meter"><i style="width:${ratio}%"></i></div>${currentEvent}</div>
-    <div class="stall-shelf" aria-hidden="true"><span>🥭</span><span>🌶️</span><span>🫙</span><span>🥚</span><span>🌿</span><span>🥜</span></div>
+    <div class="stall-shelf" aria-hidden="true">${["green_mango", "satay", "shrimp_salt", "quail_egg", "vietnamese_coriander", "peanut"].map((id) => renderFoodAsset(id, "shelf-asset")).join("")}</div>
     <div class="customer-deck"><div class="customer-lane">${customerLane}</div>${renderOnlineOrders(state)}</div>
     <section class="work-counter" aria-label="Bàn trộn bánh tráng">
       <div class="counter-work">
@@ -48,11 +49,13 @@ function renderCustomer(customer, state, isSelected) {
   const item = order.items[0];
   const product = PRODUCT_BY_ID[item.productId];
   const size = PRODUCT_OPTIONS.sizes[item.size]?.label ?? "SIZE M";
+  const recipe = getProductRecipe(item.productId, item) ?? {};
+  const ingredients = Object.keys(recipe).filter((id) => id !== "food_box").slice(0, 4).map((id) => INGREDIENT_BY_ID[id]?.name ?? id).join(" · ");
   const sprite = spritePosition(customer.type);
   const patience = Math.max(0, Math.min(100, (customer.patience / 55) * 100));
   return `<button class="customer-stop ${isSelected ? "is-selected" : ""}" data-action="select-customer" data-customer="${customer.id}" aria-pressed="${isSelected}">
     <span class="customer-face ${sprite.delivery ? "is-delivery" : ""}" style="--sprite-x:${sprite.column * 50}%;--sprite-y:${sprite.row * (sprite.delivery ? 100 : 12.5)}%" aria-hidden="true"></span>
-    <span class="customer-speech"><strong>${escapeHtml(customer.label)}</strong><small>${escapeHtml(product?.name ?? "Bánh tráng trộn")} · ${size}</small><small>${formatMoneyCompact(order.totalPrice)}</small></span>
+    <span class="customer-speech"><strong>${escapeHtml(customer.label)}</strong><small>${escapeHtml(product?.name ?? "Bánh tráng trộn")} · ${size}</small><small>${escapeHtml(ingredients)}</small></span>
     <span class="patience-track"><i class="${customer.patience < 12 ? "is-short" : ""}" style="width:${patience}%"></i></span>
   </button>`;
 }
@@ -70,25 +73,25 @@ function renderOrderDetails(order, customer) {
 function renderMixingBowl(order) {
   const ingredients = Object.entries(order?.preparedIngredients ?? {}).filter(([, quantity]) => quantity > 0);
   if (order?.packed) {
-    return `<div class="mixing-bowl-wrap is-packed"><div class="food-box" aria-label="Món đã đóng hộp"><span>🥡</span><small>ĐÃ ĐÓNG HỘP</small></div></div>`;
+    return `<div class="mixing-bowl-wrap is-packed"><div class="food-box" aria-label="Món đã đóng hộp">${renderFoodAsset("food_box", "food-box-asset", "Hộp bánh tráng trộn")}<small>ĐÃ ĐÓNG HỘP</small></div></div>`;
   }
   const hasSatay = (order?.preparedIngredients?.satay ?? 0) > 0;
   const hasTamarind = (order?.preparedIngredients?.tamarind_sauce ?? 0) > 0;
   const toppings = ingredients.map(([id, quantity], index) => {
     const ingredient = INGREDIENT_BY_ID[id];
-    return `<button class="bowl-topping topping-${index % 8}" data-action="remove-bowl-ingredient" data-ingredient="${id}" ${order?.mixed ? "disabled" : ""} aria-label="Bỏ ${escapeHtml(ingredient?.name ?? id)} khỏi tô"><span>${ingredient?.emoji ?? "🥗"}</span>${quantity > 1 ? `<small>×${quantity}</small>` : ""}</button>`;
+    return `<button class="bowl-topping topping-${index % 8}" data-action="remove-bowl-ingredient" data-ingredient="${id}" ${order?.mixed ? "disabled" : ""} aria-label="Bỏ ${escapeHtml(ingredient?.name ?? id)} khỏi tô">${renderFoodAsset(id, "bowl-ingredient-asset")}${quantity > 1 ? `<small>×${quantity}</small>` : ""}</button>`;
   }).join("");
   const stage = order?.mixed ? "Đã trộn xong" : order?.mixing ? "Đang trộn…" : ingredients.length ? "Chạm nguyên liệu trong tô để bỏ" : "Tô đang trống";
   return `<div class="mixing-bowl-wrap">
     <div class="mixing-bowl ${order?.mixing ? "is-mixing" : ""} ${order?.mixed ? "is-mixed" : ""}" aria-label="Tô trộn bánh tráng">
-      <div class="bowl-contents ${hasSatay ? "has-satay" : ""} ${hasTamarind ? "has-tamarind" : ""}">${toppings || `<span class="bowl-empty">🥣</span>`}</div>
-      <div class="bowl-rim" aria-hidden="true"></div>
+      ${renderFoodAsset("mixing_bowl", "mixing-bowl-art", "Thau trộn bánh tráng")}
+      <div class="bowl-contents ${hasSatay ? "has-satay" : ""} ${hasTamarind ? "has-tamarind" : ""}">${toppings || `<span class="bowl-empty">${renderFoodAsset("rice_paper", "bowl-empty-asset")}</span>`}</div>
     </div><small class="bowl-hint">${stage}</small>
   </div>`;
 }
 
 function renderWorkControls(order, state) {
-  if (!order) return `<div class="counter-controls"><div class="counter-waiting">🥣<small>Tô trộn đang chờ</small></div></div>`;
+  if (!order) return `<div class="counter-controls"><div class="counter-waiting">${renderFoodAsset("mixing_bowl", "waiting-bowl-asset")}<small>Tô trộn đang chờ</small></div></div>`;
   const item = order.items[0];
   const hasIngredients = Object.values(order.preparedIngredients ?? {}).some((quantity) => quantity > 0);
   const sizeDisabled = order.mixed || hasIngredients || order.status !== "waiting";
@@ -122,7 +125,7 @@ function renderIngredientControls(state, order) {
       const requested = targetRecipe[ingredient.id] ?? 0;
       const unavailable = !order || locked || stock <= inBowl;
       const stateLabel = !order ? "Chọn khách" : !order.preparedSize ? "Chọn size" : `${inBowl}/${requested || "thêm"} · kho ${stock}`;
-      return `<button class="ingredient-control ${inBowl ? "is-active" : ""} ${stock <= inBowl ? "is-unavailable" : ""}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="Thêm ${escapeHtml(ingredient.name)}, còn ${stock}" ${unavailable ? "disabled" : ""}><span>${ingredient.emoji}</span><strong>${escapeHtml(ingredient.name)}</strong><small>${stateLabel}</small></button>`;
+      return `<button class="ingredient-control ${inBowl ? "is-active" : ""} ${stock <= inBowl ? "is-unavailable" : ""}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="Thêm ${escapeHtml(ingredient.name)}, còn ${stock}" ${unavailable ? "disabled" : ""}>${renderFoodAsset(ingredient.id, "ingredient-control-asset")}<strong>${escapeHtml(ingredient.name)}</strong><small>${stateLabel}</small></button>`;
     }).join("")}</div>`;
 }
 
@@ -147,7 +150,7 @@ function renderFeedback(feedback) {
     : accuracy?.wrongIngredients?.length ? "Món hơi dư nguyên liệu nè…"
       : accuracy && !accuracy.sizeCorrect ? "Sai size rồi…" : "Ngon quá!";
   const stars = `${"★".repeat(feedback.rating)}${"☆".repeat(5 - feedback.rating)}`;
-  return `<div class="serve-feedback" key="${feedback.createdAt}"><span class="feedback-box" aria-hidden="true">🥡</span><strong>+${formatMoneyCompact(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
+  return `<div class="serve-feedback" key="${feedback.createdAt}"><span class="feedback-box" aria-hidden="true">${renderFoodAsset("food_box", "feedback-box-asset")}</span><strong>+${formatMoneyCompact(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
 }
 
 function spritePosition(type) {

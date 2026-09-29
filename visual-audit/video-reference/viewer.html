@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Video reference frames</title>
+    <style>
+      body { margin: 0; background: #efe6d7; font: 16px sans-serif; }
+      main { width: min(100%, 960px); margin: 0 auto; padding: 12px; }
+      video { display: none; }
+      #status { margin-bottom: 8px; font-weight: 700; }
+      canvas { display: block; max-width: 100%; height: auto; background: #fff; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <video id="video" src="/__reference.mp4" preload="auto" playsinline></video>
+      <div id="status">Loading video metadata…</div>
+      <canvas id="sheet"></canvas>
+    </main>
+    <script>
+      const video = document.querySelector("#video");
+      const status = document.querySelector("#status");
+      const canvas = document.querySelector("#sheet");
+      const ctx = canvas.getContext("2d");
+      window.ready = new Promise((resolve, reject) => {
+        video.addEventListener("loadedmetadata", () => resolve({
+          duration: video.duration,
+          width: video.videoWidth,
+          height: video.videoHeight,
+        }), { once: true });
+        video.addEventListener("error", () => reject(new Error("Video decode failed")), { once: true });
+      });
+      window.renderFrame = async (time) => {
+        video.currentTime = Math.min(time, video.duration);
+        await new Promise((resolve) => video.addEventListener("seeked", resolve, { once: true }));
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        ctx.drawImage(video, 0, 0);
+        return canvas.toDataURL("image/png");
+      };
+      window.renderSheet = async (from, to, step = 2) => {
+        const times = [];
+        for (let t = from; t <= Math.min(to, video.duration); t += step) times.push(t);
+        const cols = 3;
+        const thumbW = 300;
+        const thumbH = Math.round(thumbW * video.videoHeight / video.videoWidth);
+        const gap = 12;
+        const labelH = 24;
+        const rows = Math.ceil(times.length / cols);
+        canvas.width = cols * thumbW + (cols + 1) * gap;
+        canvas.height = rows * (thumbH + labelH) + (rows + 1) * gap;
+        ctx.fillStyle = "#fffaf1";
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < times.length; i++) {
+          const t = times[i];
+          video.currentTime = t;
+          await new Promise((resolve) => video.addEventListener("seeked", resolve, { once: true }));
+          const x = gap + (i % cols) * (thumbW + gap);
+          const y = gap + Math.floor(i / cols) * (thumbH + labelH + gap);
+          ctx.drawImage(video, x, y, thumbW, thumbH);
+          ctx.fillStyle = "#3c2115";
+          ctx.font = "700 14px sans-serif";
+          ctx.fillText(`${t.toFixed(1)}s`, x + 2, y + thumbH + 17);
+          status.textContent = `Rendered ${i + 1} / ${times.length} frames`;
+        }
+        return { times, width: canvas.width, height: canvas.height, dataUrl: canvas.toDataURL("image/png") };
+      };
+    </script>
+  </body>
+</html>

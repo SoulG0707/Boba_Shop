@@ -25,22 +25,22 @@
 
 :root {
   color-scheme: light;
-  --bg: #fdf3e4;
-  --ink: #3a2317;
-  --soft: #7a5a48;
-  --panel: #fffaf2;
-  --line: #ead7bd;
-  --counter: #8a5a3b;
+  --bg: #fff3dc;
+  --ink: #3c2115;
+  --soft: #77563e;
+  --panel: #fffaf1;
+  --line: #ead3b3;
+  --counter: #6c3d22;
   --counter-top: #a8714c;
-  --pink: #ef6f8e;
-  --pink-d: #c24c69;
+  --pink: #f47a29;
+  --pink-d: #c95720;
   --pink-dark: var(--pink-d);
-  --mint: #4fa883;
-  --warn: #e2574c;
+  --mint: #608f45;
+  --warn: #df4c36;
   --warning: var(--warn);
-  --gold: #f0b43c;
-  --chalk: #2f4a3a;
-  --chalk-ink: #f4efe2;
+  --gold: #f2be3e;
+  --chalk: #35513d;
+  --chalk-ink: #fff5df;
   --cream: var(--bg);
   --paper: var(--panel);
   --muted: var(--soft);

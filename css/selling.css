@@ -54,7 +54,7 @@
 .delivery-order button { padding: 3px 7px; border: 1px solid var(--line); border-radius: 8px; background: #fff5e9; color: var(--pink-dark); font-size: .58rem; font-weight: 800; cursor: pointer; }
 .delivery-order button:disabled { opacity: .45; }
 .work-counter { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 5px; padding: 0 0 1px; }
-.counter-work { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 6px 8px 8px; border: 2px solid rgba(255, 249, 238, .65); border-top: 7px solid var(--counter-top); border-radius: 13px 13px 8px 8px; background: rgba(138, 90, 59, .96); color: #fff2de; box-shadow: 0 4px 0 rgba(67, 42, 30, .18); }
+.counter-work { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 6px 8px 8px; border: 2px solid rgba(255, 249, 238, .72); border-top: 7px solid var(--counter-top); border-radius: 13px 13px 8px 8px; background: #996443; color: #fff2de; box-shadow: 0 4px 0 rgba(67, 42, 30, .15); }
 .counter-note { display: flex; min-width: 0; min-height: 38px; flex: none; flex-direction: column; justify-content: center; line-height: 1.12; }
 .counter-note strong { font-size: .78rem; }
 .counter-note small { margin-top: 3px; color: #f9e4c5; font-size: .59rem; }
@@ -145,3 +145,21 @@
   .ingredient-control strong { font-size: .54rem; }
 }
 @media (prefers-reduced-motion: reduce) { .mixing-bowl.is-mixing, .mixing-bowl.is-mixing .bowl-topping, .bowl-topping, .food-box, .feedback-box, .serve-feedback { animation-duration: .01ms !important; } }
+
+.selling-scene { border-inline: 0; background: linear-gradient(180deg, rgba(247, 223, 183, .96), rgba(255, 244, 221, .96) 34%, rgba(229, 175, 108, .96)); }
+.stall-shelf { min-height: 42px; }
+.stall-shelf .shelf-asset { width: 30px; height: 30px; padding: 2px; border: 1px solid rgba(112, 65, 36, .23); border-radius: 7px; background: #fff4df; }
+.mixing-bowl-art { position: absolute; z-index: 0; inset: 0; width: 100%; height: 100%; }
+.bowl-contents { z-index: 1; background: radial-gradient(ellipse at 50% 35%, rgba(240, 183, 84, .18), rgba(218, 138, 50, .16) 72%, rgba(185, 97, 33, .12)); }
+.bowl-contents.has-satay { background: radial-gradient(ellipse at 50% 35%, rgba(245, 139, 54, .24), rgba(217, 75, 53, .2) 74%, rgba(169, 67, 37, .16)); }
+.bowl-topping { background: rgba(255, 249, 238, .75); }
+.bowl-ingredient-asset { width: 24px; height: 22px; }
+.bowl-empty { width: 34px; height: 30px; opacity: .6; }
+.bowl-empty-asset { width: 31px; height: 28px; }
+.food-box { padding: 5px; }
+.food-box-asset { width: 68px; height: 58px; }
+.counter-waiting { font-size: 1rem; }
+.waiting-bowl-asset { width: 79px; height: 56px; }
+.ingredient-control-asset { width: 28px; height: 27px; }
+.feedback-box { width: 36px; height: 33px; }
+.feedback-box-asset { width: 34px; height: 31px; }

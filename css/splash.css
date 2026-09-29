@@ -1,27 +1,78 @@
-.splash-content { position: absolute; top: 34%; left: 50%; display: flex; width: min(330px, calc(100% - 32px)); flex-direction: column; align-items: center; transform: translateX(-50%); text-align: center; }
-.splash-ribbon { padding: 3px 12px; border: 1px solid rgba(138, 90, 59, .35); border-radius: 999px; background: rgba(255, 250, 242, .84); color: var(--counter); font-size: .72rem; font-weight: 800; box-shadow: 0 2px 0 rgba(138, 90, 59, .16); }
-.splash-content h1 { margin: 7px 0 0; color: var(--ink); font-size: clamp(2rem, 9vw, 2.7rem); font-weight: 800; line-height: .9; text-shadow: 0 2px 0 rgba(255, 249, 238, .8); }
-.splash-content h1 span { color: var(--pink-dark); }
-.splash-shop-name { max-width: 85%; margin: 5px 0 0; overflow: hidden; color: var(--counter); font-size: .87rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
-.splash-actions { display: grid; width: min(228px, 100%); gap: 8px; margin-top: 12px; }
-.splash-actions .button { min-height: 43px; font-size: .88rem; }
-.splash-version { margin-top: 7px; color: rgba(58, 35, 23, .68); font-size: .56rem; font-weight: 800; letter-spacing: .06em; }
-.splash-lantern { position: absolute; top: 25%; width: 48px; transform-origin: 50% 4%; animation: lantern-sway 3.8s ease-in-out infinite alternate; }
-.splash-lantern-left { left: 8%; }
-.splash-lantern-right { right: 7%; animation-delay: -1.7s; }
-.splash-sticker { position: absolute; object-fit: contain; opacity: .75; pointer-events: none; }
-.splash-sticker-star { top: 55%; left: 11%; width: 35px; animation: sticker-float 3.5s ease-in-out infinite; }
-.splash-sticker-leaf { top: 58%; right: 10%; width: 38px; animation: sticker-float 4s ease-in-out infinite reverse; }
-.splash-food-art { position: absolute; z-index: 1; right: 0; bottom: 18%; left: 0; display: flex; justify-content: center; gap: 16px; font-size: 2rem; filter: drop-shadow(0 3px 1px rgba(67, 42, 30, .13)); }
-.splash-food-art span:nth-child(2) { transform: translateY(-12px); }
-.splash-food-art span:nth-child(3) { font-size: 2.7rem; }
-@keyframes lantern-sway { to { transform: rotate(4deg); } }
-@keyframes sticker-float { 50% { transform: translateY(-5px) rotate(3deg); } }
-@media (max-height: 700px) {
-  .splash-content { top: 29%; }
-  .splash-content h1 { font-size: 2rem; }
-  .splash-actions { margin-top: 8px; gap: 5px; }
-  .splash-actions .button { min-height: 38px; }
-  .splash-lantern { top: 19%; width: 39px; }
+.splash-awning { position: absolute; top: 0; right: 0; left: 0; height: 34px; border-top: 7px solid #75472b; border-bottom: 4px solid #a56a3d; background: repeating-linear-gradient(90deg, #df4c36 0 34px, #fff7e7 34px 68px); box-shadow: 0 5px 0 rgba(51, 31, 18, .15); }
+.splash-awning::after { position: absolute; right: 0; bottom: -10px; left: 0; height: 10px; background: radial-gradient(circle at 17px 0, #df4c36 10px, transparent 10.5px) 0 0 / 68px 10px repeat-x, radial-gradient(circle at 51px 0, #fff7e7 10px, transparent 10.5px) 0 0 / 68px 10px repeat-x; content: ""; }
+.welcome-card { position: relative; display: grid; width: min(458px, 100%); justify-items: center; padding: 21px 24px 23px; border: 2px solid #ead3b3; border-radius: 20px; background: var(--panel); color: var(--ink); text-align: center; box-shadow: 0 8px 0 rgba(63, 37, 19, .17), 0 20px 55px rgba(47, 31, 20, .25); animation: modal-pop .24s cubic-bezier(.2, .8, .2, 1.1); }
+.welcome-mark { display: grid; width: 88px; height: 88px; place-items: center; margin: 2px 0 9px; border: 2px solid #e8c797; border-radius: 50%; background: #fff4df; box-shadow: inset 0 0 0 5px rgba(255,255,255,.65); }
+.welcome-logo { width: 76px; height: 76px; }
+.splash-ribbon { padding: 3px 11px; border: 1px solid rgba(138, 90, 59, .28); border-radius: 999px; background: #fff1d8; color: var(--counter); font-size: .66rem; font-weight: 800; letter-spacing: .045em; }
+.welcome-card h1 { margin: 9px 0 0; color: var(--ink); font-size: clamp(1.75rem, 8vw, 2.15rem); font-weight: 800; line-height: .95; }
+.welcome-card h1 span { color: var(--warn); }
+.welcome-shop-name { max-width: 90%; margin: 5px 0 0; overflow: hidden; color: var(--counter); font-size: .86rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
+.welcome-copy { max-width: 330px; margin: 7px 0 0; color: var(--soft); font-size: .83rem; line-height: 1.3; }
+.splash-actions { display: grid; width: min(294px, 100%); gap: 8px; margin-top: 17px; }
+.splash-actions .button { min-height: 48px; font-size: .9rem; }
+.splash-actions .button-primary { text-transform: uppercase; }
+
+.tutorial-scene { position: relative; display: flex; min-height: 100dvh; flex-direction: column; background: var(--bg); }
+.tutorial-topbar { position: absolute; z-index: 2; top: 0; right: 0; left: 0; display: flex; height: 57px; align-items: center; justify-content: space-between; gap: 8px; padding: calc(env(safe-area-inset-top, 0px) + 5px) max(12px, calc((100vw - 560px) / 2 + 12px)) 5px; background: #fffaf1; }
+.tutorial-brand { display: flex; min-width: 0; align-items: center; gap: 8px; }
+.tutorial-brand-logo { width: 38px; height: 38px; flex: none; }
+.tutorial-brand strong { overflow: hidden; color: var(--counter); font-size: .78rem; text-overflow: ellipsis; white-space: nowrap; }
+.tutorial-skip { flex: none; padding: 5px 0 5px 8px; border: 0; background: transparent; color: var(--soft); font-size: .76rem; font-weight: 800; cursor: pointer; }
+.tutorial-skip span { margin-left: 3px; font-size: 1.1rem; }
+.tutorial-awning { position: relative; height: 23px; flex: none; margin-top: 57px; border-bottom: 3px solid #a56a3d; background: repeating-linear-gradient(90deg, #df4c36 0 30px, #fff7e7 30px 60px); }
+.tutorial-awning::after { position: absolute; right: 0; bottom: -9px; left: 0; height: 8px; background: radial-gradient(circle at 15px 0, #df4c36 7px, transparent 7.5px) 0 0 / 60px 8px repeat-x, radial-gradient(circle at 45px 0, #fff7e7 7px, transparent 7.5px) 0 0 / 60px 8px repeat-x; content: ""; }
+.tutorial-main { display: grid; width: 100%; flex: 1; place-items: center; padding: 19px 14px max(18px, env(safe-area-inset-bottom, 0px)); }
+.tutorial-card { display: grid; width: min(560px, 100%); gap: 0; padding: 19px 20px 18px; border: 1px solid #ead3b3; border-radius: 20px; background: var(--panel); box-shadow: 0 5px 15px rgba(88, 59, 34, .09); animation: modal-pop .18s ease-out; }
+.tutorial-step { color: var(--pink-d); font-size: .63rem; font-weight: 900; letter-spacing: .09em; }
+.tutorial-card h1 { margin: 3px 0 3px; color: var(--ink); font-size: clamp(1.25rem, 5vw, 1.58rem); font-weight: 800; line-height: 1.05; }
+.tutorial-card > p { min-height: 41px; margin: 0; color: var(--soft); font-size: .83rem; line-height: 1.35; }
+.tutorial-illustration { display: grid; min-height: 206px; place-items: center; margin: 12px 0 8px; padding: 12px; border: 1px solid #efdfc7; border-radius: 16px; background: linear-gradient(145deg, #fff3df, #fffaf1); }
+.tutorial-logo-art { display: grid; width: 150px; height: 150px; place-items: center; border: 2px solid #e5c999; border-radius: 50%; background: #fffaf1; box-shadow: 0 5px 0 rgba(112, 65, 36, .11); }
+.tutorial-logo { width: 132px; height: 132px; }
+.tutorial-art-caption { margin-top: -18px; color: var(--counter); font-size: .72rem; font-weight: 800; }
+.tutorial-demo-list { display: grid; width: min(330px, 100%); padding: 5px 12px; border-radius: 12px; background: #fffaf1; }
+.tutorial-demo-list > div { display: grid; min-height: 48px; grid-template-columns: 40px 1fr auto; align-items: center; gap: 7px; border-bottom: 1px solid var(--line); }
+.tutorial-demo-list > div:last-child { border-bottom: 0; }
+.tutorial-demo-list strong { font-size: .84rem; }
+.tutorial-demo-list b { padding: 4px 9px; border-radius: 9px; background: #e7f0dc; color: #4f7840; font-size: .8rem; }
+.tutorial-food-icon { width: 36px; height: 36px; }
+.tutorial-order-demo { display: flex; width: min(375px, 100%); align-items: center; gap: 10px; padding: 14px; border: 1px solid #edc891; border-radius: 15px; background: #fffaf1; box-shadow: 0 4px 0 rgba(113, 73, 39, .1); }
+.tutorial-customer { display: grid; width: 54px; height: 54px; flex: none; place-items: center; border-radius: 50%; background: #ffead2; }
+.tutorial-customer .tutorial-food-icon { width: 44px; height: 44px; }
+.tutorial-order-demo > div { display: grid; gap: 2px; min-width: 0; }
+.tutorial-order-demo small { color: var(--pink-d); font-size: .59rem; font-weight: 900; }
+.tutorial-order-demo strong { font-size: .85rem; }
+.tutorial-order-demo span:last-child { color: var(--soft); font-size: .7rem; }
+.tutorial-flow { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 9px; }
+.tutorial-flow > span { display: grid; justify-items: center; gap: 3px; color: var(--counter); font-size: .66rem; font-weight: 800; }
+.tutorial-flow > b { color: #d68a43; font-size: 1.1rem; }
+.tutorial-bowl { width: 77px; height: 62px; }
+.tutorial-pack-flow { display: grid; justify-items: center; gap: 2px; color: #cf8042; font-size: 1.45rem; }
+.tutorial-pack-flow .tutorial-bowl { width: 105px; height: 75px; }
+.tutorial-box { width: 83px; height: 72px; }
+.tutorial-review { display: grid; justify-items: center; gap: 4px; padding: 17px; border: 1px solid #efd5aa; border-radius: 15px; background: #fffaf1; text-align: center; }
+.tutorial-review span { color: var(--gold); font-size: 1.65rem; letter-spacing: .06em; }
+.tutorial-review strong { color: var(--counter); font-size: 1rem; }
+.tutorial-review small { color: var(--soft); font-size: .73rem; }
+.tutorial-upgrades { display: grid; width: min(375px, 100%); grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 7px; }
+.tutorial-upgrades span { display: grid; min-height: 83px; align-content: center; justify-items: center; gap: 4px; border: 1px solid #ecd9bb; border-radius: 12px; background: #fffaf1; font-size: 1.55rem; }
+.tutorial-upgrades small { color: var(--counter); font-size: .61rem; font-weight: 800; }
+.tutorial-progress { display: flex; justify-content: center; gap: 6px; margin: 2px 0 11px; }
+.tutorial-dot { width: 7px; height: 7px; border-radius: 9px; background: #dfc9aa; transition: width .18s ease, background-color .18s ease; }
+.tutorial-dot.is-active { width: 22px; background: var(--pink); }
+.tutorial-next { width: 100%; min-height: 48px; }
+@media (max-height: 740px) {
+  .tutorial-main { padding-block: 13px; }
+  .tutorial-card { padding: 14px 17px; }
+  .tutorial-illustration { min-height: 166px; margin-block: 8px 6px; }
+  .tutorial-logo-art { width: 128px; height: 128px; }
+  .tutorial-logo { width: 111px; height: 111px; }
 }
-@media (prefers-reduced-motion: reduce) { .splash-lantern, .splash-sticker { animation: none; } }
+@media (max-width: 390px) {
+  .welcome-card { padding: 17px 17px 19px; }
+  .tutorial-card { padding-inline: 14px; }
+  .tutorial-illustration { padding: 9px; }
+  .tutorial-flow { gap: 6px; }
+  .tutorial-flow > span { font-size: .6rem; }
+}
+@media (prefers-reduced-motion: reduce) { .welcome-card, .tutorial-card { animation: none; } }

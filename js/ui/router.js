@@ -9,6 +9,7 @@ import { renderReviewsView } from "./reviewsView.js";
 import { renderStatsView } from "./statsView.js";
 import { renderBauCuaView } from "./bauCuaView.js";
 import { renderXidachView } from "./xidachView.js";
+import { renderMoreView } from "./moreView.js";
 import { renderPreparationAction, renderPreparationShell } from "./preparationShell.js";
 
 const VIEWS = {
@@ -20,6 +21,7 @@ const VIEWS = {
   stats: renderStatsView,
   baucua: renderBauCuaView,
   xidach: renderXidachView,
+  more: renderMoreView,
 };
 
 let currentRoute = "inventory";
@@ -35,14 +37,15 @@ export function getCurrentRoute() {
 }
 
 export function renderNavigation() {
-  const options = ROUTES.map((route) => {
+  const mainRoutes = ROUTES.filter((route) => ["inventory", "upgrades", "prices", "reviews", "stats"].includes(route.id));
+  const extras = ["employees", "baucua", "xidach"];
+  const options = mainRoutes.map((route) => {
     const active = route.id === currentRoute;
-    const icon = ["inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
-      ? `<img src="./img/icons/${route.icon}.png" alt="">`
-      : `<span aria-hidden="true">${route.icon}</span>`;
+    const icon = `<img src="./img/icons/${route.icon}.png" alt="">`;
     return `<button class="prep-route-option ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}>${icon}<span>${route.label}</span></button>`;
   }).join("");
-  return `<details class="prep-route-menu"><summary aria-label="Mở các màn khác"><span aria-hidden="true">•••</span></summary><nav aria-label="Các màn trong tiệm">${options}</nav></details>`;
+  const moreActive = currentRoute === "more" || extras.includes(currentRoute);
+  return `<nav class="prep-main-nav" aria-label="Điều hướng chính">${options}<button class="prep-route-option ${moreActive ? "is-active" : ""}" data-navigate="more" ${moreActive ? 'aria-current="page"' : ""}><span class="more-nav-icon" aria-hidden="true">•••</span><span>Thêm</span></button></nav>`;
 }
 
 export function renderCurrentView(state, presentation = {}) {

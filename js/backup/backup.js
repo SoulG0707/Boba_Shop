@@ -52,6 +52,7 @@ export async function restoreBackup(text) {
     throw new Error("Không đọc được JSON trong backup.");
   }
   if (!validateSaveSchema(state) || state.version !== GAME_CONFIG.STATE_VERSION) throw new Error(`Backup không đúng schema hoặc phiên bản game ${GAME_CONFIG.STATE_VERSION}.`);
+  if (typeof state.tutorialCompleted !== "boolean") state.tutorialCompleted = true;
   return state;
 }
 

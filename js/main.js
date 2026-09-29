@@ -5,6 +5,7 @@ import { navigate, renderApp } from "./ui/router.js";
 import { setInventoryCategory } from "./ui/inventoryView.js";
 import { renderHeader } from "./ui/header.js";
 import { renderSplashView } from "./ui/splashView.js";
+import { renderTutorialView } from "./ui/tutorialView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
 import { showToast } from "./ui/toast.js";
 import { purchaseIngredient } from "./systems/inventory.js";
@@ -28,6 +29,8 @@ const splash = document.querySelector("#splash");
 let renderedSecond = -1;
 let summaryShownForDay = null;
 let splashVisible = true;
+let tutorialVisible = false;
+let tutorialPage = 0;
 let selectedCustomerId = null;
 let serveFeedback = null;
 let serveFeedbackTimer = null;
@@ -39,7 +42,7 @@ function refreshUI() {
     appShell.hidden = true;
     appShell.setAttribute("aria-hidden", "true");
     splash.hidden = false;
-    splash.innerHTML = renderSplashView(state);
+    splash.innerHTML = tutorialVisible ? renderTutorialView(tutorialPage) : renderSplashView(state);
     return;
   }
 
@@ -52,6 +55,7 @@ function refreshUI() {
 
 function enterGame() {
   splashVisible = false;
+  tutorialVisible = false;
   let state = getState();
   const migrationNotice = state.migrationNotice;
   if (migrationNotice) {
@@ -71,6 +75,18 @@ function enterGame() {
     summaryShownForDay = state.day;
     showEndDayModal(state.dailyStats, state.day);
   }
+}
+
+function startTutorial() {
+  tutorialPage = 0;
+  tutorialVisible = true;
+  splashVisible = true;
+  refreshUI();
+}
+
+function finishTutorial() {
+  updateState((state) => { state.tutorialCompleted = true; });
+  enterGame();
 }
 
 function syncSelectedCustomer(state) {
@@ -95,7 +111,7 @@ function openSettings() {
     <div class="setting-line"><span><strong>Hiệu ứng âm thanh</strong><div class="tiny muted">Tiếng trộn, đóng hộp và nhận tiền</div></span><input class="switch" type="checkbox" data-setting="sound" ${state.settings.sound ? "checked" : ""}></div>
     <div class="setting-line"><label for="music-volume">Âm lượng nhạc</label><input id="music-volume" type="range" min="0" max="100" value="50" data-setting-volume="music"></div><div class="setting-line"><label for="sfx-volume">Âm lượng hiệu ứng</label><input id="sfx-volume" type="range" min="0" max="100" value="65" data-setting-volume="sound"></div>
     <div class="divider"></div><strong>Sao lưu tiến trình</strong><p class="tiny">Backup được tạo trên thiết bị này, có checksum SHA-256 để phát hiện dữ liệu sai.</p><div class="button-row"><button class="button button-quiet" data-action="export-backup">Tạo backup</button><button class="button button-primary" data-action="restore-backup">Khôi phục</button></div><textarea id="backup-text" class="text-input" rows="4" style="margin-top:.65rem;resize:vertical" placeholder="Dán mã BTRON1... vào đây để khôi phục"></textarea>
-    <div class="button-row" style="margin-top:1rem"><button class="button button-quiet" data-action="edit-shop-name">Đổi tên tiệm</button><button class="button button-danger" data-action="confirm-reset">Chơi lại từ đầu</button></div>`;
+    <div class="button-row" style="margin-top:1rem"><button class="button button-quiet" data-action="edit-shop-name">Đổi tên tiệm</button><button class="button button-quiet" data-action="replay-tutorial">Xem lại hướng dẫn</button><button class="button button-danger" data-action="confirm-reset">Chơi lại từ đầu</button></div>`;
   showModal("Cài đặt", body, "Tùy chỉnh trải nghiệm chơi trên thiết bị này.");
 }
 
@@ -110,16 +126,31 @@ function openResetConfirmation() {
 }
 
 function notifyResult(result, successMessage) {
-  if (result.success && successMessage) showToast(successMessage, "success");
-  else showToast(result.reason ?? "Thao tác chưa hoàn tất.", "error");
+  if (result.success) {
+    if (successMessage) showToast(successMessage, "success");
+    return;
+  }
+  showToast(result.reason ?? "Thao tác chưa hoàn tất.", "error");
 }
 
 function handleAction(action, element) {
   const state = getState();
   switch (action) {
     case "splash-start":
+      startTutorial();
+      break;
     case "splash-continue":
       enterGame();
+      break;
+    case "tutorial-next":
+      if (tutorialPage >= 6) finishTutorial();
+      else {
+        tutorialPage += 1;
+        refreshUI();
+      }
+      break;
+    case "tutorial-skip":
+      finishTutorial();
       break;
     case "select-customer":
       selectCustomer(element.dataset.customer);
@@ -176,6 +207,10 @@ function handleAction(action, element) {
     case "settings":
       openSettings();
       break;
+    case "replay-tutorial":
+      hideModal();
+      startTutorial();
+      break;
     case "edit-shop-name":
       openShopNameForm();
       break;
@@ -209,6 +244,8 @@ function handleAction(action, element) {
       replaceState(resetGame());
       hideModal();
       navigate("inventory");
+      splashVisible = true;
+      tutorialVisible = false;
       refreshUI();
       showToast("Tiệm mới đã sẵn sàng!", "success");
       break;

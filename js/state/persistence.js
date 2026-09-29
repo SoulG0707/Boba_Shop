@@ -65,7 +65,13 @@ export function loadGame() {
     const raw = storage.getItem(GAME_CONFIG.STORAGE_KEY) ?? storage.getItem(GAME_CONFIG.LEGACY_STORAGE_KEY);
     if (!raw) return createInitialState();
     const parsed = JSON.parse(raw);
-    if (validateSaveSchema(parsed)) return parsed;
+    if (validateSaveSchema(parsed)) {
+      if (typeof parsed.tutorialCompleted !== "boolean") {
+        parsed.tutorialCompleted = true;
+        saveGame(parsed);
+      }
+      return parsed;
+    }
     const migrated = migrateLegacySave(parsed);
     if (migrated) {
       saveGame(migrated);
@@ -80,6 +86,7 @@ export function loadGame() {
 function migrateLegacySave(candidate) {
   if (!candidate || typeof candidate !== "object" || candidate.version >= GAME_CONFIG.STATE_VERSION || !Number.isFinite(candidate.money) || !Number.isInteger(candidate.day)) return null;
   const migrated = createInitialState();
+  migrated.tutorialCompleted = true;
   migrated.money = Math.max(0, candidate.money);
   migrated.day = Math.max(1, candidate.day);
   migrated.settings = {

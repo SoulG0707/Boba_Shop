@@ -50,13 +50,14 @@ export function createInitialState() {
     customers: [],
     currentEvent: null,
     eventEndsAt: null,
-    shopName: "Tiệm Bánh Tráng Trộn",
+    shopName: "Bánh Tráng Góc Nhỏ",
     miniGames: {
       bauCua: { bets: {}, stake: 10_000, lastRound: null, net: 0, roundsPlayed: 0 },
       xiDach: { stake: 10_000, lastRound: null, net: 0, roundsPlayed: 0 },
     },
     history: [],
     settings: { music: true, sound: true, theme: "warm" },
+    tutorialCompleted: false,
     gameplay: {
       status: "preparation",
       elapsedMs: 0,

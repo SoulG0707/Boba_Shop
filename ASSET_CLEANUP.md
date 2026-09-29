@@ -25,4 +25,4 @@ These files remain on disk, but are no longer referenced by the current UI, CSS 
 - `img/splash-decor/cloud.png`
 - `img/splash-decor/heart.png`
 
-The character sheets, active management icons, lanterns, leaf, star and new `img/banh-trang.svg` remain in use.
+This earlier list is superseded by [ASSET_MIGRATION.md](ASSET_MIGRATION.md), which records the current keep, replace and delete-later classification.

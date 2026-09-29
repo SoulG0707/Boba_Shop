@@ -1,43 +1,55 @@
+import { PRODUCTS, PRODUCT_OPTIONS } from "../data/products.js";
 import { estimateCustomerDemand } from "../systems/preparation.js";
-import { escapeHtml } from "./helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
-export function renderPreparationShell(state, navigation, content, preparation, activeRoute) {
-  const ready = preparation.canOpen;
-  const title = ready
-    ? "Sẵn sàng mở bán"
-    : !preparation.hasAnyStock
-      ? state.day === 1 ? "Chuẩn bị ngày đầu tiên" : `Chuẩn bị ngày ${state.day}`
-      : "Chưa đủ nguyên liệu để mở bán";
-  const icon = ready ? "✓" : "⚠";
-  let guidance;
+export function renderPreparationShell(state, navigation, content, preparation) {
+  const sellable = new Map(preparation.sellableProducts.map((product) => [product.id, product]));
+  const productLines = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id)).map((product) => {
+    const current = sellable.get(product.id);
+    return `<div class="menu-board-item"><span>${escapeHtml(product.name)}</span><strong>${formatMoneyCompact(state.sellPrices[product.id] ?? product.basePrice)}</strong>${current ? `<small>~${current.producibleCount} phần</small>` : ""}</div>`;
+  }).join("");
+  const extraLines = `<div class="menu-board-item"><span>Thêm trứng cút</span><strong>+${formatMoneyCompact(5_000)}</strong></div><div class="menu-board-item"><span>Size L</span><strong>+${formatMoneyCompact(PRODUCT_OPTIONS.sizes.L.priceModifier)}</strong></div>`;
 
-  if (ready) {
-    const portions = preparation.sellableProducts.slice(0, 3).map((product) =>
-      `<li>${escapeHtml(product.name)} <strong>~${product.producibleCount} phần</strong></li>`,
-    ).join("");
-    const additional = Math.max(0, preparation.sellableProducts.length - 3);
-    guidance = `<p>Có thể làm:</p><ul class="preparation-product-list">${portions}${additional ? `<li>và ${additional} món khác</li>` : ""}</ul>`;
-  } else if (!preparation.hasAnyStock) {
-    guidance = `<p>Bạn chưa có nguyên liệu. Hãy nhập hàng trước khi mở bán.</p>`;
+  let statusTitle;
+  let statusCopy;
+  let statusIcon;
+  let statusClass;
+  if (preparation.canOpen) {
+    statusTitle = "Hôm nay · Sẵn sàng mở bán";
+    const names = preparation.sellableProducts.slice(0, 2).map((product) => `${product.name} ~${product.producibleCount} phần`).join(" · ");
+    statusCopy = names ? `Đủ nguyên liệu cho ${names}.` : "Đã có nguyên liệu cho ít nhất một món.";
+    statusIcon = "✓";
+    statusClass = "is-ready";
   } else if (preparation.recommendedProduct) {
-    const missing = preparation.missingIngredients.map((ingredient) => escapeHtml(ingredient.name)).join(" · ");
-    guidance = `<p>Để bán <strong>${escapeHtml(preparation.recommendedProduct.name)}</strong> còn thiếu: ${missing || "nguyên liệu theo công thức"}.</p>`;
+    const missing = preparation.missingIngredients.map((ingredient) => ingredient.name).join(" · ");
+    statusTitle = "Hôm nay · Chưa đủ nguyên liệu";
+    statusCopy = `Còn thiếu ${missing || "nguyên liệu"} để bán ${preparation.recommendedProduct.name}.`;
+    statusIcon = "!";
+    statusClass = "is-blocked";
   } else {
-    guidance = `<p>${escapeHtml(preparation.message)}</p>`;
+    statusTitle = "Hôm nay · Chưa đủ nguyên liệu";
+    statusCopy = "Nhập đủ nguyên liệu cho ít nhất một món để mở quầy.";
+    statusIcon = "!";
+    statusClass = "is-blocked";
   }
 
-  const buyLink = !ready && activeRoute === "inventory"
-    ? `<button type="button" class="prep-stock-link" data-action="focus-inventory-list">Nhập hàng</button>`
-    : "";
-
   return `<div class="prep-world">
-    <section class="prep-status-card ${ready ? "is-ready" : "is-blocked"}" aria-live="polite">
-      <div class="prep-status-main"><span class="prep-status-icon" aria-hidden="true">${icon}</span><div class="prep-status-copy"><h1>${title}</h1>${guidance}</div>${navigation}</div>
-      ${buyLink}
+    <div class="shop-sign"><span class="shop-sign-flourish" aria-hidden="true">✦</span><span>${escapeHtml(state.shopName)}</span><button type="button" data-action="edit-shop-name" aria-label="Đổi tên tiệm">✎</button><span class="shop-sign-flourish" aria-hidden="true">✦</span></div>
+    <section class="menu-board" aria-label="Menu hôm nay">
+      <h1><span aria-hidden="true">${renderBowlMark()}</span> MENU HÔM NAY</h1>
+      <div class="menu-board-grid">${productLines}${extraLines}</div>
     </section>
-    <div class="estimated-customers" aria-label="Lượng khách dự kiến">👥 <strong>Dự kiến ~${estimateCustomerDemand(state)} khách</strong></div>
-    <section class="prep-pane" aria-live="polite">${content}</section>
+    <section class="prep-pane" aria-live="polite">
+      ${navigation}
+      <div class="prep-status-card ${statusClass}" aria-live="polite"><span class="prep-status-icon" aria-hidden="true">${statusIcon}</span><span class="prep-status-copy"><strong>${statusTitle}</strong><small>${escapeHtml(statusCopy)}</small></span></div>
+      <div class="estimated-customers" aria-label="Lượng khách dự kiến"><span aria-hidden="true">👥</span><strong>Dự kiến ~${estimateCustomerDemand(state)} khách</strong></div>
+      ${content}
+    </section>
   </div>`;
+}
+
+function renderBowlMark() {
+  return `<svg viewBox="0 0 180 128" aria-hidden="true"><use href="./img/food-assets.svg#mixing_bowl"></use></svg>`;
 }
 
 export function renderPreparationAction(state, preparation) {
@@ -45,9 +57,8 @@ export function renderPreparationAction(state, preparation) {
     return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="show-summary">Xem tổng kết ngày</button></div>`;
   }
 
-  if (!preparation.canOpen) {
-    return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="start-day" disabled aria-disabled="true">Chuẩn bị nguyên liệu để mở cửa</button></div>`;
-  }
-
-  return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="start-day">Mở cửa ngày ${state.day}</button></div>`;
+  const label = preparation.canOpen
+    ? `Mở cửa ngày ${state.day}`
+    : `Nhập nguyên liệu để mở cửa`;
+  return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="start-day" ${preparation.canOpen ? "" : "disabled aria-disabled=\"true\""}>${label}</button></div>`;
 }

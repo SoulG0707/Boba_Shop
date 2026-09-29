@@ -4,7 +4,7 @@ import { escapeHtml, formatStars } from "./helpers.js";
 export function showModal(title, body, subtitle = "") {
   const layer = document.querySelector("#modal");
   const content = document.querySelector("#modal-content");
-  content.innerHTML = `<h2 id="modal-title" class="modal-title">${escapeHtml(title)}</h2>${subtitle ? `<p class="modal-subtitle">${escapeHtml(subtitle)}</p>` : ""}${body}`;
+  content.innerHTML = `<h2 id="modal-title" class="modal-title">${escapeHtml(title)}</h2>${subtitle ? `<p class="modal-subtitle">${escapeHtml(subtitle)}</p>` : ""}${body}<button type="button" class="modal-bottom-close" data-action="close-modal">Đóng</button>`;
   layer.classList.add("is-open");
   layer.setAttribute("aria-hidden", "false");
 }

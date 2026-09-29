@@ -1,0 +1,121 @@
+<svg xmlns="http://www.w3.org/2000/svg" fill="none">
+  <symbol id="rice_paper" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="47" rx="23" ry="7" fill="#d5a266" opacity=".45"/>
+    <path d="M10 38 23 12l30 11-11 28c-9 3-24-1-32-13Z" fill="#fff0ce" stroke="#8a512b" stroke-width="3" stroke-linejoin="round"/>
+    <path d="m23 12 8 34M34 16l7 30" stroke="#edc98a" stroke-width="2"/>
+    <circle cx="19" cy="35" r="1.7" fill="#d89a4a"/><circle cx="38" cy="25" r="1.7" fill="#d89a4a"/><circle cx="31" cy="40" r="1.7" fill="#d89a4a"/>
+  </symbol>
+  <symbol id="shrimp_salt" viewBox="0 0 64 64">
+    <path d="M18 18h28l4 36H14z" fill="#fff6e6" stroke="#75452c" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M16 12h32v9H16z" fill="#d74f35" stroke="#75452c" stroke-width="3"/>
+    <path d="M19 34h26v14H19z" fill="#ec8a40"/>
+    <circle cx="23" cy="30" r="2" fill="#d74f35"/><circle cx="34" cy="28" r="2" fill="#f1c344"/><circle cx="41" cy="32" r="2" fill="#9c4e31"/>
+    <path d="M23 25h18" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="satay" viewBox="0 0 64 64">
+    <path d="M20 18h24l4 37H16z" fill="#e25532" stroke="#744228" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17 12h30v10H17z" fill="#f1c744" stroke="#744228" stroke-width="3"/>
+    <path d="M24 34c7-5 13-5 18 0" stroke="#ffcc65" stroke-width="4" stroke-linecap="round"/>
+    <path d="M27 43h13" stroke="#a83927" stroke-width="4" stroke-linecap="round"/>
+    <path d="m31 8 3-5" stroke="#e25532" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="tamarind_sauce" viewBox="0 0 64 64">
+    <path d="M11 28h42l-5 22c-2 7-30 7-32 0z" fill="#f2d6a7" stroke="#74472b" stroke-width="3"/>
+    <ellipse cx="32" cy="28" rx="21" ry="8" fill="#9b4b2b" stroke="#74472b" stroke-width="3"/>
+    <path d="M20 27c6-4 15-4 24 0" stroke="#db8b45" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="27" cy="31" r="2" fill="#f4c951"/><circle cx="39" cy="26" r="2" fill="#f4c951"/>
+  </symbol>
+  <symbol id="scallion_oil" viewBox="0 0 64 64">
+    <path d="M24 13h16v8l7 7v25H17V28l7-7z" fill="#f5e6b9" stroke="#72472b" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M19 36h26v13H19z" fill="#7a9b4d"/>
+    <path d="M24 13h16v8H24z" fill="#ae5a31" stroke="#72472b" stroke-width="3"/>
+    <path d="M27 29c3-4 7-4 10 0" stroke="#fff" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="green_mango" viewBox="0 0 64 64">
+    <path d="M19 13c12-10 30 1 30 18 0 13-12 24-23 21C11 49 9 26 19 13Z" fill="#f1bd39" stroke="#75472a" stroke-width="3"/>
+    <path d="M32 14c4-8 12-8 18-6-4 8-10 10-18 6Z" fill="#648844" stroke="#45683a" stroke-width="2"/>
+    <path d="M20 28c2-5 5-8 9-10" stroke="#fff0b0" stroke-width="4" stroke-linecap="round"/>
+    <circle cx="42" cy="39" r="2" fill="#e98f31"/>
+  </symbol>
+  <symbol id="vietnamese_coriander" viewBox="0 0 64 64">
+    <path d="M31 55c2-18-4-32-18-43m19 42c0-20 8-32 21-43M31 41 16 31m15 7 17-12m-16 2L21 18m11 30 16-8" stroke="#4e7d3c" stroke-width="3" stroke-linecap="round"/>
+    <path d="M13 11c-1 9 4 14 11 15 2-8-3-14-11-15Zm39 0c-7 1-12 6-11 14 8-1 12-6 11-14ZM15 28c0 8 5 13 13 13 1-8-5-13-13-13Zm34-6c-8 1-12 7-10 14 7-1 11-7 10-14Zm-2 18c-7 0-12 4-12 12 8 1 13-4 12-12Z" fill="#7eaa50" stroke="#4e7d3c" stroke-width="2" stroke-linejoin="round"/>
+  </symbol>
+  <symbol id="fried_shallot" viewBox="0 0 64 64">
+    <path d="M9 43c2-8 9-11 17-7 7-11 16-9 19-1 8-5 14 0 12 8-3 13-41 18-48 0Z" fill="#edb34d" stroke="#75472b" stroke-width="3"/>
+    <path d="M18 39c4-4 7-3 10 1m4-7c4-3 8-2 9 2m4 5c4-4 8-3 10 1" stroke="#c77731" stroke-width="3" stroke-linecap="round"/>
+    <path d="M15 52c8 4 25 3 34-2" stroke="#fff0c9" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="peanut" viewBox="0 0 64 64">
+    <path d="M14 21c2-8 12-9 18-2 7-7 18-4 18 5 0 6-6 9-9 12 3 9-5 15-13 11-7 4-17 0-16-9-8-5-6-14 2-17Z" fill="#ddb276" stroke="#765033" stroke-width="3"/>
+    <path d="M31 19c-5 5-6 13 1 18m9-11c-5 1-8 5-10 11" stroke="#a97745" stroke-width="2.5"/>
+    <path d="M18 27c4-5 8-4 11-1m10 17c4 1 7-1 9-5" stroke="#f5d5a0" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="quail_egg" viewBox="0 0 64 64">
+    <ellipse cx="23" cy="38" rx="13" ry="18" fill="#fff2d9" stroke="#765033" stroke-width="3"/>
+    <ellipse cx="42" cy="34" rx="12" ry="17" fill="#fff8e9" stroke="#765033" stroke-width="3"/>
+    <g fill="#a75c37"><circle cx="19" cy="30" r="2"/><circle cx="27" cy="39" r="2"/><circle cx="20" cy="46" r="1.6"/><circle cx="40" cy="26" r="1.7"/><circle cx="46" cy="35" r="2"/><circle cx="39" cy="42" r="1.6"/></g>
+  </symbol>
+  <symbol id="beef_jerky" viewBox="0 0 64 64">
+    <path d="M12 43c2-9 6-21 13-23 5-1 7 5 11 5 4-7 13-9 17-3 3 5 0 9-4 13-2 9-8 14-18 12-7 6-17 5-19-4Z" fill="#a8482b" stroke="#6f3827" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M21 38c5-7 9-8 13-8m-4 17c5-8 10-10 17-12" stroke="#d98748" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="20" cy="28" r="2" fill="#f4c24a"/><circle cx="43" cy="25" r="2" fill="#f4c24a"/>
+  </symbol>
+  <symbol id="chicken_jerky" viewBox="0 0 64 64">
+    <path d="M14 46c-3-5 1-11 6-14-1-8 6-13 12-8 6-8 16-5 15 3 8 1 9 9 3 14-2 8-10 12-16 7-7 5-16 4-20-2Z" fill="#d98a43" stroke="#7b482b" stroke-width="3"/>
+    <path d="M20 39c6-2 10-6 13-12m-6 23c5-5 11-9 18-11m-4-12c-1 5-3 8-7 11" stroke="#f4c878" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="dried_shrimp" viewBox="0 0 64 64">
+    <path d="M48 14c-15-5-32 3-35 18-3 14 11 23 25 17 12-5 16-22 8-31" fill="#ed8741" stroke="#854527" stroke-width="3"/>
+    <path d="M46 13 55 9l-3 12m-10 4 10 3m-18 1 10 6m-21-1 9 9m-2-18 2 6m11-12-3 6" stroke="#854527" stroke-width="2.5" stroke-linecap="round"/>
+    <circle cx="44" cy="19" r="2" fill="#3c2115"/>
+  </symbol>
+  <symbol id="calamansi" viewBox="0 0 64 64">
+    <circle cx="28" cy="36" r="18" fill="#8ea64a" stroke="#506d37" stroke-width="3"/>
+    <circle cx="43" cy="28" r="13" fill="#b8c85a" stroke="#506d37" stroke-width="3"/>
+    <path d="M26 15c3-7 10-9 16-6-3 7-9 9-16 6Z" fill="#52793e" stroke="#3f6336" stroke-width="2"/>
+    <path d="M19 32c3-5 7-8 12-8m2 13c2-4 5-6 8-7" stroke="#dbe08c" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="product_traditional" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="39" rx="23" ry="15" fill="#fff0d1" stroke="#75472b" stroke-width="3"/>
+    <ellipse cx="32" cy="36" rx="19" ry="10" fill="#e5a344"/>
+    <path d="M17 36c8-7 14 4 21-1 5-4 8-4 12-1" stroke="#d94c32" stroke-width="4" stroke-linecap="round"/>
+    <path d="M24 32c4-6 8-5 10-1m4 10 6-5" stroke="#608f45" stroke-width="3" stroke-linecap="round"/>
+    <circle cx="31" cy="38" r="2" fill="#f2be3e"/><circle cx="42" cy="33" r="2" fill="#704124"/>
+  </symbol>
+  <symbol id="product_beef" viewBox="0 0 64 64">
+    <use href="#product_traditional"/>
+    <path d="M28 26c3-6 8-7 12-3l-2 9-8 2Zm12 4c3-5 7-5 10-1l-2 8-8 1Z" fill="#8e3e29" stroke="#613523" stroke-width="2"/>
+  </symbol>
+  <symbol id="product_chicken" viewBox="0 0 64 64">
+    <use href="#product_traditional"/>
+    <path d="M28 27c3-5 7-6 10-3l-2 9-8 1Zm11 6c3-5 8-5 10-1l-3 7-8 1Z" fill="#d9873e" stroke="#80502d" stroke-width="2"/>
+  </symbol>
+  <symbol id="product_special" viewBox="0 0 64 64">
+    <use href="#product_beef"/>
+    <circle cx="20" cy="35" r="4" fill="#fff0d1" stroke="#b46c32" stroke-width="2"/>
+    <path d="m20 32 .5 6m-3.5-3h6" stroke="#d84f34" stroke-width="1.5"/>
+    <path d="m17 28 2-3m27 17 3 2" stroke="#648d43" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="food_box" viewBox="0 0 64 64">
+    <path d="M12 27h40l-4 29H16z" fill="#fff0c9" stroke="#75472b" stroke-width="3" stroke-linejoin="round"/>
+    <path d="m10 25 8-12h28l8 12-8 8H18z" fill="#e3ac5f" stroke="#75472b" stroke-width="3" stroke-linejoin="round"/>
+    <path d="m22 28 10 8 10-8m-10 8v18" stroke="#b2773f" stroke-width="2.5"/>
+    <path d="M21 44h7m8 0h7" stroke="#d95635" stroke-width="3" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="mixing_bowl" viewBox="0 0 180 128">
+    <ellipse cx="90" cy="111" rx="63" ry="10" fill="#633820" opacity=".25"/>
+    <path d="M18 45c5 40 31 68 72 68s67-28 72-68" fill="#df792d" stroke="#714329" stroke-width="6" stroke-linejoin="round"/>
+    <path d="M29 53c12 21 29 32 61 32s49-11 61-32" fill="#c8572c"/>
+    <ellipse cx="90" cy="45" rx="73" ry="27" fill="#fff0d1" stroke="#714329" stroke-width="6"/>
+    <ellipse cx="90" cy="43" rx="60" ry="17" fill="#efa64b" stroke="#b7632e" stroke-width="3"/>
+    <path d="M42 51c11 6 21 7 31 2m33 4c12 5 23 2 33-5" stroke="#f8cc69" stroke-width="4" stroke-linecap="round"/>
+    <path d="M50 94c23 15 57 15 80 0" stroke="#f5b154" stroke-width="4" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="shop-logo" viewBox="0 0 128 128">
+    <circle cx="64" cy="64" r="61" fill="#fff3dc" stroke="#704124" stroke-width="5"/>
+    <use href="#mixing_bowl" x="9" y="19" width="110" height="81"/>
+    <path d="M29 48c11-9 22-10 34-2 10 7 21 7 35-1" stroke="#df4c36" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="54" cy="45" r="4" fill="#f2be3e"/><circle cx="79" cy="53" r="4" fill="#f2be3e"/>
+  </symbol>
+</svg>
