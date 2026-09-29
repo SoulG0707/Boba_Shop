@@ -111,3 +111,32 @@ body::before { position: fixed; inset: 0; z-index: -1; background: repeating-lin
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
 }
+
+/* Compact mobile-game frame */
+body { background: #282521; }
+body::before { background: repeating-linear-gradient(135deg, rgba(255, 247, 232, .025) 0 2px, transparent 2px 18px); }
+.app-shell { max-width: 560px; background: var(--bg); box-shadow: 0 0 0 1px rgba(255, 250, 242, .08), 0 14px 44px rgba(0, 0, 0, .24); }
+.app-header { min-height: 66px; grid-template-columns: minmax(0, 1fr) minmax(86px, 1.1fr) auto; gap: 5px; padding: calc(env(safe-area-inset-top, 0px) + 3px) 10px 4px; }
+.header-left { gap: 5px; }
+.round-action { width: 30px; height: 30px; border-width: 1.5px; background: var(--panel); font-size: .85rem; }
+.header-day strong { font-size: .76rem; }
+.header-day small { font-size: .6rem; }
+.header-center strong { font-size: .65rem; font-weight: 700; }
+.header-center b { margin-top: 0; color: var(--ink); font-size: clamp(1.6rem, 7vw, 1.85rem); font-weight: 900; letter-spacing: -.035em; }
+.header-rating { display: grid; justify-items: end; gap: 0; }
+.header-rating span { font-size: .9rem; letter-spacing: -.08em; line-height: 1; }
+.header-rating small { color: var(--soft); font-size: .56rem; line-height: 1.2; }
+.awning { height: 44px; background: repeating-linear-gradient(90deg, var(--pink) 0 28px, var(--panel) 28px 56px); }
+.awning::after { bottom: -8px; height: 10px; background: radial-gradient(circle at 14px 0, var(--pink) 10px, transparent 11px) 0 0 / 56px 10px repeat-x, radial-gradient(circle at 42px 0, var(--panel) 10px, transparent 11px) 0 0 / 56px 10px repeat-x; }
+.toast-root { top: calc(env(safe-area-inset-top, 0px) + 72px); }
+.modal-card { padding: 16px 14px 13px; border-radius: var(--radius-lg); box-shadow: 0 4px 14px rgba(80, 45, 25, .16); }
+@media (min-width: 561px) {
+  body { background: radial-gradient(ellipse at 50% 15%, #47413a, #25231f 62%); }
+  .app-shell { border-inline: 1px solid rgba(255, 250, 242, .12); }
+}
+@media (max-width: 370px) {
+  .app-header { min-height: 62px; grid-template-columns: minmax(0, 1fr) minmax(75px, 1fr) auto; gap: 3px; padding-inline: 7px; }
+  .header-left { gap: 3px; }
+  .round-action { width: 27px; height: 27px; }
+  .header-rating small { font-size: .51rem; }
+}

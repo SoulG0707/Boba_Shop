@@ -25,6 +25,7 @@ const VIEWS = {
 };
 
 let currentRoute = "dashboard";
+const PRIMARY_ROUTE_IDS = new Set(["dashboard", "inventory", "upgrades", "prices", "reviews", "stats"]);
 
 export function navigate(routeId) {
   if (!VIEWS[routeId]) return false;
@@ -37,12 +38,26 @@ export function getCurrentRoute() {
 }
 
 export function renderNavigation() {
-  return `<nav class="prep-tabs" aria-label="Các phần trong tiệm">${ROUTES.map((route) => {
-    const icon = ["prep", "inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
-      ? `<img src="./img/icons/${route.icon === "prep" ? "preparation" : route.icon}.png" alt="">`
-      : route.icon;
-    return `<button class="prep-tab ${route.id === currentRoute ? "is-active" : ""}" data-navigate="${route.id}" ${route.id === currentRoute ? 'aria-current="page"' : ""}><span class="tab-icon">${icon}</span><span>${route.label}</span></button>`;
-  }).join("")}</nav>`;
+  const primary = ROUTES.filter((route) => PRIMARY_ROUTE_IDS.has(route.id)).map(renderRouteButton).join("");
+  const extras = ROUTES.filter((route) => !PRIMARY_ROUTE_IDS.has(route.id));
+  const moreIsActive = extras.some((route) => route.id === currentRoute);
+  const moreItems = extras.map((route) => {
+    const active = route.id === currentRoute;
+    return `<button class="prep-more-option ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}><span>${renderRouteIcon(route)}</span><strong>${route.label}</strong></button>`;
+  }).join("");
+
+  return `<nav class="prep-tabs" aria-label="Các phần trong tiệm">${primary}<details class="prep-more"><summary class="prep-tab prep-more-trigger ${moreIsActive ? "is-active" : ""}"><span class="tab-icon" aria-hidden="true">•••</span><span>Thêm</span></summary><div class="prep-more-menu">${moreItems}</div></details></nav>`;
+}
+
+function renderRouteButton(route) {
+  const active = route.id === currentRoute;
+  return `<button class="prep-tab ${active ? "is-active" : ""}" data-navigate="${route.id}" ${active ? 'aria-current="page"' : ""}><span class="tab-icon">${renderRouteIcon(route)}</span><span>${route.label}</span></button>`;
+}
+
+function renderRouteIcon(route) {
+  return ["prep", "inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
+    ? `<img src="./img/icons/${route.icon === "prep" ? "preparation" : route.icon}.png" alt="">`
+    : route.icon;
 }
 
 export function renderCurrentView(state, presentation = {}) {

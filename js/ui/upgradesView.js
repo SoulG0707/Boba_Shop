@@ -1,7 +1,6 @@
 import { UPGRADES } from "../data/upgrades.js";
 import { getUpgradeCost } from "../systems/upgrades.js";
-import { formatMoney } from "../config.js";
-import { escapeHtml } from "./helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 const UPGRADE_ICONS = { sealer: "🥣", ledSign: "💡", chairs: "🪑", advertising: "📣", counter: "🫙", airConditioner: "🧊" };
 
@@ -11,7 +10,7 @@ export function renderUpgradesView(state) {
     const cost = getUpgradeCost(state, upgrade.id);
     const effects = Object.entries(upgrade.effects).map(([key, value]) => `${effectName(key)} +${Math.round(value * 100)}%`).join(" · ");
     const dots = Array.from({ length: upgrade.maxLevel }, (_, index) => `<i class="level-dot ${index < level ? "is-filled" : ""}"></i>`).join("");
-    const buttonText = level >= upgrade.maxLevel ? "Đã tối đa" : `Nâng · ${formatMoney(cost)}`;
+    const buttonText = level >= upgrade.maxLevel ? "Đã tối đa" : `Nâng · ${formatMoneyCompact(cost)}`;
     return `<div class="prep-row upgrade-row"><span class="row-emoji">${UPGRADE_ICONS[upgrade.id] ?? "✨"}</span><div class="row-copy"><strong>${escapeHtml(upgrade.name)} <small class="upgrade-level-label">${level}/${upgrade.maxLevel}</small></strong><small>${escapeHtml(upgrade.description)}</small><small class="upgrade-effects">${escapeHtml(effects)}</small><span class="upgrade-level">${dots}</span></div><div class="row-actions"><button class="button button-small button-primary" data-action="buy-upgrade" data-upgrade="${upgrade.id}" ${level >= upgrade.maxLevel || state.money < cost ? "disabled" : ""}>${buttonText}</button></div></div>`;
   }).join("");
 

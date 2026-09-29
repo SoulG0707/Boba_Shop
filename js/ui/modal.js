@@ -1,4 +1,4 @@
-import { formatMoney } from "../config.js";
+import { formatMoneyCompact } from "./helpers.js";
 import { escapeHtml, formatStars } from "./helpers.js";
 
 export function showModal(title, body, subtitle = "") {
@@ -19,14 +19,14 @@ export function hideModal() {
 export function showEndDayModal(stats, day) {
   const profitClass = stats.profit >= 0 ? "pill-green" : "pill-yellow";
   const body = `<div class="endday-summary"><div class="summary-ribbon"><img src="./img/icons/calendar.png" alt=""><span>SỔ CUỐI NGÀY · NGÀY ${day}</span></div><div class="summary-grid">
-    <div class="summary-item"><small>Doanh thu</small><strong>${formatMoney(stats.revenue)}</strong></div>
-    <div class="summary-item"><small>Chi phí nguyên liệu</small><strong>${formatMoney(stats.ingredientCost)}</strong></div>
-    <div class="summary-item"><small>Chi phí vận hành</small><strong>${formatMoney(stats.ingredientCost + stats.salaryCost + stats.rent + stats.utilities + stats.marketingCost + stats.expiredStockCost + stats.tax)}</strong></div>
-    <div class="summary-item"><small>Lợi nhuận</small><strong><span class="pill ${profitClass}">${formatMoney(stats.profit)}</span></strong></div>
+    <div class="summary-item"><small>Doanh thu</small><strong>${formatMoneyCompact(stats.revenue)}</strong></div>
+    <div class="summary-item"><small>Chi phí nguyên liệu</small><strong>${formatMoneyCompact(stats.ingredientCost)}</strong></div>
+    <div class="summary-item"><small>Chi phí vận hành</small><strong>${formatMoneyCompact(stats.ingredientCost + stats.salaryCost + stats.rent + stats.utilities + stats.marketingCost + stats.expiredStockCost + stats.tax)}</strong></div>
+    <div class="summary-item"><small>Lợi nhuận</small><strong><span class="pill ${profitClass}">${formatMoneyCompact(stats.profit)}</span></strong></div>
     <div class="summary-item"><small>Khách phục vụ</small><strong>${stats.customersServed}</strong></div>
     <div class="summary-item"><small>Đơn online</small><strong>${stats.onlineOrders}</strong></div>
-    <div class="summary-item"><small>Hàng hết hạn</small><strong>${formatMoney(stats.expiredStockCost)}</strong></div>
-    <div class="summary-item"><small>Tiền mua tồn kho</small><strong>${formatMoney(stats.stockPurchases ?? 0)}</strong></div>
+    <div class="summary-item"><small>Hàng hết hạn</small><strong>${formatMoneyCompact(stats.expiredStockCost)}</strong></div>
+    <div class="summary-item"><small>Tiền mua tồn kho</small><strong>${formatMoneyCompact(stats.stockPurchases ?? 0)}</strong></div>
     <div class="summary-item"><small>Đánh giá</small><strong>${formatStars(stats.ratingEnd)} ${stats.ratingEnd.toFixed(1)}</strong></div>
     <div class="summary-item"><small>Thay đổi rating</small><strong>${stats.ratingEnd - stats.ratingStart >= 0 ? "+" : ""}${(stats.ratingEnd - stats.ratingStart).toFixed(1)}</strong></div>
   </div><button class="button button-primary" data-action="next-day">Chuẩn bị ngày ${day + 1} →</button></div>`;

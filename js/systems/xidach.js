@@ -23,7 +23,7 @@ function drawUntilSeventeen(cards, random) {
 
 export function playXidachHouseRound(state, amount, random = Math.random) {
   const stake = Math.floor(Number(amount));
-  if (!Number.isFinite(stake) || stake < GAME_CONFIG.MIN_MINIGAME_BET || stake > GAME_CONFIG.MAX_MINIGAME_BET) return { success: false, reason: "Mức bàn phải từ 5.000đ đến 100.000đ." };
+  if (!Number.isFinite(stake) || stake < GAME_CONFIG.MIN_MINIGAME_BET || stake > GAME_CONFIG.MAX_MINIGAME_BET) return { success: false, reason: "Mức bàn nằm ngoài giới hạn của trò chơi." };
   if (state.money < stake) return { success: false, reason: "Quỹ chung chưa đủ tiền bảo chứng cho bàn." };
 
   // The stall holds the stake, then settles against the visitor's hand.

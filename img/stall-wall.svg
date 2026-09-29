@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 320" fill="none">
+  <rect width="560" height="320" fill="#f4dfb9"/>
+  <path d="M0 0h560v36H0z" fill="#edc990"/>
+  <path d="M18 0v320M542 0v320" stroke="#9a633b" stroke-opacity=".1" stroke-width="5"/>
+  <circle cx="64" cy="69" r="25" fill="#fff5de" fill-opacity=".55"/>
+  <circle cx="496" cy="67" r="25" fill="#fff5de" fill-opacity=".55"/>
+  <path d="M0 151h560v12H0z" fill="#7a4b31" fill-opacity=".78"/>
+  <path d="M0 160h560v6H0z" fill="#bd8550" fill-opacity=".7"/>
+  <g stroke="#704124" stroke-opacity=".35" stroke-width="2">
+    <path d="M50 150V91h460v59"/>
+    <path d="M74 91v59M486 91v59"/>
+  </g>
+  <g opacity=".74">
+    <path d="M96 128h48l-4 20H100z" fill="#f3c874" stroke="#875834" stroke-width="2"/>
+    <path d="M101 122h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+    <path d="M158 123h48l-4 25h-40z" fill="#d95d42" stroke="#875834" stroke-width="2"/>
+    <path d="M163 117h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+    <path d="M220 128h48l-4 20h-40z" fill="#669052" stroke="#875834" stroke-width="2"/>
+    <path d="M225 122h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+    <path d="M292 123h48l-4 25h-40z" fill="#c9934b" stroke="#875834" stroke-width="2"/>
+    <path d="M297 117h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+    <path d="M354 128h48l-4 20h-40z" fill="#bf6d39" stroke="#875834" stroke-width="2"/>
+    <path d="M359 122h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+    <path d="M416 123h48l-4 25h-40z" fill="#d8aa5c" stroke="#875834" stroke-width="2"/>
+    <path d="M421 117h38v9h-38z" fill="#fff3d6" stroke="#875834" stroke-width="2"/>
+  </g>
+  <path d="M0 282h560v8H0z" fill="#875333" fill-opacity=".33"/>
+  <path d="M0 290h560v30H0z" fill="#fff5de" fill-opacity=".28"/>
+  <g fill="#ef688a" fill-opacity=".22">
+    <circle cx="36" cy="214" r="4"/><circle cx="52" cy="226" r="3"/><circle cx="518" cy="205" r="4"/><circle cx="502" cy="219" r="3"/>
+  </g>
+</svg>

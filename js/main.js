@@ -1,4 +1,4 @@
-import { DEBUG, formatMoney } from "./config.js";
+import { DEBUG } from "./config.js";
 import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
@@ -14,7 +14,7 @@ import { spawnCustomer } from "./systems/customers.js";
 import { acceptOnlineOrder, completeOnlineOrder } from "./systems/onlineOrders.js";
 import { startDay, pauseDay, resumeDay, tickDay, endDay, nextDay } from "./systems/dayCycle.js";
 import { triggerEvent } from "./systems/events.js";
-import { escapeHtml } from "./ui/helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./ui/helpers.js";
 import { createBackup, restoreBackup } from "./backup/backup.js";
 import { audioManager } from "./systems/audioManager.js";
 import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js";
@@ -259,7 +259,7 @@ function handleAction(action, element) {
     case "add-bau-bet": {
       let result;
       updateState((current) => { result = placeBauCuaBet(current, element.dataset.symbol, current.miniGames.bauCua.stake); });
-      notifyResult(result, `Đã đặt ${formatMoney(result.stake)} vào cửa ${element.dataset.symbol}.`);
+      notifyResult(result, `Đã đặt ${formatMoneyCompact(result.stake)} vào cửa ${element.dataset.symbol}.`);
       refreshUI();
       break;
     }
@@ -270,7 +270,7 @@ function handleAction(action, element) {
     case "roll-bau-cua": {
       let result;
       updateState((current) => { result = rollBauCua(current); });
-      notifyResult(result, `Lắc xong · ${result.net >= 0 ? "lãi" : "lỗ"} ${formatMoney(Math.abs(result.net))}.`);
+      notifyResult(result, `Lắc xong · ${result.net >= 0 ? "lãi" : "lỗ"} ${formatMoneyCompact(Math.abs(result.net))}.`);
       refreshUI();
       break;
     }
@@ -281,7 +281,7 @@ function handleAction(action, element) {
     case "play-xidach": {
       let result;
       updateState((current) => { result = playXidachHouseRound(current, current.miniGames.xiDach.stake); });
-      notifyResult(result, result.outcome === "house" ? `Nhà cái thắng ${formatMoney(result.net)}.` : result.outcome === "visitor" ? `Khách thắng ${formatMoney(Math.abs(result.net))}.` : "Hai bên hòa, tiền bảo chứng được hoàn lại.");
+      notifyResult(result, result.outcome === "house" ? `Nhà cái thắng ${formatMoneyCompact(result.net)}.` : result.outcome === "visitor" ? `Khách thắng ${formatMoneyCompact(Math.abs(result.net))}.` : "Hai bên hòa, tiền bảo chứng được hoàn lại.");
       refreshUI();
       break;
     }
@@ -343,7 +343,7 @@ document.addEventListener("change", (event) => {
   const input = event.target;
   if (input.matches("[data-price-product]")) {
     const productId = input.dataset.priceProduct;
-    const price = Math.max(1_000, Math.round(Number(input.value) / 1_000) * 1_000);
+    const price = Math.max(1_000, Math.round(Number(input.value) || 1) * 1_000);
     updateState((state) => { state.sellPrices[productId] = price; });
     showToast("Giá bán đã được cập nhật.", "success");
     refreshUI();

@@ -4,10 +4,10 @@ import { BAU_CUA_SYMBOLS } from "../data/bauCua.js";
 export function placeBauCuaBet(state, symbolId, amount) {
   if (!BAU_CUA_SYMBOLS.some((symbol) => symbol.id === symbolId)) return { success: false, reason: "Lựa chọn không hợp lệ." };
   const stake = Math.floor(Number(amount));
-  if (!Number.isFinite(stake) || stake < GAME_CONFIG.MIN_MINIGAME_BET || stake > GAME_CONFIG.MAX_MINIGAME_BET) return { success: false, reason: "Mức cược phải từ 5.000đ đến 100.000đ." };
+  if (!Number.isFinite(stake) || stake < GAME_CONFIG.MIN_MINIGAME_BET || stake > GAME_CONFIG.MAX_MINIGAME_BET) return { success: false, reason: "Mức cược nằm ngoài giới hạn của bàn." };
   const game = state.miniGames.bauCua;
   const roundTotal = Object.values(game.bets).reduce((total, bet) => total + bet, 0);
-  if (roundTotal + stake > GAME_CONFIG.MAX_MINIGAME_ROUND_STAKE) return { success: false, reason: "Tổng cược một lượt tối đa 250.000đ." };
+  if (roundTotal + stake > GAME_CONFIG.MAX_MINIGAME_ROUND_STAKE) return { success: false, reason: "Tổng cược lượt này đã vượt giới hạn." };
   if (state.money < stake) return { success: false, reason: "Quỹ chung không đủ để đặt cược." };
   state.money -= stake;
   game.bets[symbolId] = (game.bets[symbolId] ?? 0) + stake;

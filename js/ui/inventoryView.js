@@ -1,6 +1,5 @@
 import { INGREDIENTS } from "../data/ingredients.js";
-import { formatMoney } from "../config.js";
-import { escapeHtml } from "./helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 export function renderInventoryView(state) {
   const rows = INGREDIENTS.map((ingredient) => {
@@ -11,7 +10,7 @@ export function renderInventoryView(state) {
     const shortage = stock.quantity < 4;
     return `<div class="prep-row inventory-row">
       <span class="row-emoji">${ingredient.emoji}</span>
-      <div class="row-copy"><strong>${escapeHtml(ingredient.name)}</strong><small>Còn ${stock.quantity} ${escapeHtml(ingredient.unit)} · ${shelfLife} · ${formatMoney(ingredient.purchasePrice)} / ${escapeHtml(ingredient.unit)}</small></div>
+      <div class="row-copy"><strong>${escapeHtml(ingredient.name)}</strong><small class="inventory-meta">Tồn ${stock.quantity} ${escapeHtml(ingredient.unit)} · ${formatMoneyCompact(ingredient.purchasePrice)} / ${escapeHtml(ingredient.unit)}</small><small class="inventory-expiry">${shelfLife}</small></div>
       <div class="row-actions"><button class="button button-small button-cream" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="10" aria-label="Mua 10 ${escapeHtml(ingredient.name)}" ${state.money < ingredient.purchasePrice * 10 ? "disabled" : ""}>+10</button><button class="button button-small button-cream" data-action="buy-stock" data-ingredient="${ingredient.id}" data-quantity="50" aria-label="Mua 50 ${escapeHtml(ingredient.name)}" ${state.money < ingredient.purchasePrice * 50 ? "disabled" : ""}>+50</button></div>
       ${shortage ? `<span class="stock-low" title="Sắp hết">!</span>` : ""}
     </div>`;

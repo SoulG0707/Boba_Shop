@@ -24,15 +24,12 @@ export const ROUTES = Object.freeze([
   { id: "inventory", label: "Kho", icon: "inventory" },
   { id: "upgrades", label: "Nâng cấp", icon: "upgrades" },
   { id: "prices", label: "Giá bán", icon: "prices" },
-  { id: "employees", label: "Nhân viên", icon: "employees" },
   { id: "reviews", label: "Đánh giá", icon: "reviews" },
-  { id: "stats", label: "Thống kê", icon: "stats" },
+  { id: "stats", label: "Tổng kết", icon: "stats" },
+  { id: "employees", label: "Nhân viên", icon: "employees" },
   { id: "baucua", label: "Bầu Cua", icon: "🎲" },
   { id: "xidach", label: "Xì Dách", icon: "🃏" },
 ]);
-
-export const formatMoney = (value) =>
-  `${Math.round(Number(value) || 0).toLocaleString("vi-VN")}đ`;
 
 export const formatDuration = (seconds) => {
   const safeSeconds = Math.max(0, Math.ceil(seconds));

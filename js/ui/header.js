@@ -1,6 +1,5 @@
-import { formatMoney } from "../config.js";
 import { getAverageRating } from "../systems/reviews.js";
-import { escapeHtml } from "./helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 const STATUS_LABELS = Object.freeze({
   preparation: "Chuẩn bị",
@@ -16,10 +15,10 @@ export function renderHeader(state) {
   const canPause = ["running", "paused"].includes(state.gameplay.status);
 
   return `<div class="header-left">
-      <button class="round-action" data-action="pause-day" aria-label="${pauseLabel}" title="${pauseLabel}" ${canPause ? "" : "disabled"}>${pauseIcon}</button>
       <button class="round-action" data-action="settings" aria-label="Cài đặt" title="Cài đặt"><img src="./img/icons/settings.png" alt=""></button>
+      <button class="round-action" data-action="pause-day" aria-label="${pauseLabel}" title="${pauseLabel}" ${canPause ? "" : "disabled"}>${pauseIcon}</button>
       <div class="header-day"><strong>Ngày ${state.day}</strong><small>${STATUS_LABELS[state.gameplay.status] ?? "Chuẩn bị"}</small></div>
     </div>
-    <div class="header-center"><strong>${escapeHtml(state.shopName)}</strong><b>${formatMoney(state.money)}</b></div>
-    <div class="header-rating"><span aria-label="${rating.toFixed(1)} trên 5 sao">${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}</span><strong>${rating.toFixed(1).replace(".", ",")}</strong></div>`;
+    <div class="header-center"><strong>${escapeHtml(state.shopName)}</strong><b>${formatMoneyCompact(state.money)}</b></div>
+    <div class="header-rating"><span aria-label="${rating.toFixed(1)} trên 5 sao">${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}</span><small>${rating.toFixed(1).replace(".", ",")} · ${state.reviews.length} đánh giá</small></div>`;
 }

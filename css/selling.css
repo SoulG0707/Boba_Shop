@@ -11,7 +11,7 @@
   flex: 1;
   flex-direction: column;
   gap: 5px;
-  padding: 5px 8px 10px;
+  padding: 5px 8px 4px;
   overflow-x: hidden;
   overflow-y: auto;
   background: linear-gradient(180deg, #f8dda8 0, #fff4de 27%, #fff0d0 62%, #e6b679 100%);

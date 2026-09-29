@@ -1,8 +1,8 @@
-import { formatDuration, formatMoney, GAME_CONFIG } from "../config.js";
+import { formatDuration, GAME_CONFIG } from "../config.js";
 import { INGREDIENTS, INGREDIENT_BY_ID } from "../data/ingredients.js";
 import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getProductRecipe } from "../data/products.js";
 import { getRemainingSeconds } from "../systems/dayCycle.js";
-import { escapeHtml } from "./helpers.js";
+import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 const CUSTOMER_SPRITES = Object.freeze({
   regular: { row: 0, column: 0 },
@@ -52,7 +52,7 @@ function renderCustomer(customer, state, isSelected) {
   const patience = Math.max(0, Math.min(100, (customer.patience / 55) * 100));
   return `<button class="customer-stop ${isSelected ? "is-selected" : ""}" data-action="select-customer" data-customer="${customer.id}" aria-pressed="${isSelected}">
     <span class="customer-face ${sprite.delivery ? "is-delivery" : ""}" style="--sprite-x:${sprite.column * 50}%;--sprite-y:${sprite.row * (sprite.delivery ? 100 : 12.5)}%" aria-hidden="true"></span>
-    <span class="customer-speech"><strong>${escapeHtml(customer.label)}</strong><small>${escapeHtml(product?.name ?? "Bánh tráng trộn")} · ${size}</small><small>${formatMoney(order.totalPrice)}</small></span>
+    <span class="customer-speech"><strong>${escapeHtml(customer.label)}</strong><small>${escapeHtml(product?.name ?? "Bánh tráng trộn")} · ${size}</small><small>${formatMoneyCompact(order.totalPrice)}</small></span>
     <span class="patience-track"><i class="${customer.patience < 12 ? "is-short" : ""}" style="width:${patience}%"></i></span>
   </button>`;
 }
@@ -64,7 +64,7 @@ function renderOrderDetails(order, customer) {
   const target = getProductRecipe(item.productId, item) ?? {};
   const ingredients = Object.entries(target).filter(([id]) => id !== "food_box").slice(0, 5);
   const list = ingredients.map(([id, quantity]) => `${quantity} ${INGREDIENT_BY_ID[id]?.name ?? id}`).join(" · ");
-  return `<span class="counter-customer">${escapeHtml(customer.label)} gọi món · ${requestedSize}</span><strong>${escapeHtml(product?.name ?? "Bánh tráng trộn")}</strong><small>${formatMoney(order.totalPrice)} · ${escapeHtml(list)}${Object.keys(target).length > 6 ? " · …" : ""}</small>`;
+  return `<span class="counter-customer">${escapeHtml(customer.label)} gọi món · ${requestedSize}</span><strong>${escapeHtml(product?.name ?? "Bánh tráng trộn")}</strong><small>${formatMoneyCompact(order.totalPrice)} · ${escapeHtml(list)}${Object.keys(target).length > 6 ? " · …" : ""}</small>`;
 }
 
 function renderMixingBowl(order) {
@@ -104,7 +104,7 @@ function renderWorkControls(order, state) {
     <div class="order-actions">
       <button class="button button-primary" data-action="mix-order" ${canMix ? "" : "disabled"}>${mixLabel}</button>
       <button class="button button-secondary" data-action="pack-order" ${canPack ? "" : "disabled"}>${packLabel}</button>
-      <button class="button button-serve" data-action="serve-order" data-order="${order.id}" ${order.packed ? "" : "disabled"}>GIAO KHÁCH · ${formatMoney(order.totalPrice)}</button>
+      <button class="button button-serve" data-action="serve-order" data-order="${order.id}" ${order.packed ? "" : "disabled"}>GIAO KHÁCH · ${formatMoneyCompact(order.totalPrice)}</button>
     </div>
     <small class="size-hint">Khách gọi ${PRODUCT_OPTIONS.sizes[item.size]?.label ?? "SIZE M"}</small>
   </div>`;
@@ -135,7 +135,7 @@ function renderOnlineOrders(state) {
     const action = order.status === "waiting"
       ? `<button data-action="accept-online" data-order="${order.id}" ${employee ? "disabled" : ""}>${employee ? "Đang làm" : "Nhận đơn"}</button>`
       : `<button data-action="complete-online" data-order="${order.id}" ${employee ? "disabled" : ""}>Giao hộp</button>`;
-    return `<div class="delivery-order"><span class="delivery-face" aria-hidden="true"></span><span><strong>${escapeHtml(product?.name ?? "Đơn bánh tráng")}</strong><small>${formatMoney(order.totalPrice)}</small></span>${action}</div>`;
+    return `<div class="delivery-order"><span class="delivery-face" aria-hidden="true"></span><span><strong>${escapeHtml(product?.name ?? "Đơn bánh tráng")}</strong><small>${formatMoneyCompact(order.totalPrice)}</small></span>${action}</div>`;
   }).join("")}</div>`;
 }
 
@@ -147,7 +147,7 @@ function renderFeedback(feedback) {
     : accuracy?.wrongIngredients?.length ? "Món hơi dư nguyên liệu nè…"
       : accuracy && !accuracy.sizeCorrect ? "Sai size rồi…" : "Ngon quá!";
   const stars = `${"★".repeat(feedback.rating)}${"☆".repeat(5 - feedback.rating)}`;
-  return `<div class="serve-feedback" key="${feedback.createdAt}"><span class="feedback-box" aria-hidden="true">🥡</span><strong>+${formatMoney(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
+  return `<div class="serve-feedback" key="${feedback.createdAt}"><span class="feedback-box" aria-hidden="true">🥡</span><strong>+${formatMoneyCompact(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
 }
 
 function spritePosition(type) {

@@ -1,7 +1,8 @@
-const CACHE_NAME = "banh-trang-tron-v8";
+const CACHE_NAME = "banh-trang-tron-v13";
 const STATIC_ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./img/banh-trang.svg",
+  "./img/stall-wall.svg",
   "./img/characters/customers.webp", "./img/characters/delivery-customers.webp",
   "./img/icons/calendar.png", "./img/icons/employees.png", "./img/icons/inventory.png", "./img/icons/preparation.png", "./img/icons/prices.png", "./img/icons/reviews.png", "./img/icons/settings.png", "./img/icons/stats.png", "./img/icons/upgrades.png",
   "./img/splash-decor/lantern-left.png", "./img/splash-decor/lantern-right.png", "./img/splash-decor/leaf.png", "./img/splash-decor/star.png",
