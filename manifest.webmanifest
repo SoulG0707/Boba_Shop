@@ -1,15 +1,15 @@
 {
-  "name": "Tiệm Trà Mơ Ước",
-  "short_name": "Trà Mơ Ước",
-  "description": "Game quản lý tiệm trà, pha chế cho khách và nâng cấp cửa tiệm.",
+  "name": "Tiệm Bánh Tráng Trộn",
+  "short_name": "Bánh Tráng Trộn",
+  "description": "Game quản lý quầy bánh tráng trộn Việt Nam.",
   "lang": "vi",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#fdf3e4",
-  "theme_color": "#fdf3e4",
+  "background_color": "#FFF4DE",
+  "theme_color": "#FFF4DE",
   "icons": [
-    { "src": "./img/tea-cup.svg", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable" }
+    { "src": "./img/banh-trang.svg", "sizes": "192x192 512x512", "type": "image/svg+xml", "purpose": "any maskable" }
   ]
 }

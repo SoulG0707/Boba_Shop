@@ -62,10 +62,12 @@ export function purchaseIngredient(state, ingredientId, quantity, currentDay = s
   if (state.money < totalCost) return { success: false, reason: "Tiệm chưa đủ tiền để mua." };
 
   const entry = normalizeStockEntry(state.stock, ingredientId);
+  const shelfLifeBonus = Math.max(0, Number(state.upgrades?.airConditioner) || 0) * 0.2;
+  const expirationDays = definition.expirationDays + Math.round(definition.expirationDays * shelfLifeBonus);
   state.money -= totalCost;
   entry.purchasePrice = definition.purchasePrice;
-  entry.expirationDays = definition.expirationDays;
-  entry.batches.push({ quantity: amount, boughtDay: currentDay, expireDay: currentDay + definition.expirationDays, unitPrice: definition.purchasePrice });
+  entry.expirationDays = expirationDays;
+  entry.batches.push({ quantity: amount, boughtDay: currentDay, expireDay: currentDay + expirationDays, unitPrice: definition.purchasePrice });
   entry.quantity += amount;
   state.dailyStats.stockPurchases = (state.dailyStats.stockPurchases ?? 0) + totalCost;
   return { success: true, totalCost, quantity: amount };

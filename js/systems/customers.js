@@ -49,10 +49,11 @@ export function spawnCustomer(state, now = Date.now(), random = Math.random) {
 }
 
 export function calculateSatisfaction(customer, order, state, waitSeconds) {
+  const accuracyRating = 1 + Math.floor((order.accuracy?.satisfaction ?? 100) / 25);
   const priceRatio = order.totalPrice / Math.max(1, customer.maxPrice);
   const priceScore = Math.max(-1, Math.min(1, (1 - priceRatio) * 1.5));
   const waitScore = Math.max(-1, 0.45 - waitSeconds / Math.max(10, customer.patience) * 0.9);
-  const score = 3.8 + customer.ratingBias + priceScore * 0.65 + waitScore * 0.75 + getGameplayModifiers(state).rating;
+  const score = accuracyRating + customer.ratingBias + priceScore * 0.25 + waitScore * 0.35 + getGameplayModifiers(state).rating;
   return Math.max(1, Math.min(5, Math.round(score)));
 }
 

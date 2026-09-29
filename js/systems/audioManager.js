@@ -40,9 +40,9 @@ class AudioManager {
 
   playSfx(kind = "tap") {
     if (!this.sfxEnabled || !this.unlock()) return;
-    const tones = { tap: 620, pour: 490, cash: 880, bell: 740, levelup: 660 };
+    const tones = { tap: 620, mix: 390, bag: 540, cash: 880, bell: 740, levelup: 660 };
     const first = tones[kind] ?? tones.tap;
-    this.playTone(first, kind === "pour" ? 0.18 : 0.12, this.sfxVolume * 0.2, "triangle");
+    this.playTone(first, kind === "mix" ? 0.22 : 0.12, this.sfxVolume * 0.2, "triangle");
     if (kind === "cash" || kind === "levelup") this.playTone(first * 1.25, 0.16, this.sfxVolume * 0.13, "sine", 0.1);
   }
 

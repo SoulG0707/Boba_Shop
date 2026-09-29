@@ -1,7 +1,7 @@
 import { GAME_CONFIG } from "../config.js";
 import { validateSaveSchema } from "../state/persistence.js";
 
-const BACKUP_PREFIX = "TEASHOP1";
+const BACKUP_PREFIX = "BTRON1";
 const TEXT_ENCODER = new TextEncoder();
 const TEXT_DECODER = new TextDecoder();
 
@@ -28,7 +28,7 @@ export async function createBackup(state) {
 
 export async function restoreBackup(text) {
   const parts = String(text ?? "").trim().split(".");
-  if (parts.length !== 3 || parts[0] !== BACKUP_PREFIX) throw new Error("Mã backup không đúng định dạng TEASHOP1.");
+  if (parts.length !== 3 || parts[0] !== BACKUP_PREFIX) throw new Error("Mã backup không đúng định dạng BTRON1.");
   if (!/^[A-Za-z0-9+/]+={0,2}$/.test(parts[1]) || !/^[a-f0-9]{64}$/i.test(parts[2])) throw new Error("Dữ liệu backup bị lỗi định dạng.");
 
   const payloadBytes = base64ToBytes(parts[1]);

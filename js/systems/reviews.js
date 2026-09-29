@@ -8,8 +8,9 @@ export function addReview(state, customer, order, now = Date.now()) {
     customerType: customer.type,
     customerName: customer.label,
     productId: order.items[0]?.productId,
+    satisfaction: order.accuracy?.satisfaction ?? 100,
     rating: calculateSatisfaction(customer, order, state, waitSeconds),
-    comment: buildReviewComment(customer, waitSeconds),
+    comment: buildReviewComment(customer, waitSeconds, order),
     day: state.day,
     createdAt: now,
   };
@@ -25,7 +26,7 @@ export function addDepartureReview(state, customer, order, now = Date.now()) {
     customerName: customer.label,
     productId: order.items[0]?.productId,
     rating: order.availabilityBlocked ? 2 : 1,
-    comment: order.availabilityBlocked ? "Tiệm đang hết nguyên liệu cho món mình muốn." : "Mình chờ hơi lâu nên đành ghé lại lần sau.",
+    comment: order.availabilityBlocked ? "Quầy đang hết nguyên liệu cho món mình muốn." : "Mình chờ hơi lâu nên đành ghé lại lần sau.",
     day: state.day,
     createdAt: now,
   };
@@ -34,11 +35,13 @@ export function addDepartureReview(state, customer, order, now = Date.now()) {
   return review;
 }
 
-function buildReviewComment(customer, waitSeconds) {
-  if (waitSeconds > customer.patience * 0.75) return "Đồ uống ổn, lần sau mong chờ ít hơn nhé.";
-  if (customer.type === "reviewer") return "Mình để ý từng chi tiết, vị trà khá hài hòa.";
+function buildReviewComment(customer, waitSeconds, order) {
+  const satisfaction = order.accuracy?.satisfaction;
+  if (satisfaction != null && satisfaction < 70) return "Món hơi thiếu topping, lần sau nêm vừa hơn nhé.";
+  if (waitSeconds > customer.patience * 0.75) return "Bánh tráng ngon, lần sau mong chờ ít hơn nhé.";
+  if (customer.type === "reviewer") return "Mình để ý từng chi tiết, vị chua cay khá hài hòa.";
   if (customer.type === "student") return "Ngon và vừa túi tiền!";
-  return "Một ly trà ngon cho ngày vui hơn.";
+  return "Bánh tráng trộn ngon quá, sẽ quay lại!";
 }
 
 export function getAverageRating(state) {

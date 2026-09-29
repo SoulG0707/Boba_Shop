@@ -20,7 +20,7 @@ export function showEndDayModal(stats, day) {
   const profitClass = stats.profit >= 0 ? "pill-green" : "pill-yellow";
   const body = `<div class="endday-summary"><div class="summary-ribbon"><img src="./img/icons/calendar.png" alt=""><span>SỔ CUỐI NGÀY · NGÀY ${day}</span></div><div class="summary-grid">
     <div class="summary-item"><small>Doanh thu</small><strong>${formatMoney(stats.revenue)}</strong></div>
-    <div class="summary-item"><small>Trong đó Mì Cay</small><strong>${formatMoney(stats.noodleRevenue ?? 0)}</strong></div>
+    <div class="summary-item"><small>Chi phí nguyên liệu</small><strong>${formatMoney(stats.ingredientCost)}</strong></div>
     <div class="summary-item"><small>Chi phí vận hành</small><strong>${formatMoney(stats.ingredientCost + stats.salaryCost + stats.rent + stats.utilities + stats.marketingCost + stats.expiredStockCost + stats.tax)}</strong></div>
     <div class="summary-item"><small>Lợi nhuận</small><strong><span class="pill ${profitClass}">${formatMoney(stats.profit)}</span></strong></div>
     <div class="summary-item"><small>Khách phục vụ</small><strong>${stats.customersServed}</strong></div>

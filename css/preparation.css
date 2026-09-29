@@ -2,13 +2,13 @@
   flex: 1 0 auto;
   min-height: 100%;
   padding: 14px 0 22px;
-  background: #f6ecd8 url("../img/backgrounds/preparation.jpg") center top / cover fixed no-repeat;
+  background: radial-gradient(ellipse at 50% 0, rgba(245, 197, 66, .18), transparent 45%), linear-gradient(180deg, #fce8c7, #fff4de 38%);
 }
 .chalkboard {
   position: relative;
   margin: 0 12px 11px;
   padding: 8px 12px 9px;
-  border: 7px solid #8a5a3b;
+  border: 7px solid var(--counter);
   border-radius: 10px;
   background: var(--chalk);
   color: var(--chalk-ink);
@@ -22,7 +22,7 @@
 .chalk-row strong { flex: none; color: #fff1c7; font-weight: 800; }
 .chalk-extras { display: flex; justify-content: center; gap: 14px; padding-top: 5px; color: rgba(244, 239, 226, .83); font-size: .66rem; }
 .chalk-extras b { color: #fff1c7; }
-.prep-tabs { display: flex; gap: 3px; margin: 0 12px; padding: 5px 5px 0; overflow-x: auto; overscroll-behavior-x: contain; background: rgba(234, 215, 189, .85); border-radius: 15px 15px 0 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.prep-tabs { display: flex; gap: 3px; margin: 0 12px; padding: 5px 5px 0; overflow-x: auto; overscroll-behavior-x: contain; background: rgba(232, 207, 171, .85); border-radius: 15px 15px 0 0; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .prep-tabs::-webkit-scrollbar { display: none; }
 .prep-tab { display: flex; min-width: 58px; min-height: 48px; flex: 1 0 58px; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 4px 5px 5px; border: 0; border-radius: 11px 11px 0 0; background: transparent; color: var(--soft); font-size: .67rem; font-weight: 800; line-height: 1.05; opacity: .75; white-space: nowrap; cursor: pointer; }
 .prep-tab.is-active { background: var(--panel); color: var(--ink); opacity: 1; }
@@ -31,7 +31,7 @@
 .prep-pane { min-height: 300px; margin: 0 12px 24px; padding: 11px 12px 14px; border: 1px solid rgba(234, 215, 189, .9); border-top: 0; border-radius: 0 0 16px 16px; background: var(--panel); box-shadow: 0 4px 0 rgba(58, 35, 23, .08); }
 .prep-home { display: grid; gap: 11px; }
 .prep-welcome { display: flex; align-items: center; gap: 9px; padding: 2px 0 9px; border-bottom: 1px dashed var(--line); }
-.welcome-teacup { display: grid; width: 42px; height: 42px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff1e1; font-size: 1.4rem; }
+.welcome-bowl { display: grid; width: 42px; height: 42px; flex: none; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: #fff1e1; font-size: 1.4rem; }
 .welcome-kicker { color: var(--pink-dark); font-size: .67rem; font-weight: 800; }
 .prep-welcome h2 { margin: 0 0 1px; font-size: 1.04rem; }
 .prep-welcome p { margin: 0; font-size: .71rem; }

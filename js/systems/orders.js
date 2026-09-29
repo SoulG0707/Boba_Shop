@@ -1,6 +1,9 @@
-import { PRODUCT_OPTIONS, getProductPrice } from "../data/products.js";
-import { consumeIngredients } from "./inventory.js";
+import { INGREDIENT_BY_ID } from "../data/ingredients.js";
+import { PRODUCT_OPTIONS, getProductPrice, getProductRecipe } from "../data/products.js";
+import { consumeIngredients, getStockQuantity } from "./inventory.js";
 import { addReview } from "./reviews.js";
+
+const BOWL_INGREDIENTS = Object.freeze(Object.keys(INGREDIENT_BY_ID).filter((id) => id !== "food_box"));
 
 function pickOption(options, random = Math.random) {
   const keys = Object.keys(options);
@@ -10,16 +13,13 @@ function pickOption(options, random = Math.random) {
 export function createOrder(state, customer, now = Date.now(), random = Math.random) {
   const productId = customer.preferredProduct;
   let size = pickOption(PRODUCT_OPTIONS.sizes, random);
-  const toppings = Object.keys(PRODUCT_OPTIONS.toppings);
-  let topping = toppings[Math.min(toppings.length - 1, Math.floor(random() * toppings.length))];
-  let totalPrice = getProductPrice(productId, state.sellPrices, { size, topping });
+  let totalPrice = getProductPrice(productId, state.sellPrices, { size });
   if (totalPrice > customer.maxPrice) {
-    size = "regular";
-    topping = "none";
-    totalPrice = getProductPrice(productId, state.sellPrices, { size, topping });
+    size = "M";
+    totalPrice = getProductPrice(productId, state.sellPrices, { size });
   }
   const number = state.gameplay.nextEntityId++;
-  const item = { productId, size, topping, quantity: 1 };
+  const item = { productId, size, quantity: 1 };
   const order = {
     id: `order-${number}`,
     customerId: customer.id,
@@ -28,6 +28,11 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
     createdAt: now,
     status: "waiting",
     channel: "counter",
+    preparedIngredients: {},
+    preparedSize: null,
+    mixed: false,
+    mixing: false,
+    packed: false,
   };
   customer.orderId = order.id;
   state.orders.unshift(order);
@@ -35,46 +40,103 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
   return order;
 }
 
-export function setOrderStatus(state, orderId, status) {
+export function addIngredientToOrder(state, orderId, ingredientId) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
-  if (!order || !["waiting", "preparing", "ready"].includes(status)) return false;
-  if (status === "preparing" && order.status === "waiting") {
-    order.preparationRemaining = 6 + (order.items[0]?.size === "large" ? 2 : 0) + (order.items[0]?.topping === "none" ? 0 : 1);
-  }
-  order.status = status;
+  if (!order || order.status !== "waiting" || order.mixed) return { success: false, reason: "Tô đã trộn hoặc đơn không còn hoạt động." };
+  if (!order.preparedSize) return { success: false, reason: "Chọn size trước khi thêm nguyên liệu." };
+  if (!BOWL_INGREDIENTS.includes(ingredientId)) return { success: false, reason: "Nguyên liệu này không dùng để trộn." };
+  const quantity = order.preparedIngredients?.[ingredientId] ?? 0;
+  if (getStockQuantity(state, ingredientId) <= quantity) return { success: false, reason: `Kho không còn ${INGREDIENT_BY_ID[ingredientId]?.name ?? "nguyên liệu"} để thêm.` };
+  order.preparedIngredients ??= {};
+  order.preparedIngredients[ingredientId] = quantity + 1;
+  return { success: true, ingredient: INGREDIENT_BY_ID[ingredientId], quantity: quantity + 1 };
+}
+
+export function setOrderSize(state, orderId, size) {
+  const order = state.orders.find((candidate) => candidate.id === orderId);
+  if (!order || order.status !== "waiting" || order.mixed || !PRODUCT_OPTIONS.sizes[size]) return false;
+  if (Object.values(order.preparedIngredients ?? {}).some((quantity) => quantity > 0)) return false;
+  order.preparedSize = size;
   return true;
 }
 
-export function advanceOrderPreparation(state, deltaSeconds, serviceSpeed = 1) {
-  let completed = 0;
-  for (const order of state.orders) {
-    if (order.status !== "preparing") continue;
-    order.preparationRemaining = Math.max(0, order.preparationRemaining - deltaSeconds * serviceSpeed);
-    if (order.preparationRemaining === 0) {
-      order.status = "ready";
-      completed += 1;
-    }
+export function removeIngredientFromOrder(state, orderId, ingredientId) {
+  const order = state.orders.find((candidate) => candidate.id === orderId);
+  const quantity = order?.preparedIngredients?.[ingredientId] ?? 0;
+  if (!order || order.status !== "waiting" || order.mixed || quantity <= 0) return false;
+  if (quantity === 1) delete order.preparedIngredients[ingredientId];
+  else order.preparedIngredients[ingredientId] = quantity - 1;
+  return true;
+}
+
+export function mixOrder(state, orderId) {
+  const order = state.orders.find((candidate) => candidate.id === orderId);
+  if (!order || order.status !== "waiting" || order.mixed || order.mixing) return false;
+  if (!order.preparedSize || !(order.preparedIngredients?.rice_paper > 0)) return false;
+  order.mixing = true;
+  return true;
+}
+
+export function finishMixingOrder(state, orderId) {
+  const order = state.orders.find((candidate) => candidate.id === orderId);
+  if (!order || order.status !== "waiting" || !order.mixing) return false;
+  order.mixing = false;
+  order.mixed = true;
+  return true;
+}
+
+export function packOrder(state, orderId) {
+  const order = state.orders.find((candidate) => candidate.id === orderId);
+  if (!order || order.status !== "waiting" || !order.mixed || order.packed) {
+    return { success: false, reason: "Hãy trộn món trước khi đóng hộp." };
   }
-  return completed;
+  const packed = consumeIngredients(state, { food_box: 1 });
+  if (!packed.success) return { success: false, reason: "Kho đã hết hộp đựng." };
+  order.packed = true;
+  order.status = "ready";
+  return { success: true, order, ingredientCost: packed.cost };
+}
+
+export function evaluatePreparedOrder(order, customer) {
+  const item = order.items[0];
+  const target = getProductRecipe(item.productId, { size: order.preparedSize ?? item.size }) ?? {};
+  delete target.food_box;
+  const prepared = order.preparedIngredients ?? {};
+  const ingredientIds = new Set([...Object.keys(target), ...Object.keys(prepared)]);
+  const missingIngredients = [];
+  const wrongIngredients = [];
+  let correctIngredients = 0;
+  for (const id of ingredientIds) {
+    const needed = target[id] ?? 0;
+    const used = prepared[id] ?? 0;
+    const correct = Math.min(needed, used);
+    correctIngredients += correct;
+    if (needed > used) missingIngredients.push({ id, quantity: needed - used });
+    if (used > needed) wrongIngredients.push({ id, quantity: used - needed });
+  }
+  const missingCount = missingIngredients.reduce((sum, entry) => sum + entry.quantity, 0);
+  const wrongCount = wrongIngredients.reduce((sum, entry) => sum + entry.quantity, 0);
+  const sizeCorrect = order.preparedSize === item.size;
+  const waitingTime = Math.max(0, customer.elapsedWait ?? ((Date.now() - order.createdAt) / 1000));
+  const satisfaction = Math.max(0, Math.min(100, 100 - missingCount * 9 - wrongCount * 7 - (sizeCorrect ? 0 : 15) - Math.min(30, Math.floor(waitingTime / 8))));
+  return { correctIngredients, missingIngredients, wrongIngredients, sizeCorrect, waitingTime, satisfaction };
 }
 
 export function serveOrder(state, orderId, now = Date.now()) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
-  if (!order || !["waiting", "preparing", "ready"].includes(order.status)) return { success: false, reason: "Đơn này không còn chờ phục vụ." };
+  if (!order || order.status !== "ready" || !order.packed) return { success: false, reason: "Hãy trộn và đóng hộp món trước khi giao khách." };
   const customer = state.customers.find((candidate) => candidate.id === order.customerId);
   if (!customer) return { success: false, reason: "Khách đã rời quầy." };
 
-  const recipe = {};
-  for (const item of order.items) {
-    const itemRecipe = (awaitRecipe(item));
-    for (const [ingredientId, quantity] of Object.entries(itemRecipe)) recipe[ingredientId] = (recipe[ingredientId] ?? 0) + quantity * item.quantity;
-  }
-  const consumed = consumeIngredients(state, recipe);
+  const actualRecipe = { ...(order.preparedIngredients ?? {}) };
+  const consumed = consumeIngredients(state, actualRecipe);
   if (!consumed.success) {
     order.availabilityBlocked = true;
-    return { success: false, reason: "Kho thiếu nguyên liệu để pha món này.", missing: consumed.missing };
+    return { success: false, reason: "Kho thiếu nguyên liệu đã cho vào tô.", missing: consumed.missing };
   }
 
+  const accuracy = evaluatePreparedOrder(order, customer);
+  order.accuracy = accuracy;
   order.status = "served";
   order.servedAt = now;
   state.money += order.totalPrice;
@@ -84,15 +146,8 @@ export function serveOrder(state, orderId, now = Date.now()) {
   const review = addReview(state, customer, order, now);
   customer.status = "served";
   state.customers = state.customers.filter((candidate) => candidate.id !== customer.id);
-  return { success: true, order, review, ingredientCost: consumed.cost };
+  return { success: true, order, review, accuracy, revenue: order.totalPrice, ingredientCost: consumed.cost };
 }
-
-function awaitRecipe(item) {
-  // Kept as a tiny wrapper so order aggregation stays independent from the DOM.
-  return getProductRecipe(item.productId, item);
-}
-
-import { getProductRecipe } from "../data/products.js";
 
 export function getOrderDetails(state, order) {
   const items = order.items.map((item) => ({

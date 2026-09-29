@@ -32,8 +32,6 @@ export function createInitialState() {
     totalProfit: 0,
     dailyStats: {
       revenue: 0,
-      noodleRevenue: 0,
-      noodleCustomers: 0,
       ingredientCost: 0,
       stockPurchases: 0,
       salaryCost: 0,
@@ -53,20 +51,13 @@ export function createInitialState() {
     customers: [],
     currentEvent: null,
     eventEndsAt: null,
-    shopName: "Tiệm Trà Mơ Ước",
-    noodleBranch: {
-      name: "Tiệm Mì Cay",
-      sharedWallet: true,
-      customersServed: 0,
-      totalRevenue: 0,
-      sellPrices: { spicyBeefNoodle: 52_000, fishBallNoodle: 46_000 },
-    },
+    shopName: "Tiệm Bánh Tráng Trộn",
     miniGames: {
       bauCua: { bets: {}, stake: 10_000, lastRound: null, net: 0, roundsPlayed: 0 },
       xiDach: { stake: 10_000, lastRound: null, net: 0, roundsPlayed: 0 },
     },
     history: [],
-    settings: { music: true, sound: true, theme: "peach" },
+    settings: { music: true, sound: true, theme: "warm" },
     gameplay: {
       status: "preparation",
       elapsedMs: 0,

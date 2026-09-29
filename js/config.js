@@ -2,8 +2,9 @@ export const DEBUG = true;
 
 export const GAME_CONFIG = Object.freeze({
   DAY_DURATION_SECONDS: 240,
-  STORAGE_KEY: "tea-shop-game-save-v1",
-  STATE_VERSION: 2,
+  STORAGE_KEY: "banh-trang-tron-game-save-v1",
+  LEGACY_STORAGE_KEY: "tea-shop-game-save-v1",
+  STATE_VERSION: 3,
   INITIAL_MONEY: 400_000,
   MAX_REVIEWS: 40,
   MAX_HISTORY_ENTRIES: 80,
@@ -22,11 +23,10 @@ export const ROUTES = Object.freeze([
   { id: "dashboard", label: "Tiệm", icon: "prep" },
   { id: "inventory", label: "Kho", icon: "inventory" },
   { id: "upgrades", label: "Nâng cấp", icon: "upgrades" },
-  { id: "prices", label: "Giá", icon: "prices" },
+  { id: "prices", label: "Giá bán", icon: "prices" },
   { id: "employees", label: "Nhân viên", icon: "employees" },
   { id: "reviews", label: "Đánh giá", icon: "reviews" },
   { id: "stats", label: "Thống kê", icon: "stats" },
-  { id: "noodles", label: "Mì Cay", icon: "noodles" },
   { id: "baucua", label: "Bầu Cua", icon: "🎲" },
   { id: "xidach", label: "Xì Dách", icon: "🃏" },
 ]);

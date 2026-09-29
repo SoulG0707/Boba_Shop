@@ -1,5 +1,5 @@
 import { GAME_CONFIG } from "../config.js";
-import { PRODUCT_BY_ID, getProductRecipe, getProductPrice } from "../data/products.js";
+import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getProductRecipe, getProductPrice } from "../data/products.js";
 import { getIngredientUnitCost } from "./inventory.js";
 import { getGameplayModifiers } from "./modifiers.js";
 
@@ -19,7 +19,8 @@ export function calculateDemandModifier(state, productId, options = {}) {
   const product = PRODUCT_BY_ID[productId];
   if (!product) return 0;
   const price = getProductPrice(productId, state.sellPrices, options);
-  const referencePrice = product.basePrice * (options.size === "large" ? 1.3 : 1) + (options.topping === "blackPearl" ? 5_000 : options.topping === "whitePearl" ? 6_000 : 0);
+  const sizeOption = PRODUCT_OPTIONS.sizes[options.size] ?? PRODUCT_OPTIONS.sizes.M;
+  const referencePrice = product.basePrice + sizeOption.priceModifier;
   const eventModifiers = getGameplayModifiers(state);
   const priceSensitivity = eventModifiers.priceSensitivity;
   const priceRatio = price / referencePrice;
@@ -38,8 +39,6 @@ export function createDailyStats(state) {
   const rating = getCurrentRating(state);
   state.dailyStats = {
     revenue: 0,
-    noodleRevenue: 0,
-    noodleCustomers: 0,
     ingredientCost: 0,
     stockPurchases: 0,
     salaryCost: 0,

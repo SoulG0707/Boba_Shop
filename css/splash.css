@@ -1,26 +1,27 @@
 .splash-content { position: absolute; top: 34%; left: 50%; display: flex; width: min(330px, calc(100% - 32px)); flex-direction: column; align-items: center; transform: translateX(-50%); text-align: center; }
 .splash-ribbon { padding: 3px 12px; border: 1px solid rgba(138, 90, 59, .35); border-radius: 999px; background: rgba(255, 250, 242, .84); color: var(--counter); font-size: .72rem; font-weight: 800; box-shadow: 0 2px 0 rgba(138, 90, 59, .16); }
-.splash-content h1 { margin: 7px 0 0; color: var(--ink); font-size: clamp(2.2rem, 10vw, 3rem); font-weight: 800; line-height: .88; text-shadow: 0 2px 0 rgba(255, 250, 242, .72); }
+.splash-content h1 { margin: 7px 0 0; color: var(--ink); font-size: clamp(2rem, 9vw, 2.7rem); font-weight: 800; line-height: .9; text-shadow: 0 2px 0 rgba(255, 249, 238, .8); }
 .splash-content h1 span { color: var(--pink-dark); }
 .splash-shop-name { max-width: 85%; margin: 5px 0 0; overflow: hidden; color: var(--counter); font-size: .87rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
 .splash-actions { display: grid; width: min(228px, 100%); gap: 8px; margin-top: 12px; }
 .splash-actions .button { min-height: 43px; font-size: .88rem; }
 .splash-version { margin-top: 7px; color: rgba(58, 35, 23, .68); font-size: .56rem; font-weight: 800; letter-spacing: .06em; }
-.splash-cloud { position: absolute; top: 5%; left: -9%; width: 145px; opacity: .72; animation: cloud-drift 9s ease-in-out infinite alternate; }
 .splash-lantern { position: absolute; top: 25%; width: 48px; transform-origin: 50% 4%; animation: lantern-sway 3.8s ease-in-out infinite alternate; }
 .splash-lantern-left { left: 8%; }
 .splash-lantern-right { right: 7%; animation-delay: -1.7s; }
 .splash-sticker { position: absolute; object-fit: contain; opacity: .75; pointer-events: none; }
 .splash-sticker-star { top: 55%; left: 11%; width: 35px; animation: sticker-float 3.5s ease-in-out infinite; }
 .splash-sticker-leaf { top: 58%; right: 10%; width: 38px; animation: sticker-float 4s ease-in-out infinite reverse; }
-@keyframes cloud-drift { to { transform: translateX(20px); } }
+.splash-food-art { position: absolute; z-index: 1; right: 0; bottom: 18%; left: 0; display: flex; justify-content: center; gap: 16px; font-size: 2rem; filter: drop-shadow(0 3px 1px rgba(67, 42, 30, .13)); }
+.splash-food-art span:nth-child(2) { transform: translateY(-12px); }
+.splash-food-art span:nth-child(3) { font-size: 2.7rem; }
 @keyframes lantern-sway { to { transform: rotate(4deg); } }
 @keyframes sticker-float { 50% { transform: translateY(-5px) rotate(3deg); } }
 @media (max-height: 700px) {
   .splash-content { top: 29%; }
-  .splash-content h1 { font-size: 2.2rem; }
+  .splash-content h1 { font-size: 2rem; }
   .splash-actions { margin-top: 8px; gap: 5px; }
   .splash-actions .button { min-height: 38px; }
   .splash-lantern { top: 19%; width: 39px; }
 }
-@media (prefers-reduced-motion: reduce) { .splash-cloud, .splash-lantern, .splash-sticker { animation: none; } }
+@media (prefers-reduced-motion: reduce) { .splash-lantern, .splash-sticker { animation: none; } }

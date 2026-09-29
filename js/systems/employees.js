@@ -32,7 +32,7 @@ export function getEmployeeEffects(state) {
     const role = EMPLOYEE_ROLE_BY_ID[employee.role];
     if (!role) continue;
     for (const [effect, value] of Object.entries(role.effect ?? {})) effects[effect] = (effects[effect] ?? 0) + value * (employee.level ?? 1);
-    if (employee.role === "barista") effects.serviceSpeed += employee.speed * (employee.level ?? 1);
+    if (employee.role === "mixer") effects.serviceSpeed += employee.speed * (employee.level ?? 1);
     if (employee.role === "online") effects.onlineOrders += employee.speed * (employee.level ?? 1);
   }
   return effects;

@@ -3,7 +3,7 @@ import { getUpgradeCost } from "../systems/upgrades.js";
 import { formatMoney } from "../config.js";
 import { escapeHtml } from "./helpers.js";
 
-const UPGRADE_ICONS = { sealer: "🥤", ledSign: "💡", chairs: "🪑", advertising: "📣", counter: "🧰", airConditioner: "❄️" };
+const UPGRADE_ICONS = { sealer: "🥣", ledSign: "💡", chairs: "🪑", advertising: "📣", counter: "🫙", airConditioner: "🧊" };
 
 export function renderUpgradesView(state) {
   const rows = UPGRADES.map((upgrade) => {
@@ -19,5 +19,5 @@ export function renderUpgradesView(state) {
 }
 
 function effectName(key) {
-  return ({ serviceSpeed: "Tốc độ", customerSpawn: "Khách", patience: "Kiên nhẫn", onlineOrders: "Đơn online", rating: "Rating", capacity: "Sức chứa" })[key] ?? key;
+  return ({ serviceSpeed: "Tốc độ", customerSpawn: "Khách", patience: "Kiên nhẫn", onlineOrders: "Đơn online", rating: "Đánh giá", capacity: "Sức chứa", shelfLife: "Hạn dùng" })[key] ?? key;
 }

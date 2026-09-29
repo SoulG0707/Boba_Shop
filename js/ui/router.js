@@ -7,7 +7,6 @@ import { renderPricesView } from "./pricesView.js";
 import { renderEmployeesView } from "./employeesView.js";
 import { renderReviewsView } from "./reviewsView.js";
 import { renderStatsView } from "./statsView.js";
-import { renderNoodleBranchView } from "./noodleBranchView.js";
 import { renderBauCuaView } from "./bauCuaView.js";
 import { renderXidachView } from "./xidachView.js";
 import { renderPreparationShell } from "./preparationShell.js";
@@ -21,7 +20,6 @@ const VIEWS = {
   employees: renderEmployeesView,
   reviews: renderReviewsView,
   stats: renderStatsView,
-  noodles: renderNoodleBranchView,
   baucua: renderBauCuaView,
   xidach: renderXidachView,
 };
@@ -40,7 +38,7 @@ export function getCurrentRoute() {
 
 export function renderNavigation() {
   return `<nav class="prep-tabs" aria-label="Các phần trong tiệm">${ROUTES.map((route) => {
-    const icon = ["prep", "inventory", "upgrades", "prices", "employees", "reviews", "stats", "noodles"].includes(route.icon)
+    const icon = ["prep", "inventory", "upgrades", "prices", "employees", "reviews", "stats"].includes(route.icon)
       ? `<img src="./img/icons/${route.icon === "prep" ? "preparation" : route.icon}.png" alt="">`
       : route.icon;
     return `<button class="prep-tab ${route.id === currentRoute ? "is-active" : ""}" data-navigate="${route.id}" ${route.id === currentRoute ? 'aria-current="page"' : ""}><span class="tab-icon">${icon}</span><span>${route.label}</span></button>`;

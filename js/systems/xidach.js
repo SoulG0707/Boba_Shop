@@ -26,7 +26,7 @@ export function playXidachHouseRound(state, amount, random = Math.random) {
   if (!Number.isFinite(stake) || stake < GAME_CONFIG.MIN_MINIGAME_BET || stake > GAME_CONFIG.MAX_MINIGAME_BET) return { success: false, reason: "Mức bàn phải từ 5.000đ đến 100.000đ." };
   if (state.money < stake) return { success: false, reason: "Quỹ chung chưa đủ tiền bảo chứng cho bàn." };
 
-  // The tea shop acts as the bank: reserve one stake, then settle against a visitor's hand.
+  // The stall holds the stake, then settles against the visitor's hand.
   state.money -= stake;
   const visitorCards = drawUntilSeventeen([drawCard(random), drawCard(random)], random);
   const houseCards = drawUntilSeventeen([drawCard(random), drawCard(random)], random);

@@ -1,4 +1,4 @@
-import { PRODUCTS, PRODUCT_OPTIONS, getProductPrice } from "../data/products.js";
+import { PRODUCTS, getProductPrice } from "../data/products.js";
 import { consumeIngredients } from "./inventory.js";
 import { addReview } from "./reviews.js";
 
@@ -6,15 +6,14 @@ export function spawnOnlineOrder(state, now = Date.now(), random = Math.random) 
   const availableProducts = PRODUCTS.filter((candidate) => state.unlockedItems.includes(candidate.id));
   const product = availableProducts[Math.floor(random() * availableProducts.length)];
   if (!product) return null;
-  const size = random() > 0.75 ? "large" : "regular";
-  const topping = Object.keys(PRODUCT_OPTIONS.toppings)[Math.floor(random() * Object.keys(PRODUCT_OPTIONS.toppings).length)];
+  const size = random() > 0.75 ? "L" : "M";
   const number = state.gameplay.nextEntityId++;
   const customer = { id: `online-customer-${number}`, type: "online", label: "Khách online", patience: 90, maxPrice: 60_000, ratingBias: 0.05, preferredProduct: product.id, arrivedAt: now, elapsedWait: 0, orderId: `online-${number}`, status: "waiting" };
   const order = {
     id: `online-${number}`,
     customerId: customer.id,
-    items: [{ productId: product.id, size, topping, quantity: 1 }],
-    totalPrice: getProductPrice(product.id, state.sellPrices, { size, topping }),
+    items: [{ productId: product.id, size, quantity: 1 }],
+    totalPrice: getProductPrice(product.id, state.sellPrices, { size }),
     createdAt: now,
     status: "waiting",
     channel: "online",

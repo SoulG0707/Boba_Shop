@@ -8,27 +8,17 @@
 .minigame-tile small { color: var(--soft); font-size: .59rem; }
 .minigame-emoji { font-size: 1.35rem; }
 .dice-result { display: flex; justify-content: center; gap: 9px; margin: 5px 0; font-size: 2rem; }
+.round-result { margin-bottom: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel); }
+.branch-status { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
+.branch-status > strong { font-size: .77rem; }
 .playing-cards { display: flex; flex-wrap: wrap; gap: 4px; margin: 5px 0; }
 .playing-card { display: grid; width: 37px; height: 52px; place-content: center; gap: 1px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-size: .91rem; font-weight: 800; text-align: center; box-shadow: 0 2px 0 rgba(58, 35, 23, .08); }
 .playing-card small { font-size: .78rem; }
 .playing-card.is-red { color: #c94f5a; }
-.order-actions { display: flex; flex-wrap: wrap; gap: 5px; }
 .product-title { display: flex; align-items: center; gap: 7px; }
 .product-emoji { font-size: 1.3rem; }
 .product-meta, .ingredient-meta { display: flex; justify-content: space-between; gap: 6px; font-size: .71rem; }
 .review-stars { color: var(--gold); }
-.branch-ledger, .round-result { margin-bottom: 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 12px; background: #fff8ef; }
-.branch-status { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
-.branch-status > strong { font-size: .77rem; }
-.branch-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 7px; padding-top: 6px; border-top: 1px dashed var(--line); }
-.branch-stats span { display: grid; min-width: 0; }
-.branch-stats small, .hand-result-grid > div > small { color: var(--soft); font-size: .6rem; }
-.branch-stats strong { overflow: hidden; font-size: .7rem; text-overflow: ellipsis; white-space: nowrap; }
-.branch-menu-heading { margin-top: 9px; }
-.branch-menu-heading h3 { margin: 0; font-size: .9rem; }
-.branch-menu-heading p { margin: 1px 0 0; font-size: .65rem; }
-.noodle-row .row-copy strong small { color: var(--pink-dark); font-size: .64rem; }
-.noodle-row .row-copy small { white-space: normal; }
 .activity-panel { display: grid; gap: 7px; padding: 10px; border-bottom: 1px solid var(--line); background: #fffaf2; }
 .activity-intro { display: flex; align-items: center; justify-content: space-between; gap: 7px; }
 .activity-intro h3 { margin: 0; font-size: .9rem; }

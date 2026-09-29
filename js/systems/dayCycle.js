@@ -1,7 +1,7 @@
 import { GAME_CONFIG } from "../config.js";
 import { createDailyStats, settleDay } from "./economy.js";
 import { advanceCustomerQueue, spawnCustomer } from "./customers.js";
-import { advanceOrderPreparation, createOrder } from "./orders.js";
+import { createOrder } from "./orders.js";
 import { spawnOnlineOrder } from "./onlineOrders.js";
 import { expireIngredients } from "./inventory.js";
 import { startRandomEvent } from "./events.js";
@@ -117,7 +117,6 @@ export function tickDay(state, now = Date.now(), random = Math.random) {
     state.gameplay.onlineSpawnAccumulator -= GAME_CONFIG.ONLINE_SPAWN_INTERVAL_SECONDS * 1000;
     spawnOnlineOrder(state, now, random);
   }
-  advanceOrderPreparation(state, deltaSeconds, modifiers.serviceSpeed);
   processEmployeeAutomation(state, now, modifiers.serviceSpeed);
 
   if (state.eventEndsAt && now >= state.eventEndsAt) {

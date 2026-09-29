@@ -1,62 +1,72 @@
+const foodBox = { food_box: 1 };
+
 const baseProducts = [
   {
-    id: "milkTea",
-    name: "Trà sữa truyền thống",
-    category: "Trà sữa",
-    emoji: "🧋",
-    basePrice: 28_000,
-    baseRecipe: { tea: 1, milk: 1, sugar: 1, cup: 1 },
-    description: "Trà đen thơm, sữa dịu và ngọt vừa.",
+    id: "traditional",
+    name: "Bánh tráng trộn truyền thống",
+    category: "Truyền thống",
+    emoji: "🥗",
+    basePrice: 25_000,
+    baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, ...foodBox },
+    description: "Vị chua cay quen thuộc, thơm xoài xanh và rau răm.",
     unlockedByDefault: true,
   },
   {
-    id: "matchaLatte",
-    name: "Matcha latte",
-    category: "Matcha",
-    emoji: "🍵",
-    basePrice: 34_000,
-    baseRecipe: { matcha: 1, milk: 1, sugar: 1, cup: 1 },
-    description: "Matcha xanh mịn pha cùng sữa tươi.",
+    id: "beef",
+    name: "Bánh tráng trộn khô bò",
+    category: "Khô bò",
+    emoji: "🥩",
+    basePrice: 32_000,
+    baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, beef_jerky: 1, ...foodBox },
+    description: "Thêm khô bò dai thơm, đậm đà.",
+    unlockedByDefault: true,
+  },
+  {
+    id: "chicken",
+    name: "Bánh tráng trộn khô gà",
+    category: "Khô gà",
+    emoji: "🍗",
+    basePrice: 32_000,
+    baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, chicken_jerky: 1, ...foodBox },
+    description: "Khô gà lá chanh thơm nhẹ, cay vừa.",
+    unlockedByDefault: true,
+  },
+  {
+    id: "special",
+    name: "Bánh tráng trộn đặc biệt",
+    category: "Đặc biệt",
+    emoji: "✨",
+    basePrice: 40_000,
+    baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, tamarind_sauce: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, quail_egg: 1, beef_jerky: 1, dried_shrimp: 1, ...foodBox },
+    description: "Đủ vị sốt me, trứng cút, khô bò và tép khô.",
     unlockedByDefault: true,
   },
 ];
 
 export const PRODUCT_OPTIONS = Object.freeze({
   sizes: {
-    regular: { label: "Vừa", priceMultiplier: 1, recipeMultiplier: 1 },
-    large: { label: "Lớn", priceMultiplier: 1.3, recipeMultiplier: 1.5 },
-  },
-  toppings: {
-    none: { label: "Không topping", price: 0, recipe: {} },
-    blackPearl: { label: "Trân châu đen", price: 5_000, recipe: { blackPearl: 1 } },
-    whitePearl: { label: "Trân châu trắng", price: 6_000, recipe: { whitePearl: 1 } },
+    M: { label: "SIZE M", ingredientMultiplier: 1, priceModifier: 0 },
+    L: { label: "SIZE L", ingredientMultiplier: 1.4, priceModifier: 7_000 },
   },
 });
 
 export const PRODUCTS = Object.freeze(baseProducts.map((product) => Object.freeze(product)));
 export const PRODUCT_BY_ID = Object.freeze(Object.fromEntries(PRODUCTS.map((product) => [product.id, product])));
 
-export function getProductRecipe(productId, { size = "regular", topping = "none" } = {}) {
+export function getProductRecipe(productId, { size = "M" } = {}) {
   const product = PRODUCT_BY_ID[productId];
   if (!product) return null;
-  const sizeOption = PRODUCT_OPTIONS.sizes[size] ?? PRODUCT_OPTIONS.sizes.regular;
-  const toppingOption = PRODUCT_OPTIONS.toppings[topping] ?? PRODUCT_OPTIONS.toppings.none;
-  const recipe = {};
-
-  for (const [ingredientId, quantity] of Object.entries(product.baseRecipe)) {
-    recipe[ingredientId] = Math.ceil(quantity * sizeOption.recipeMultiplier);
-  }
-  for (const [ingredientId, quantity] of Object.entries(toppingOption.recipe)) {
-    recipe[ingredientId] = (recipe[ingredientId] ?? 0) + quantity;
-  }
-  return recipe;
+  const sizeOption = PRODUCT_OPTIONS.sizes[size] ?? PRODUCT_OPTIONS.sizes.M;
+  return Object.fromEntries(Object.entries(product.baseRecipe).map(([ingredientId, quantity]) => [
+    ingredientId,
+    ingredientId === "food_box" ? quantity : Math.ceil(quantity * sizeOption.ingredientMultiplier),
+  ]));
 }
 
-export function getProductPrice(productId, sellPrices, { size = "regular", topping = "none" } = {}) {
+export function getProductPrice(productId, sellPrices, { size = "M" } = {}) {
   const product = PRODUCT_BY_ID[productId];
   if (!product) return 0;
-  const sizeOption = PRODUCT_OPTIONS.sizes[size] ?? PRODUCT_OPTIONS.sizes.regular;
-  const toppingOption = PRODUCT_OPTIONS.toppings[topping] ?? PRODUCT_OPTIONS.toppings.none;
+  const sizeOption = PRODUCT_OPTIONS.sizes[size] ?? PRODUCT_OPTIONS.sizes.M;
   const basePrice = sellPrices?.[productId] ?? product.basePrice;
-  return Math.round(basePrice * sizeOption.priceMultiplier + toppingOption.price);
+  return Math.round(basePrice + sizeOption.priceModifier);
 }

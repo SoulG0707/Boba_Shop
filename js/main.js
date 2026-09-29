@@ -4,13 +4,12 @@ import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
 import { renderHeader } from "./ui/header.js";
 import { renderSplashView } from "./ui/splashView.js";
-import { getDefaultCupVisual } from "./ui/gameplayView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
 import { showToast } from "./ui/toast.js";
 import { purchaseIngredient } from "./systems/inventory.js";
 import { buyUpgrade } from "./systems/upgrades.js";
 import { hireEmployee, fireEmployee } from "./systems/employees.js";
-import { createOrder, setOrderStatus, serveOrder } from "./systems/orders.js";
+import { addIngredientToOrder, createOrder, finishMixingOrder, mixOrder, packOrder, removeIngredientFromOrder, serveOrder, setOrderSize } from "./systems/orders.js";
 import { spawnCustomer } from "./systems/customers.js";
 import { acceptOnlineOrder, completeOnlineOrder } from "./systems/onlineOrders.js";
 import { startDay, pauseDay, resumeDay, tickDay, endDay, nextDay } from "./systems/dayCycle.js";
@@ -18,7 +17,6 @@ import { triggerEvent } from "./systems/events.js";
 import { escapeHtml } from "./ui/helpers.js";
 import { createBackup, restoreBackup } from "./backup/backup.js";
 import { audioManager } from "./systems/audioManager.js";
-import { sellNoodleBowl } from "./systems/noodleBranch.js";
 import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js";
 import { playXidachHouseRound } from "./systems/xidach.js";
 
@@ -29,7 +27,6 @@ let renderedSecond = -1;
 let summaryShownForDay = null;
 let splashVisible = true;
 let selectedCustomerId = null;
-let visualCup = { orderId: null, ingredients: {} };
 let serveFeedback = null;
 let serveFeedbackTimer = null;
 
@@ -48,12 +45,17 @@ function refreshUI() {
   appShell.hidden = false;
   appShell.setAttribute("aria-hidden", "false");
   header.innerHTML = renderHeader(state);
-  renderApp(state, { selectedCustomerId, visualCup, feedback: serveFeedback });
+  renderApp(state, { selectedCustomerId, feedback: serveFeedback });
 }
 
 function enterGame() {
   splashVisible = false;
   let state = getState();
+  const migrationNotice = state.migrationNotice;
+  if (migrationNotice) {
+    updateState((current) => { delete current.migrationNotice; });
+    state = getState();
+  }
   if (state.gameplay.status === "running") {
     updateState((current) => { current.gameplay.lastTickAt = Date.now(); });
     state = getState();
@@ -62,6 +64,7 @@ function enterGame() {
   syncSelectedCustomer(state);
   navigate(["running", "paused"].includes(state.gameplay.status) ? "gameplay" : "dashboard");
   refreshUI();
+  if (migrationNotice) showToast(migrationNotice, "info", 7000);
   if (state.gameplay.status === "summary") {
     summaryShownForDay = state.day;
     showEndDayModal(state.dailyStats, state.day);
@@ -73,8 +76,6 @@ function syncSelectedCustomer(state) {
   if (customer) return;
   const nextCustomer = state.customers.find((candidate) => candidate.status === "waiting");
   selectedCustomerId = nextCustomer?.id ?? null;
-  const order = nextCustomer && state.orders.find((candidate) => candidate.id === nextCustomer.orderId && candidate.status !== "cancelled");
-  visualCup = { orderId: order?.id ?? null, ingredients: order ? getDefaultCupVisual(order) : {} };
 }
 
 function selectCustomer(customerId) {
@@ -83,16 +84,15 @@ function selectCustomer(customerId) {
   const order = customer && state.orders.find((candidate) => candidate.id === customer.orderId);
   if (!order) return;
   selectedCustomerId = customerId;
-  visualCup = { orderId: order.id, ingredients: getDefaultCupVisual(order) };
   refreshUI();
 }
 
 function openSettings() {
   const state = getState();
   const body = `<div class="setting-line"><span><strong>Nhạc nền</strong><div class="tiny muted">Phát nhạc sau thao tác đầu tiên</div></span><input class="switch" type="checkbox" data-setting="music" ${state.settings.music ? "checked" : ""}></div>
-    <div class="setting-line"><span><strong>Hiệu ứng âm thanh</strong><div class="tiny muted">Chuông và âm thanh pha chế</div></span><input class="switch" type="checkbox" data-setting="sound" ${state.settings.sound ? "checked" : ""}></div>
+    <div class="setting-line"><span><strong>Hiệu ứng âm thanh</strong><div class="tiny muted">Tiếng trộn, đóng hộp và nhận tiền</div></span><input class="switch" type="checkbox" data-setting="sound" ${state.settings.sound ? "checked" : ""}></div>
     <div class="setting-line"><label for="music-volume">Âm lượng nhạc</label><input id="music-volume" type="range" min="0" max="100" value="50" data-setting-volume="music"></div><div class="setting-line"><label for="sfx-volume">Âm lượng hiệu ứng</label><input id="sfx-volume" type="range" min="0" max="100" value="65" data-setting-volume="sound"></div>
-    <div class="divider"></div><strong>Sao lưu tiến trình</strong><p class="tiny">Backup được tạo trên thiết bị này, có checksum SHA-256 để phát hiện dữ liệu sai.</p><div class="button-row"><button class="button button-quiet" data-action="export-backup">Tạo backup</button><button class="button button-primary" data-action="restore-backup">Khôi phục</button></div><textarea id="backup-text" class="text-input" rows="4" style="margin-top:.65rem;resize:vertical" placeholder="Dán mã TEASHOP1... vào đây để khôi phục"></textarea>
+    <div class="divider"></div><strong>Sao lưu tiến trình</strong><p class="tiny">Backup được tạo trên thiết bị này, có checksum SHA-256 để phát hiện dữ liệu sai.</p><div class="button-row"><button class="button button-quiet" data-action="export-backup">Tạo backup</button><button class="button button-primary" data-action="restore-backup">Khôi phục</button></div><textarea id="backup-text" class="text-input" rows="4" style="margin-top:.65rem;resize:vertical" placeholder="Dán mã BTRON1... vào đây để khôi phục"></textarea>
     <div class="button-row" style="margin-top:1rem"><button class="button button-quiet" data-action="edit-shop-name">Đổi tên tiệm</button><button class="button button-danger" data-action="confirm-reset">Chơi lại từ đầu</button></div>`;
   showModal("Cài đặt", body, "Tùy chỉnh trải nghiệm chơi trên thiết bị này.");
 }
@@ -108,7 +108,7 @@ function openResetConfirmation() {
 }
 
 function notifyResult(result, successMessage) {
-  if (result.success) showToast(successMessage, "success");
+  if (result.success && successMessage) showToast(successMessage, "success");
   else showToast(result.reason ?? "Thao tác chưa hoàn tất.", "error");
 }
 
@@ -122,12 +122,49 @@ function handleAction(action, element) {
     case "select-customer":
       selectCustomer(element.dataset.customer);
       break;
-    case "toggle-cup-ingredient": {
-      const customer = getState().customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-      const order = customer && getState().orders.find((candidate) => candidate.id === customer.orderId);
-      if (!order) break;
-      if (visualCup.orderId !== order.id) visualCup = { orderId: order.id, ingredients: getDefaultCupVisual(order) };
-      visualCup.ingredients[element.dataset.ingredient] = !visualCup.ingredients[element.dataset.ingredient];
+    case "choose-order-size":
+      updateState((current) => {
+        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+        if (customer) setOrderSize(current, customer.orderId, element.dataset.size);
+      });
+      refreshUI();
+      break;
+    case "add-order-ingredient":
+      updateState((current) => {
+        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+        if (customer) notifyResult(addIngredientToOrder(current, customer.orderId, element.dataset.ingredient), null);
+      });
+      refreshUI();
+      break;
+    case "remove-bowl-ingredient":
+      updateState((current) => {
+        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+        if (customer) removeIngredientFromOrder(current, customer.orderId, element.dataset.ingredient);
+      });
+      refreshUI();
+      break;
+    case "mix-order": {
+      let orderId = null;
+      updateState((current) => {
+        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+        if (customer && mixOrder(current, customer.orderId)) orderId = customer.orderId;
+      });
+      if (orderId) {
+        refreshUI();
+        window.setTimeout(() => {
+          updateState((current) => finishMixingOrder(current, orderId));
+          refreshUI();
+        }, 650);
+      }
+      break;
+    }
+    case "pack-order": {
+      let result;
+      updateState((current) => {
+        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
+        result = customer ? packOrder(current, customer.orderId) : { success: false, reason: "Chưa chọn khách." };
+      });
+      notifyResult(result, "Đã đóng hộp, sẵn sàng giao khách!");
       refreshUI();
       break;
     }
@@ -148,7 +185,7 @@ function handleAction(action, element) {
         const blobUrl = URL.createObjectURL(new Blob([backup], { type: "text/plain;charset=utf-8" }));
         const link = document.createElement("a");
         link.href = blobUrl;
-        link.download = `tra-nho-ngay-${getState().day}.teashop`;
+        link.download = `banh-trang-tron-ngay-${getState().day}.btron`;
         link.click();
         URL.revokeObjectURL(blobUrl);
         const field = document.querySelector("#backup-text");
@@ -215,13 +252,6 @@ function handleAction(action, element) {
       updateState((current) => fireEmployee(current, element.dataset.employee));
       refreshUI();
       break;
-    case "sell-noodle": {
-      let result;
-      updateState((current) => { result = sellNoodleBowl(current, element.dataset.noodle); });
-      notifyResult(result, `${result.noodle?.name ?? "Món mì"} đã bán, quỹ chung được cập nhật.`);
-      refreshUI();
-      break;
-    }
     case "select-bau-stake":
       updateState((current) => { current.miniGames.bauCua.stake = Number(element.dataset.stake); });
       refreshUI();
@@ -255,10 +285,6 @@ function handleAction(action, element) {
       refreshUI();
       break;
     }
-    case "prepare-order":
-      updateState((current) => setOrderStatus(current, element.dataset.order, "preparing"));
-      refreshUI();
-      break;
     case "serve-order": {
       let result;
       updateState((current) => { result = serveOrder(current, element.dataset.order); });
@@ -268,6 +294,7 @@ function handleAction(action, element) {
           revenue: result.revenue ?? result.order?.totalPrice ?? 0,
           rating: result.review?.rating ?? 5,
           customerType: result.review?.customerType ?? "regular",
+          accuracy: result.accuracy,
           createdAt: Date.now(),
         };
         if (serveFeedbackTimer) window.clearTimeout(serveFeedbackTimer);
@@ -283,7 +310,7 @@ function handleAction(action, element) {
     case "accept-online":
       updateState((current) => {
         const accepted = acceptOnlineOrder(current, element.dataset.order);
-        if (accepted) showToast("Đã nhận đơn online, bắt đầu pha chế.", "success");
+        if (accepted) showToast("Đã nhận đơn bánh tráng online.", "success");
       });
       refreshUI();
       break;
@@ -304,7 +331,7 @@ document.addEventListener("click", (event) => {
   if (actionButton && !actionButton.disabled) {
     const action = actionButton.dataset.action;
     handleAction(action, actionButton);
-    audioManager.playSfx(action === "serve-order" || action === "complete-online" ? "cash" : action === "buy-upgrade" ? "levelup" : action === "prepare-order" ? "pour" : "tap");
+    audioManager.playSfx(action === "serve-order" || action === "complete-online" ? "cash" : action === "buy-upgrade" ? "levelup" : action === "mix-order" ? "mix" : action === "pack-order" ? "bag" : "tap");
     return;
   }
   const routeButton = event.target.closest("[data-navigate]");

@@ -41,8 +41,6 @@ export function validateSaveSchema(candidate) {
     candidate.dailyStats && typeof candidate.dailyStats === "object" &&
     candidate.settings && typeof candidate.settings === "object" &&
     candidate.gameplay && typeof candidate.gameplay === "object" &&
-    candidate.noodleBranch && typeof candidate.noodleBranch === "object" &&
-    candidate.noodleBranch.sellPrices && typeof candidate.noodleBranch.sellPrices === "object" &&
     candidate.miniGames && typeof candidate.miniGames === "object" &&
     candidate.miniGames.bauCua && candidate.miniGames.xiDach
   );
@@ -64,11 +62,11 @@ export function loadGame() {
   const storage = getStorage();
   if (!storage) return createInitialState();
   try {
-    const raw = storage.getItem(GAME_CONFIG.STORAGE_KEY);
+    const raw = storage.getItem(GAME_CONFIG.STORAGE_KEY) ?? storage.getItem(GAME_CONFIG.LEGACY_STORAGE_KEY);
     if (!raw) return createInitialState();
     const parsed = JSON.parse(raw);
     if (validateSaveSchema(parsed)) return parsed;
-    const migrated = migrateVersionOneSave(parsed);
+    const migrated = migrateLegacySave(parsed);
     if (migrated) {
       saveGame(migrated);
       return migrated;
@@ -79,41 +77,33 @@ export function loadGame() {
   return createInitialState();
 }
 
-function migrateVersionOneSave(candidate) {
-  if (!candidate || candidate.version !== 1 || !Number.isFinite(candidate.money) || !Number.isInteger(candidate.day) || !candidate.stock || !Array.isArray(candidate.reviews)) return null;
-  const defaults = createInitialState();
-  const stock = Object.fromEntries(Object.entries(defaults.stock).map(([ingredientId, fallback]) => {
-    const previous = candidate.stock[ingredientId];
-    if (!previous) return [ingredientId, fallback];
-    const quantity = Number.isFinite(previous.quantity) ? Math.max(0, previous.quantity) : 0;
-    const batches = Array.isArray(previous.batches) && previous.batches.length ? previous.batches : quantity > 0 ? [{
-      quantity,
-      boughtDay: candidate.day,
-      expireDay: candidate.day + fallback.expirationDays,
-      unitPrice: previous.purchasePrice ?? fallback.purchasePrice,
-    }] : [];
-    return [ingredientId, { ...fallback, ...previous, quantity, batches }];
-  }));
-  const migrated = {
-    ...defaults,
-    ...candidate,
-    version: GAME_CONFIG.STATE_VERSION,
-    stock,
-    upgrades: { ...defaults.upgrades, ...candidate.upgrades },
-    sellPrices: { ...defaults.sellPrices, ...candidate.sellPrices },
-    dailyStats: { ...defaults.dailyStats, ...candidate.dailyStats },
-    settings: { ...defaults.settings, ...candidate.settings },
-    gameplay: { ...defaults.gameplay, ...candidate.gameplay },
-    orders: Array.isArray(candidate.orders) ? candidate.orders : [],
-    customers: Array.isArray(candidate.customers) ? candidate.customers : [],
-    onlineOrders: Array.isArray(candidate.onlineOrders) ? candidate.onlineOrders : [],
-    employees: Array.isArray(candidate.employees) ? candidate.employees : [],
-    history: Array.isArray(candidate.history) ? candidate.history : [],
-    unlockedItems: Array.isArray(candidate.unlockedItems) ? candidate.unlockedItems : defaults.unlockedItems,
-    noodleBranch: candidate.noodleBranch ?? defaults.noodleBranch,
-    miniGames: candidate.miniGames ?? defaults.miniGames,
+function migrateLegacySave(candidate) {
+  if (!candidate || typeof candidate !== "object" || candidate.version >= GAME_CONFIG.STATE_VERSION || !Number.isFinite(candidate.money) || !Number.isInteger(candidate.day)) return null;
+  const migrated = createInitialState();
+  migrated.money = Math.max(0, candidate.money);
+  migrated.day = Math.max(1, candidate.day);
+  migrated.settings = {
+    ...migrated.settings,
+    music: typeof candidate.settings?.music === "boolean" ? candidate.settings.music : migrated.settings.music,
+    sound: typeof candidate.settings?.sound === "boolean" ? candidate.settings.sound : migrated.settings.sound,
   };
-  return validateSaveSchema(migrated) ? migrated : null;
+  for (const upgrade of UPGRADES) {
+    const savedLevel = candidate.upgrades?.[upgrade.id];
+    if (Number.isInteger(savedLevel)) migrated.upgrades[upgrade.id] = Math.max(0, Math.min(upgrade.maxLevel, savedLevel));
+  }
+  migrated.employees = Array.isArray(candidate.employees)
+    ? candidate.employees.filter((employee) => ["counter", "barista", "mixer", "online"].includes(employee?.role)).map((employee) => {
+      const role = employee.role === "barista" ? "mixer" : employee.role;
+      return {
+        ...employee,
+        role,
+        name: { counter: "Nhân viên sơ chế", mixer: "Nhân viên trộn", online: "Nhân viên giao đơn online" }[role],
+      };
+    })
+    : [];
+  if (candidate.miniGames?.bauCua && candidate.miniGames?.xiDach) migrated.miniGames = candidate.miniGames;
+  migrated.migrationNotice = "Game đã được cập nhật sang Tiệm Bánh Tráng Trộn. Dữ liệu phiên bản cũ không tương thích; tiền, ngày và một số nâng cấp đã được giữ lại, kho và đơn hàng đã làm mới.";
+  return migrated;
 }
 
 export function resetGame() {
