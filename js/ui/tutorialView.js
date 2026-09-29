@@ -15,7 +15,7 @@ const PAGES = [
   {
     title: "Nhận đơn của khách",
     copy: "Đọc món, size và ghi chú trước khi bắt đầu. Mỗi khách có sở thích riêng.",
-    art: `<div class="tutorial-order-demo"><span class="tutorial-customer">${renderFoodAsset("product_beef", "tutorial-food-icon")}</span><div><small>KHÁCH GỌI MÓN · SIZE M</small><strong>Bánh tráng khô bò</strong><span>+ Trứng cút · Không rau răm</span></div></div>`,
+    art: `<div class="tutorial-order-demo"><span class="tutorial-customer">${renderFoodAsset("product_beef", "tutorial-food-icon")}</span><div><small>KHÁCH GỌI MÓN · SIZE BÉ</small><strong>Bánh tráng khô bò</strong><span>+ Trứng cút · Không rau răm</span></div></div>`,
   },
   {
     title: "Trộn món theo yêu cầu",

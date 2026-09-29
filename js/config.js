@@ -2,6 +2,8 @@ export const DEBUG = true;
 
 export const GAME_CONFIG = Object.freeze({
   DAY_DURATION_SECONDS: 240,
+  CUSTOMER_PATIENCE_MULTIPLIER: 2.5,
+  MIX_DURATION_MS: 1_400,
   STORAGE_KEY: "banh-trang-tron-game-save-v1",
   LEGACY_STORAGE_KEY: "tea-shop-game-save-v1",
   STATE_VERSION: 3,

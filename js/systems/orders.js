@@ -42,7 +42,7 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
 
 export function addIngredientToOrder(state, orderId, ingredientId) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
-  if (!order || order.status !== "waiting" || order.mixed) return { success: false, reason: "Tô đã trộn hoặc đơn không còn hoạt động." };
+  if (!order || order.status !== "waiting" || order.mixed || order.mixing) return { success: false, reason: "Tô đã trộn hoặc đơn không còn hoạt động." };
   if (!order.preparedSize) return { success: false, reason: "Chọn size trước khi thêm nguyên liệu." };
   if (!BOWL_INGREDIENTS.includes(ingredientId)) return { success: false, reason: "Nguyên liệu này không dùng để trộn." };
   const quantity = order.preparedIngredients?.[ingredientId] ?? 0;
@@ -54,7 +54,7 @@ export function addIngredientToOrder(state, orderId, ingredientId) {
 
 export function setOrderSize(state, orderId, size) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
-  if (!order || order.status !== "waiting" || order.mixed || !PRODUCT_OPTIONS.sizes[size]) return false;
+  if (!order || order.status !== "waiting" || order.mixed || order.mixing || !PRODUCT_OPTIONS.sizes[size]) return false;
   if (Object.values(order.preparedIngredients ?? {}).some((quantity) => quantity > 0)) return false;
   order.preparedSize = size;
   return true;
@@ -63,7 +63,7 @@ export function setOrderSize(state, orderId, size) {
 export function removeIngredientFromOrder(state, orderId, ingredientId) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
   const quantity = order?.preparedIngredients?.[ingredientId] ?? 0;
-  if (!order || order.status !== "waiting" || order.mixed || quantity <= 0) return false;
+  if (!order || order.status !== "waiting" || order.mixed || order.mixing || quantity <= 0) return false;
   if (quantity === 1) delete order.preparedIngredients[ingredientId];
   else order.preparedIngredients[ingredientId] = quantity - 1;
   return true;

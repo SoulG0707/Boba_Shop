@@ -9,6 +9,7 @@ const CUSTOMER_TYPES = [
   { id: "office", name: "Dân văn phòng", weight: 0.23, patience: 40, maxPrice: 55_000, ratingBias: 0.05 },
   { id: "reviewer", name: "Khách kỹ tính", weight: 0.1, patience: 55, maxPrice: 60_000, ratingBias: -0.25 },
 ];
+const CUSTOMER_TYPE_BY_ID = Object.freeze(Object.fromEntries(CUSTOMER_TYPES.map((type) => [type.id, type])));
 
 function weightedPick(items, weightOf, random = Math.random) {
   const total = items.reduce((sum, item) => sum + Math.max(0, weightOf(item)), 0);
@@ -31,11 +32,13 @@ export function spawnCustomer(state, now = Date.now(), random = Math.random) {
   if (!type || !preferredProduct) return null;
 
   const number = state.gameplay.nextEntityId++;
+  const maxPatience = type.patience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * getGameplayModifiers(state).patience;
   const customer = {
     id: `customer-${number}`,
     type: type.id,
     label: type.name,
-    patience: type.patience * getGameplayModifiers(state).patience,
+    patience: maxPatience,
+    maxPatience,
     maxPrice: type.maxPrice,
     ratingBias: type.ratingBias,
     preferredProduct: preferredProduct.id,
@@ -65,13 +68,17 @@ export function advanceCustomerQueue(state, deltaSeconds) {
       left.push(customer);
       continue;
     }
+    const order = state.orders.find((candidate) => candidate.id === customer.orderId && candidate.status !== "cancelled");
+    if (order?.mixing) {
+      left.push(customer);
+      continue;
+    }
     customer.elapsedWait += deltaSeconds;
     customer.patience -= deltaSeconds;
     if (customer.patience <= 0) {
       customer.status = "left";
       customer.patience = 0;
       timedOut.push(customer);
-      const order = state.orders.find((candidate) => candidate.id === customer.orderId);
       if (order && order.status !== "served") order.status = "cancelled";
     } else {
       left.push(customer);
@@ -79,4 +86,18 @@ export function advanceCustomerQueue(state, deltaSeconds) {
   }
   state.customers = left;
   return timedOut;
+}
+
+export function migrateCustomerPatience(state) {
+  let migrated = false;
+  const patienceModifier = getGameplayModifiers(state).patience;
+  for (const customer of state.customers) {
+    if (customer.status !== "waiting" || Number.isFinite(customer.maxPatience)) continue;
+    const basePatience = CUSTOMER_TYPE_BY_ID[customer.type]?.patience ?? Math.max(1, customer.patience ?? 1);
+    const maxPatience = basePatience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * patienceModifier;
+    customer.patience = Math.min(maxPatience, Math.max(0, Number(customer.patience) || 0) * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER);
+    customer.maxPatience = maxPatience;
+    migrated = true;
+  }
+  return migrated;
 }

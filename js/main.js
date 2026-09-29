@@ -1,4 +1,4 @@
-import { DEBUG } from "./config.js";
+import { DEBUG, GAME_CONFIG } from "./config.js";
 import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
@@ -12,7 +12,7 @@ import { purchaseIngredient } from "./systems/inventory.js";
 import { buyUpgrade } from "./systems/upgrades.js";
 import { hireEmployee, fireEmployee } from "./systems/employees.js";
 import { addIngredientToOrder, createOrder, finishMixingOrder, mixOrder, packOrder, removeIngredientFromOrder, serveOrder, setOrderSize } from "./systems/orders.js";
-import { spawnCustomer } from "./systems/customers.js";
+import { migrateCustomerPatience, spawnCustomer } from "./systems/customers.js";
 import { acceptOnlineOrder, completeOnlineOrder } from "./systems/onlineOrders.js";
 import { startDay, pauseDay, resumeDay, tickDay, endDay, nextDay } from "./systems/dayCycle.js";
 import { triggerEvent } from "./systems/events.js";
@@ -187,7 +187,7 @@ function handleAction(action, element) {
         window.setTimeout(() => {
           updateState((current) => finishMixingOrder(current, orderId));
           refreshUI();
-        }, 650);
+        }, GAME_CONFIG.MIX_DURATION_MS);
       }
       break;
     }
@@ -489,6 +489,7 @@ function enableDebugTools() {
   };
 }
 
+if (migrateCustomerPatience(getState())) saveGame(getState());
 refreshUI();
 enableDebugTools();
 audioManager.setSfxEnabled(getState().settings.sound);

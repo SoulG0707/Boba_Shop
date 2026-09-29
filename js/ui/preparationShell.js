@@ -8,7 +8,7 @@ export function renderPreparationShell(state, navigation, content, preparation) 
     const current = sellable.get(product.id);
     return `<div class="menu-board-item"><span>${escapeHtml(product.name)}</span><strong>${formatMoneyCompact(state.sellPrices[product.id] ?? product.basePrice)}</strong>${current ? `<small>~${current.producibleCount} phần</small>` : ""}</div>`;
   }).join("");
-  const extraLines = `<div class="menu-board-item"><span>Thêm trứng cút</span><strong>+${formatMoneyCompact(5_000)}</strong></div><div class="menu-board-item"><span>Size L</span><strong>+${formatMoneyCompact(PRODUCT_OPTIONS.sizes.L.priceModifier)}</strong></div>`;
+  const extraLines = `<div class="menu-board-item"><span>Thêm trứng cút</span><strong>+${formatMoneyCompact(5_000)}</strong></div><div class="menu-board-item"><span>Size Lớn</span><strong>+${formatMoneyCompact(PRODUCT_OPTIONS.sizes.L.priceModifier)}</strong></div>`;
 
   let statusTitle;
   let statusCopy;

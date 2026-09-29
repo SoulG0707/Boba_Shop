@@ -143,7 +143,7 @@ await screenshot("mobile-selling-bowl");
 await click('[data-action="mix-order"]');
 await pause(300);
 await screenshot("mobile-selling-mixing");
-await pause(500);
+await waitFor("Boolean(document.querySelector('[data-action=pack-order]') && !document.querySelector('[data-action=pack-order]').disabled)", 2_500);
 await click('[data-action="pack-order"]');
 await screenshot("mobile-selling-packed");
 await click('[data-action="serve-order"]');

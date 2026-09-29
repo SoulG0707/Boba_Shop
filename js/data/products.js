@@ -45,10 +45,14 @@ const baseProducts = [
 
 export const PRODUCT_OPTIONS = Object.freeze({
   sizes: {
-    M: { label: "SIZE M", ingredientMultiplier: 1, priceModifier: 0 },
-    L: { label: "SIZE L", ingredientMultiplier: 1.4, priceModifier: 8_000 },
+    M: { label: "Bé", ingredientMultiplier: 1, priceModifier: 0 },
+    L: { label: "Lớn", ingredientMultiplier: 1.4, priceModifier: 8_000 },
   },
 });
+
+export function getSizeLabel(size) {
+  return PRODUCT_OPTIONS.sizes[size]?.label ?? PRODUCT_OPTIONS.sizes.M.label;
+}
 
 export const PRODUCTS = Object.freeze(baseProducts.map((product) => Object.freeze(product)));
 export const PRODUCT_BY_ID = Object.freeze(Object.fromEntries(PRODUCTS.map((product) => [product.id, product])));
