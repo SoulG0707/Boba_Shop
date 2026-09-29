@@ -9,7 +9,7 @@ import { renderReviewsView } from "./reviewsView.js";
 import { renderStatsView } from "./statsView.js";
 import { renderBauCuaView } from "./bauCuaView.js";
 import { renderXidachView } from "./xidachView.js";
-import { renderPreparationShell } from "./preparationShell.js";
+import { renderPreparationAction, renderPreparationShell } from "./preparationShell.js";
 
 const VIEWS = {
   dashboard: renderDashboard,
@@ -68,11 +68,17 @@ export function renderApp(state, presentation = {}) {
   const selling = ["running", "paused"].includes(state.gameplay.status);
   document.body.classList.toggle("is-selling", selling);
   document.querySelector("#app-shell").classList.toggle("is-selling", selling);
+  const prepActionRoot = document.querySelector("#prep-action-root");
 
   if (selling) {
+    prepActionRoot.hidden = true;
+    prepActionRoot.innerHTML = "";
     document.querySelector("#view").innerHTML = renderGameplayView(state, presentation);
     return;
   }
+
+  prepActionRoot.hidden = false;
+  prepActionRoot.innerHTML = renderPreparationAction(state);
 
   if (currentRoute === "gameplay") currentRoute = "dashboard";
   const content = renderCurrentView(state, presentation);

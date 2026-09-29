@@ -1,0 +1,601 @@
+{
+  "metrics": [
+    {
+      "route": "tien-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 216.203125
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "kho-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 1485.359375
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 980.359375
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "nang-cap-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 988.9375
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 483.9375
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "gia-ban-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 853.3125
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 348.3125
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "danh-gia-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 217.203125
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "tong-ket-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 122.1875
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "nhan-vien-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 229.34375
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "bau-cua-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 889.546875
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 384.546875
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    },
+    {
+      "route": "xi-dach-390x844",
+      "viewport": [
+        390,
+        844
+      ],
+      "scrollY": 0,
+      "doc": [
+        390,
+        390
+      ],
+      "shell": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 844
+      },
+      "header": {
+        "x": 0,
+        "y": 0,
+        "width": 390,
+        "height": 68
+      },
+      "awning": {
+        "x": 0,
+        "y": 68,
+        "width": 390,
+        "height": 26
+      },
+      "sign": {
+        "x": 61.625,
+        "y": 112,
+        "width": 266.734375,
+        "height": 48
+      },
+      "board": {
+        "x": 12,
+        "y": 150,
+        "width": 366,
+        "height": 184
+      },
+      "tabs": {
+        "x": 12,
+        "y": 344,
+        "width": 366,
+        "height": 65
+      },
+      "pane": {
+        "x": 12,
+        "y": 409,
+        "width": 366,
+        "height": 226.9375
+      },
+      "paneMinHeight": "0px",
+      "footer": {
+        "x": 12,
+        "y": 786,
+        "width": 366,
+        "height": 48
+      }
+    }
+  ],
+  "desktop": {
+    "viewport": [
+      1366,
+      768
+    ],
+    "doc": [
+      1366,
+      1366
+    ],
+    "shell": {
+      "x": 403,
+      "width": 560,
+      "height": 768
+    },
+    "footer": {
+      "x": 473,
+      "width": 420,
+      "height": 48
+    }
+  },
+  "selling": {
+    "viewport": [
+      390,
+      844
+    ],
+    "doc": [
+      390,
+      390
+    ],
+    "shell": {
+      "x": 0,
+      "width": 390,
+      "height": 844
+    },
+    "scene": {
+      "x": 0,
+      "y": 68,
+      "width": 390,
+      "height": 776
+    },
+    "sceneScroll": [
+      776,
+      776
+    ],
+    "tabs": false,
+    "status": "is-selling"
+  },
+  "errors": []
+}

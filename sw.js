@@ -1,4 +1,4 @@
-const CACHE_NAME = "banh-trang-tron-v13";
+const CACHE_NAME = "banh-trang-tron-v14";
 const STATIC_ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./img/banh-trang.svg",

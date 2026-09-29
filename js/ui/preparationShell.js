@@ -3,7 +3,7 @@ import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 export function renderPreparationShell(state, navigation, content) {
   const menuItems = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id)).map((product) =>
-    `<div class="chalk-row"><span>${escapeHtml(product.name)}</span><strong>${formatMoneyCompact(state.sellPrices[product.id] ?? product.basePrice)}</strong></div>`,
+    `<div class="chalk-row" title="${escapeHtml(product.name)}"><span>${escapeHtml(product.category)}</span><strong>${formatMoneyCompact(state.sellPrices[product.id] ?? product.basePrice)}</strong></div>`,
   ).join("");
   const sizeLPrice = PRODUCT_OPTIONS.sizes.L.priceModifier;
 
@@ -17,4 +17,11 @@ export function renderPreparationShell(state, navigation, content) {
     ${navigation}
     <section class="prep-pane" aria-live="polite">${content}</section>
   </div>`;
+}
+
+export function renderPreparationAction(state) {
+  const isSummary = state.gameplay.status === "summary";
+  const action = isSummary ? "show-summary" : "start-day";
+  const label = isSummary ? "Xem tổng kết ngày" : "Mở bán";
+  return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="${action}">${label}</button></div>`;
 }

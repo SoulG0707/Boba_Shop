@@ -1,7 +1,3 @@
-.app-shell.is-selling { height: 100vh; height: 100dvh; min-height: 0; overflow: hidden; }
-.app-shell.is-selling .app-header { min-height: 62px; flex: none; }
-.app-shell.is-selling .awning { height: 16px; flex: none; }
-.app-shell.is-selling #view { min-height: 0; flex: 1; overflow: hidden; }
 .selling-scene {
   position: relative;
   display: flex;
@@ -10,27 +6,27 @@
   min-height: 0;
   flex: 1;
   flex-direction: column;
-  gap: 5px;
-  padding: 5px 8px 4px;
+  gap: 4px;
+  padding: 4px 8px;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: hidden;
   background: linear-gradient(180deg, #f8dda8 0, #fff4de 27%, #fff0d0 62%, #e6b679 100%);
   isolation: isolate;
   scrollbar-width: thin;
   scrollbar-color: #d19a5b transparent;
 }
 .selling-scene::before { position: absolute; inset: 0; z-index: -1; background: radial-gradient(ellipse at 50% 36%, rgba(255, 249, 238, .78), transparent 58%); content: ""; pointer-events: none; }
-.scene-topline { position: relative; z-index: 2; display: grid; min-height: 38px; flex: none; grid-template-columns: auto minmax(25px, 1fr) auto; align-items: center; gap: 7px; padding: 2px 6px; }
+.scene-topline { position: relative; z-index: 2; display: grid; min-height: 34px; flex: none; grid-template-columns: auto minmax(25px, 1fr) auto; align-items: center; gap: 7px; padding: 2px 6px; }
 .scene-clock strong { display: block; color: var(--ink); font-size: 1rem; font-variant-numeric: tabular-nums; line-height: 1; }
 .scene-clock span { display: block; color: var(--soft); font-size: .59rem; line-height: 1; }
 .scene-meter { height: 7px; overflow: hidden; border: 1px solid rgba(112, 65, 36, .22); border-radius: 99px; background: rgba(255, 249, 238, .82); }
 .scene-meter i { display: block; height: 100%; border-radius: inherit; background: var(--pink); transition: width .4s linear; }
 .scene-event { overflow: hidden; max-width: 105px; padding: 2px 6px; border: 1px solid #efd29a; border-radius: 8px; background: #fff4d7; color: #785923; font-size: .61rem; font-weight: 800; text-overflow: ellipsis; white-space: nowrap; }
-.stall-shelf { position: relative; display: flex; min-height: 47px; flex: none; align-items: center; justify-content: space-around; margin: 0 2px; border: 2px solid #704124; border-top-width: 5px; border-radius: 9px 9px 4px 4px; background: linear-gradient(#fff9ee 0 78%, #bb8046 78%); box-shadow: 0 4px 0 rgba(67, 42, 30, .15); }
+.stall-shelf { position: relative; display: flex; min-height: 42px; flex: none; align-items: center; justify-content: space-around; margin: 0 2px; border: 2px solid var(--counter); border-top-width: 5px; border-radius: 9px 9px 4px 4px; background: linear-gradient(var(--panel) 0 78%, #bb8046 78%); box-shadow: 0 3px 0 rgba(67, 42, 30, .12); }
 .stall-shelf::before { position: absolute; top: 6px; right: 3px; left: 3px; height: 2px; background: rgba(112, 65, 36, .18); content: ""; }
 .stall-shelf span { display: grid; width: 35px; height: 31px; place-items: center; border: 1px solid rgba(112, 65, 36, .25); border-radius: 7px 7px 9px 9px; background: rgba(255, 244, 222, .88); font-size: 1.08rem; box-shadow: 0 2px 0 rgba(112, 65, 36, .12); }
 .customer-deck { position: relative; z-index: 2; display: flex; min-height: 0; flex: none; flex-direction: column; }
-.customer-lane { display: flex; min-height: 91px; flex: none; align-items: flex-start; gap: 7px; padding: 4px 3px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.customer-lane { display: flex; min-height: 82px; flex: none; align-items: flex-start; gap: 7px; padding: 3px; overflow-x: auto; overflow-y: hidden; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
 .customer-lane::-webkit-scrollbar { display: none; }
 .customer-stop { position: relative; display: grid; min-width: 139px; min-height: 82px; flex: 0 0 139px; grid-template-columns: 37px minmax(0, 1fr); align-content: start; align-items: center; gap: 3px 6px; padding: 5px; border: 2px solid var(--line); border-radius: 13px; background: rgba(255, 249, 238, .97); color: var(--ink); text-align: left; box-shadow: 0 3px 0 rgba(67, 42, 30, .15); cursor: pointer; transition: transform .12s ease, border-color .12s ease; }
 .customer-stop:active { transform: scale(.97); }
@@ -57,14 +53,14 @@
 .delivery-order small { color: var(--soft); font-size: .54rem; }
 .delivery-order button { padding: 3px 7px; border: 1px solid var(--line); border-radius: 8px; background: #fff5e9; color: var(--pink-dark); font-size: .58rem; font-weight: 800; cursor: pointer; }
 .delivery-order button:disabled { opacity: .45; }
-.work-counter { display: flex; min-height: 0; flex: none; flex-direction: column; gap: 6px; padding: 0 0 1px; }
-.counter-work { display: flex; min-height: 0; flex-direction: column; padding: 6px 8px 8px; border: 2px solid rgba(255, 249, 238, .65); border-top: 7px solid var(--counter-top); border-radius: 13px 13px 8px 8px; background: rgba(112, 65, 36, .94); color: #fff2de; box-shadow: 0 4px 0 rgba(67, 42, 30, .18); }
+.work-counter { display: flex; min-height: 0; flex: 1; flex-direction: column; gap: 5px; padding: 0 0 1px; }
+.counter-work { display: flex; min-height: 0; flex: 1; flex-direction: column; padding: 6px 8px 8px; border: 2px solid rgba(255, 249, 238, .65); border-top: 7px solid var(--counter-top); border-radius: 13px 13px 8px 8px; background: rgba(138, 90, 59, .96); color: #fff2de; box-shadow: 0 4px 0 rgba(67, 42, 30, .18); }
 .counter-note { display: flex; min-width: 0; min-height: 38px; flex: none; flex-direction: column; justify-content: center; line-height: 1.12; }
 .counter-note strong { font-size: .78rem; }
 .counter-note small { margin-top: 3px; color: #f9e4c5; font-size: .59rem; }
 .counter-customer { margin-bottom: 2px; color: #ffcd72; font-size: .58rem; font-weight: 800; }
 .counter-note-empty { color: rgba(255, 242, 222, .82); font-size: .65rem; }
-.counter-center { display: grid; min-height: 139px; flex: none; grid-template-columns: minmax(138px, .85fr) minmax(0, 1fr); align-items: center; gap: 7px; }
+.counter-center { display: grid; min-height: 0; flex: 1; grid-template-columns: minmax(138px, .85fr) minmax(0, 1fr); align-items: center; gap: 7px; }
 .mixing-bowl-wrap { display: grid; min-width: 0; justify-items: center; gap: 1px; }
 .mixing-bowl { position: relative; width: 140px; height: 104px; transform-origin: 50% 50%; filter: drop-shadow(0 4px 2px rgba(40, 20, 10, .24)); }
 .bowl-contents { position: absolute; z-index: 1; top: 18px; right: 14px; bottom: 13px; left: 14px; display: grid; grid-template-columns: repeat(4, 1fr); align-content: center; justify-items: center; overflow: hidden; border-radius: 50%; background: radial-gradient(ellipse at 50% 35%, #f0b754, #da8a32 72%, #b96121); }
@@ -100,7 +96,7 @@
 .ingredient-tools-heading span { color: var(--counter); font-size: .66rem; font-weight: 900; letter-spacing: .04em; }
 .ingredient-tools-heading small { color: var(--soft); font-size: .53rem; text-align: right; }
 .ingredient-control-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 5px; }
-.ingredient-control { display: flex; min-width: 0; min-height: 57px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; border: 2px solid var(--line); border-radius: 10px; background: #fffdf7; color: var(--ink); cursor: pointer; transition: transform .1s ease, border-color .12s ease, opacity .12s ease; }
+.ingredient-control { display: flex; min-width: 0; min-height: 53px; flex-direction: column; align-items: center; justify-content: center; gap: 2px; padding: 4px 2px; border: 2px solid var(--line); border-radius: 10px; background: #fffdf7; color: var(--ink); cursor: pointer; transition: transform .1s ease, border-color .12s ease, opacity .12s ease; }
 .ingredient-control > span { font-size: 1.1rem; line-height: 1; }
 .ingredient-control strong { max-width: 100%; overflow: hidden; font-size: .57rem; line-height: 1; text-overflow: ellipsis; white-space: nowrap; }
 .ingredient-control small { color: var(--soft); font-size: .48rem; line-height: 1; }
@@ -118,7 +114,6 @@
 .pause-curtain span { font-size: 2rem; }
 .pause-curtain h2 { margin: 4px 0; }
 .pause-curtain p { margin-bottom: 10px; font-size: .75rem; }
-body.is-selling { position: fixed; inset: 0; width: 100%; height: 100%; overflow: hidden; }
 @keyframes bowl-mix { 0%, 100% { transform: rotate(0) scale(1); } 20% { transform: rotate(-5deg) scale(1.03); } 45% { transform: rotate(5deg) scale(1.03); } 70% { transform: rotate(-3deg) scale(1.02); } }
 @keyframes topping-shake { 25% { transform: translateX(-2px) rotate(-8deg); } 75% { transform: translateX(2px) rotate(8deg); } }
 @keyframes topping-pop { from { opacity: 0; transform: scale(.6); } to { opacity: 1; transform: scale(1); } }
@@ -127,16 +122,15 @@ body.is-selling { position: fixed; inset: 0; width: 100%; height: 100%; overflow
 @keyframes serve-pop { 0% { opacity: 0; transform: translate(-50%, 12px) scale(.8); } 16% { opacity: 1; transform: translate(-50%, 0) scale(1.04); } 78% { opacity: 1; transform: translate(-50%, -12px) scale(1); } 100% { opacity: 0; transform: translate(-50%, -24px) scale(.96); } }
 @media (max-height: 720px) {
   .app-shell.is-selling .app-header { min-height: 55px; }
-  .app-shell.is-selling .awning { height: 11px; }
   .selling-scene { gap: 4px; padding-top: 3px; }
   .scene-topline { min-height: 31px; }
-  .stall-shelf { min-height: 42px; }
-  .customer-lane { min-height: 82px; padding-block: 2px; }
+  .stall-shelf { min-height: 40px; }
+  .customer-lane { min-height: 78px; padding-block: 2px; }
   .customer-stop { min-height: 74px; }
-  .counter-center { min-height: 129px; }
+  .counter-center { min-height: 0; }
   .mixing-bowl { width: 128px; height: 96px; }
   .food-box { width: 96px; height: 81px; }
-  .ingredient-control { min-height: 52px; }
+  .ingredient-control { min-height: 48px; }
 }
 @media (max-width: 380px) {
   .selling-scene { padding-inline: 5px; }
@@ -147,7 +141,7 @@ body.is-selling { position: fixed; inset: 0; width: 100%; height: 100%; overflow
   .order-actions .button { min-height: 30px; font-size: .58rem; }
   .ingredient-tools { padding: 5px; }
   .ingredient-control-grid { gap: 3px; }
-  .ingredient-control { min-height: 54px; }
+  .ingredient-control { min-height: 48px; }
   .ingredient-control strong { font-size: .54rem; }
 }
 @media (prefers-reduced-motion: reduce) { .mixing-bowl.is-mixing, .mixing-bowl.is-mixing .bowl-topping, .bowl-topping, .food-box, .feedback-box, .serve-feedback { animation-duration: .01ms !important; } }
