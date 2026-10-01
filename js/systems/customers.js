@@ -68,17 +68,13 @@ export function advanceCustomerQueue(state, deltaSeconds) {
       left.push(customer);
       continue;
     }
-    const order = state.orders.find((candidate) => candidate.id === customer.orderId && candidate.status !== "cancelled");
-    if (order?.mixing) {
-      left.push(customer);
-      continue;
-    }
     customer.elapsedWait += deltaSeconds;
     customer.patience -= deltaSeconds;
     if (customer.patience <= 0) {
       customer.status = "left";
       customer.patience = 0;
       timedOut.push(customer);
+      const order = state.orders.find((candidate) => candidate.id === customer.orderId && candidate.status !== "served");
       if (order && order.status !== "served") order.status = "cancelled";
     } else {
       left.push(customer);

@@ -35,10 +35,8 @@ export function getIngredientPreparationStatus(ingredientId, currentStock, pendi
     return { required, missing, projectedMissing, status: "pending-ready", message: "✓ Đủ sau khi xác nhận nhập" };
   }
   const message = pending > 0
-    ? `⚠ Còn thiếu ${projectedMissing} ${requirement.unit ?? "phần"} để đủ chuẩn bị hôm nay`
-    : current === 0
-      ? `⚠ Chưa nhập hôm nay · cần ${required} ${requirement.unit ?? "phần"}`
-      : `⚠ Thiếu ${missing} ${requirement.unit ?? "phần"} để đủ chuẩn bị hôm nay`;
+    ? `⚠ Còn thiếu ${projectedMissing} ${requirement.unit ?? "phần"}`
+    : `⚠ Thiếu ${missing} ${requirement.unit ?? "phần"}`;
   return { required, missing, projectedMissing, status: "missing", message };
 }
 

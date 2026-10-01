@@ -22,3 +22,27 @@ export function renderHeader(state) {
     <div class="header-center"><strong>${escapeHtml(state.shopName)}</strong><b>${formatMoneyCompact(state.money)}</b></div>
     <div class="header-rating"><span aria-label="${rating.toFixed(1)} trên 5 sao">${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}</span><small>${rating.toFixed(1).replace(".", ",")} · ${state.reviews.length} đánh giá</small></div>`;
 }
+
+export function updateHeader(state) {
+  const root = document.querySelector("#header");
+  if (!root) return;
+  const rating = getAverageRating(state);
+  const day = root.querySelector(".header-day strong");
+  const status = root.querySelector(".header-day small");
+  const money = root.querySelector(".header-center b");
+  const stars = root.querySelector(".header-rating span");
+  const ratingSummary = root.querySelector(".header-rating small");
+  const dayText = `Ngày ${state.day}`;
+  const statusText = STATUS_LABELS[state.gameplay.status] ?? "Chuẩn bị";
+  const moneyText = formatMoneyCompact(state.money);
+  const starsText = `${"★".repeat(Math.round(rating))}${"☆".repeat(5 - Math.round(rating))}`;
+  const ratingText = `${rating.toFixed(1).replace(".", ",")} · ${state.reviews.length} đánh giá`;
+  if (day && day.textContent !== dayText) day.textContent = dayText;
+  if (status && status.textContent !== statusText) status.textContent = statusText;
+  if (money && money.textContent !== moneyText) money.textContent = moneyText;
+  if (stars) {
+    if (stars.textContent !== starsText) stars.textContent = starsText;
+    stars.setAttribute("aria-label", `${rating.toFixed(1)} trên 5 sao`);
+  }
+  if (ratingSummary && ratingSummary.textContent !== ratingText) ratingSummary.textContent = ratingText;
+}

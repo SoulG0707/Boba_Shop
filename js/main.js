@@ -4,7 +4,7 @@ import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
 import { setInventoryCategory } from "./ui/inventoryView.js";
 import { INGREDIENT_BY_ID } from "./data/ingredients.js";
-import { renderHeader } from "./ui/header.js";
+import { renderHeader, updateHeader } from "./ui/header.js";
 import { renderSplashView } from "./ui/splashView.js";
 import { renderTutorialView } from "./ui/tutorialView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
@@ -23,19 +23,22 @@ import { audioManager } from "./systems/audioManager.js";
 import { placeBauCuaBet, clearBauCuaBets, rollBauCua } from "./systems/bauCua.js";
 import { playXidachHouseRound } from "./systems/xidach.js";
 import { getShopPreparationStatus } from "./systems/preparation.js";
+import { updateGameplayView } from "./ui/gameplayView.js";
 
 const header = document.querySelector("#header");
 const appShell = document.querySelector("#app-shell");
 const splash = document.querySelector("#splash");
-let renderedSecond = -1;
 let summaryShownForDay = null;
 let splashVisible = true;
 let tutorialVisible = false;
 let tutorialPage = 0;
-let selectedCustomerId = null;
+let focusedCustomerId = null;
+let activePreparationOrderId = null;
 let serveFeedback = null;
 let serveFeedbackTimer = null;
+let lastAutosaveAt = 0;
 const PENDING_PURCHASE_STORAGE_KEY = "banh-trang-pending-purchase-v1";
+const GAMEPLAY_AUTOSAVE_INTERVAL_MS = 5_000;
 
 function loadPendingPurchase() {
   try {
@@ -88,7 +91,7 @@ function refreshUI() {
   appShell.hidden = false;
   appShell.setAttribute("aria-hidden", "false");
   header.innerHTML = renderHeader(state);
-  renderApp(state, { selectedCustomerId, feedback: serveFeedback, pendingPurchase });
+  renderApp(state, { focusedCustomerId, activePreparationOrderId, feedback: serveFeedback, pendingPurchase });
 }
 
 function enterGame() {
@@ -104,8 +107,9 @@ function enterGame() {
     updateState((current) => { current.gameplay.lastTickAt = Date.now(); });
     state = getState();
     saveGame(state);
+    lastAutosaveAt = Date.now();
   }
-  syncSelectedCustomer(state);
+  syncFocusedCustomer(state);
   navigate("inventory");
   refreshUI();
   if (migrationNotice) showToast(migrationNotice, "info", 7000);
@@ -127,20 +131,32 @@ function finishTutorial() {
   enterGame();
 }
 
-function syncSelectedCustomer(state) {
-  const customer = selectedCustomerId && state.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-  if (customer) return;
-  const nextCustomer = state.customers.find((candidate) => candidate.status === "waiting");
-  selectedCustomerId = nextCustomer?.id ?? null;
+function syncFocusedCustomer(state) {
+  const customers = state.customers.filter((candidate) => candidate.status === "waiting");
+  let customer = customers.find((candidate) => candidate.id === focusedCustomerId);
+  if (!customer) {
+    customer = customers[0] ?? null;
+    focusedCustomerId = customer?.id ?? null;
+  }
+  const preparationOrder = activePreparationOrderId && state.orders.find((order) => order.id === activePreparationOrderId);
+  if (!customer || preparationOrder?.customerId !== customer.id) activePreparationOrderId = customer?.orderId ?? null;
 }
 
 function selectCustomer(customerId) {
   const state = getState();
-  const customer = state.customers.find((candidate) => candidate.id === customerId);
+  const customer = state.customers.find((candidate) => candidate.id === customerId && candidate.status === "waiting");
   const order = customer && state.orders.find((candidate) => candidate.id === customer.orderId);
   if (!order) return;
-  selectedCustomerId = customerId;
-  refreshUI();
+  focusedCustomerId = customer.id;
+  activePreparationOrderId = order.id;
+  refreshSellingUI();
+}
+
+function refreshSellingUI() {
+  const state = getState();
+  syncFocusedCustomer(state);
+  updateHeader(state);
+  if (!updateGameplayView(state, { focusedCustomerId, activePreparationOrderId, feedback: serveFeedback })) refreshUI();
 }
 
 function openSettings() {
@@ -195,36 +211,32 @@ function handleAction(action, element) {
       break;
     case "choose-order-size":
       updateState((current) => {
-        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-        if (customer) setOrderSize(current, customer.orderId, element.dataset.size);
+        if (activePreparationOrderId) setOrderSize(current, activePreparationOrderId, element.dataset.size);
       });
-      refreshUI();
+      refreshSellingUI();
       break;
     case "add-order-ingredient":
       updateState((current) => {
-        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-        if (customer) notifyResult(addIngredientToOrder(current, customer.orderId, element.dataset.ingredient), null);
+        if (activePreparationOrderId) notifyResult(addIngredientToOrder(current, activePreparationOrderId, element.dataset.ingredient), null);
       });
-      refreshUI();
+      refreshSellingUI();
       break;
     case "remove-bowl-ingredient":
       updateState((current) => {
-        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-        if (customer) removeIngredientFromOrder(current, customer.orderId, element.dataset.ingredient);
+        if (activePreparationOrderId) removeIngredientFromOrder(current, activePreparationOrderId, element.dataset.ingredient);
       });
-      refreshUI();
+      refreshSellingUI();
       break;
     case "mix-order": {
       let orderId = null;
       updateState((current) => {
-        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-        if (customer && mixOrder(current, customer.orderId)) orderId = customer.orderId;
+        if (activePreparationOrderId && mixOrder(current, activePreparationOrderId)) orderId = activePreparationOrderId;
       });
       if (orderId) {
-        refreshUI();
+        refreshSellingUI();
         window.setTimeout(() => {
           updateState((current) => finishMixingOrder(current, orderId));
-          refreshUI();
+          refreshSellingUI();
         }, GAME_CONFIG.MIX_DURATION_MS);
       }
       break;
@@ -232,11 +244,10 @@ function handleAction(action, element) {
     case "pack-order": {
       let result;
       updateState((current) => {
-        const customer = current.customers.find((candidate) => candidate.id === selectedCustomerId && candidate.status === "waiting");
-        result = customer ? packOrder(current, customer.orderId) : { success: false, reason: "Chưa chọn khách." };
+        result = activePreparationOrderId ? packOrder(current, activePreparationOrderId) : { success: false, reason: "Chưa chọn khách." };
       });
       notifyResult(result, "Đã đóng hộp, sẵn sàng giao khách!");
-      refreshUI();
+      refreshSellingUI();
       break;
     }
     case "close-modal":
@@ -305,6 +316,7 @@ function handleAction(action, element) {
       let started = false;
       updateState((current) => { started = startDay(current); });
       if (!started) showToast(getShopPreparationStatus(getState()).message, "error");
+      if (started) lastAutosaveAt = Date.now();
       refreshUI();
       break;
     }
@@ -416,11 +428,10 @@ function handleAction(action, element) {
         if (serveFeedbackTimer) window.clearTimeout(serveFeedbackTimer);
         serveFeedbackTimer = window.setTimeout(() => {
           serveFeedback = null;
-          refreshUI();
+          refreshSellingUI();
         }, 2_000);
-        syncSelectedCustomer(getState());
       }
-      refreshUI();
+      refreshSellingUI();
       break;
     }
     case "accept-online":
@@ -428,13 +439,13 @@ function handleAction(action, element) {
         const accepted = acceptOnlineOrder(current, element.dataset.order);
         if (accepted) showToast("Đã nhận đơn bánh tráng online.", "success");
       });
-      refreshUI();
+      refreshSellingUI();
       break;
     case "complete-online": {
       let result;
       updateState((current) => { result = completeOnlineOrder(current, element.dataset.order); });
       notifyResult(result, "Đơn online đã giao thành công!");
-      refreshUI();
+      refreshSellingUI();
       break;
     }
     default:
@@ -508,19 +519,21 @@ function runGameLoop() {
   if (splashVisible || state.gameplay.status !== "running") return;
   const now = Date.now();
   tickDay(state, now);
-  saveGame(state);
-  const currentSecond = Math.floor(state.gameplay.elapsedMs / 1000);
-  if (currentSecond !== renderedSecond) {
-    renderedSecond = currentSecond;
-    syncSelectedCustomer(state);
-    refreshUI();
-  }
+  syncFocusedCustomer(state);
   if (state.gameplay.status === "summary" && summaryShownForDay !== state.day) {
     summaryShownForDay = state.day;
     navigate("inventory");
     refreshUI();
     showEndDayModal(state.dailyStats, state.day);
     saveGame(state);
+    lastAutosaveAt = now;
+    return;
+  }
+  updateHeader(state);
+  if (!updateGameplayView(state, { focusedCustomerId, activePreparationOrderId, feedback: serveFeedback })) refreshUI();
+  if (now - lastAutosaveAt >= GAMEPLAY_AUTOSAVE_INTERVAL_MS) {
+    saveGame(state);
+    lastAutosaveAt = now;
   }
 }
 
@@ -544,7 +557,7 @@ function enableDebugTools() {
         const customer = spawnCustomer(state);
         if (customer) createOrder(state, customer);
       });
-      refreshUI();
+      refreshSellingUI();
     },
     triggerEvent(id) {
       updateState((state) => triggerEvent(state, id));

@@ -5,12 +5,11 @@ import { getIngredientPreparationStatus } from "../systems/preparation.js";
 import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 import { renderFoodAsset } from "./foodAssets.js";
 
-const ALL_CATEGORIES = "__all__";
 const CATEGORY_ICONS = Object.freeze({ "Bánh tráng": "rice_paper", "Gia vị": "shrimp_salt", Topping: "green_mango", "Đóng gói": "food_box" });
-let selectedCategory = ALL_CATEGORIES;
+let selectedCategory = INGREDIENTS[0]?.category ?? "Bánh tráng";
 
 export function setInventoryCategory(category) {
-  const validCategories = new Set([ALL_CATEGORIES, ...INGREDIENTS.map((ingredient) => ingredient.category)]);
+  const validCategories = new Set(INGREDIENTS.map((ingredient) => ingredient.category));
   if (validCategories.has(category)) selectedCategory = category;
 }
 
@@ -27,9 +26,7 @@ export function renderInventoryView(state, presentation = {}) {
     const active = selectedCategory === id;
     return `<button type="button" class="ingredient-category-tab ${active ? "is-active" : ""}" role="tab" aria-selected="${active}" data-action="inventory-category" data-category="${escapeHtml(id)}">${renderFoodAsset(icon, "category-asset")}<span>${escapeHtml(label)}</span></button>`;
   }).join("");
-  const visibleIngredients = INGREDIENTS.filter((ingredient) =>
-    selectedCategory === ALL_CATEGORIES || ingredient.category === selectedCategory,
-  );
+  const visibleIngredients = INGREDIENTS.filter((ingredient) => ingredient.category === selectedCategory);
   const rows = visibleIngredients.map((ingredient) => {
     const entry = stock[ingredient.id] ?? {};
     const quantity = Math.max(0, Number(entry.quantity) || 0);

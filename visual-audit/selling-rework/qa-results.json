@@ -1,0 +1,562 @@
+{
+  "screenshots": [
+    "queue-four-customers-390x844.png",
+    "focus-customer-1-390x844.png",
+    "focus-customer-2-390x844.png",
+    "focus-customer-3-390x844.png",
+    "focus-customer-4-390x844.png",
+    "selling-long-order-focused-customer-4-390x844.png",
+    "selling-desktop-1366x768.png",
+    "inventory-base-only-390x844.png",
+    "inventory-seasoning-only-390x844.png",
+    "inventory-cart-persists-after-tabs-390x844.png"
+  ],
+  "checks": {
+    "queue-four-customers-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 192,
+        "bottom": 356,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 164
+      },
+      "mainCustomer": {
+        "top": 197,
+        "bottom": 316,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 510,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 280
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "focus-customer-1-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 192,
+        "bottom": 356,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 164
+      },
+      "mainCustomer": {
+        "top": 197,
+        "bottom": 316,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 510,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 280
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "focus-customer-2-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 191,
+        "bottom": 391,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 200
+      },
+      "mainCustomer": {
+        "top": 215,
+        "bottom": 334,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 544,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 246
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "focus-customer-3-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 192,
+        "bottom": 356,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 164
+      },
+      "mainCustomer": {
+        "top": 197,
+        "bottom": 316,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 510,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 280
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "focus-customer-4-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 191,
+        "bottom": 409,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 218
+      },
+      "mainCustomer": {
+        "top": 224,
+        "bottom": 343,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 562,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 228
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "longOrderLayout": {
+      "orderWidth": 262.7867431640625,
+      "orderTop": 191.3984832763672,
+      "orderBottom": 409.4090576171875,
+      "mainCustomerHeight": 118.90350341796875,
+      "ingredientFontSize": 14.4
+    },
+    "selling-long-order-focused-customer-4-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": {
+        "top": 68,
+        "bottom": 844,
+        "left": 0,
+        "right": 390,
+        "width": 390,
+        "height": 776
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 53
+      },
+      "order": {
+        "top": 191,
+        "bottom": 409,
+        "left": 119,
+        "right": 382,
+        "width": 263,
+        "height": 218
+      },
+      "mainCustomer": {
+        "top": 224,
+        "bottom": 343,
+        "left": 9,
+        "right": 111,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 562,
+        "bottom": 790,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 228
+      },
+      "actions": {
+        "top": 795,
+        "bottom": 832,
+        "left": 8,
+        "right": 382,
+        "width": 374,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "focusAndPatience": {
+      "customerId": "customer-3",
+      "orderId": "order-4",
+      "patience": 72.225,
+      "maxPatience": 85,
+      "prepared": {},
+      "size": null
+    },
+    "selling-desktop-1366x768": {
+      "viewport": {
+        "width": 1366,
+        "height": 768
+      },
+      "documentWidth": 1366,
+      "scene": {
+        "top": 68,
+        "bottom": 768,
+        "left": 403,
+        "right": 963,
+        "width": 560,
+        "height": 700
+      },
+      "queue": {
+        "top": 134,
+        "bottom": 187,
+        "left": 411,
+        "right": 955,
+        "width": 544,
+        "height": 53
+      },
+      "order": {
+        "top": 192,
+        "bottom": 356,
+        "left": 522,
+        "right": 955,
+        "width": 433,
+        "height": 164
+      },
+      "mainCustomer": {
+        "top": 197,
+        "bottom": 316,
+        "left": 412,
+        "right": 514,
+        "width": 102,
+        "height": 119
+      },
+      "tools": {
+        "top": 510,
+        "bottom": 714,
+        "left": 411,
+        "right": 955,
+        "width": 544,
+        "height": 204
+      },
+      "actions": {
+        "top": 719,
+        "bottom": 756,
+        "left": 411,
+        "right": 955,
+        "width": 544,
+        "height": 37
+      },
+      "binGrid": {
+        "clientHeight": 183,
+        "scrollHeight": 183
+      },
+      "queueCount": 4,
+      "orderCount": 1,
+      "ingredientBins": 14
+    },
+    "idleTenSeconds": {
+      "fullRenderCount": 0,
+      "gameSaveCount": 2,
+      "queueCount": 8,
+      "sameScene": true,
+      "focusedCustomerId": "customer-7",
+      "allPatienceAdvanced": true,
+      "viewWidth": 390,
+      "viewScrollWidth": 390
+    },
+    "inventory-base-only-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": null,
+      "queue": null,
+      "order": null,
+      "mainCustomer": null,
+      "tools": null,
+      "actions": null,
+      "binGrid": null,
+      "queueCount": 0,
+      "orderCount": 0,
+      "ingredientBins": 0
+    },
+    "inventory-seasoning-only-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": null,
+      "queue": null,
+      "order": null,
+      "mainCustomer": null,
+      "tools": null,
+      "actions": null,
+      "binGrid": null,
+      "queueCount": 0,
+      "orderCount": 0,
+      "ingredientBins": 0
+    },
+    "inventory-cart-persists-after-tabs-390x844": {
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "documentWidth": 390,
+      "scene": null,
+      "queue": null,
+      "order": null,
+      "mainCustomer": null,
+      "tools": null,
+      "actions": null,
+      "binGrid": null,
+      "queueCount": 0,
+      "orderCount": 0,
+      "ingredientBins": 0
+    },
+    "inventoryCategories": {
+      "baseRows": [
+        "rice_paper"
+      ],
+      "seasoningRows": [
+        "shrimp_salt",
+        "satay",
+        "tamarind_sauce",
+        "scallion_oil",
+        "calamansi"
+      ],
+      "toppingRows": [
+        "green_mango",
+        "vietnamese_coriander",
+        "fried_shallot",
+        "peanut",
+        "quail_egg",
+        "beef_jerky",
+        "chicken_jerky",
+        "dried_shrimp"
+      ],
+      "cartSummary": "🧺 Đang chọn\n3 nguyên liệu · 15 đơn vị\nChưa trừ tiền hoặc cộng kho",
+      "stockBeforeConfirm": 0
+    },
+    "videoPlayback": {
+      "duration": null,
+      "currentTime": 0.707533,
+      "error": null
+    },
+    "consoleErrors": []
+  },
+  "video": {
+    "file": "focused-selling-flow-16s.webm",
+    "durationSeconds": 16.1,
+    "bytes": 668335,
+    "mimeType": "video/webm;codecs=vp9"
+  }
+}
