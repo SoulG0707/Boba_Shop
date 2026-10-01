@@ -112,6 +112,45 @@
     <path d="M42 51c11 6 21 7 31 2m33 4c12 5 23 2 33-5" stroke="#f8cc69" stroke-width="4" stroke-linecap="round"/>
     <path d="M50 94c23 15 57 15 80 0" stroke="#f5b154" stroke-width="4" stroke-linecap="round"/>
   </symbol>
+  <symbol id="spice_jar" viewBox="0 0 64 64">
+    <path d="M17 14h30v8l6 8v25H11V30l6-8z" fill="#fff6e6" fill-opacity=".88" stroke="#6e4a35" stroke-width="3" stroke-linejoin="round"/>
+    <path d="M17 14h30v9H17z" fill="#b8794d" stroke="#6e4a35" stroke-width="3"/>
+    <path d="M15 34h34v15H15z" fill="#efc47e" fill-opacity=".8"/>
+    <path d="M17 28h30M18 52h28" stroke="#fff" stroke-opacity=".8" stroke-width="2"/>
+    <path d="M21 8h22v6H21z" fill="#75482f" stroke="#6e4a35" stroke-width="2"/>
+  </symbol>
+  <symbol id="size_small_bowl" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="48" rx="23" ry="6" fill="#633820" opacity=".22"/>
+    <path d="M12 28h40c-2 16-8 25-20 25S14 44 12 28Z" fill="#f4dfb7" stroke="#75472d" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="32" cy="28" rx="21" ry="7" fill="#fff3d8" stroke="#75472d" stroke-width="3"/>
+    <path d="M18 35h28" stroke="#df9d57" stroke-width="3" stroke-linecap="round"/>
+    <path d="M22 45c6 4 14 5 20 1" stroke="#ce8850" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="size_large_bowl" viewBox="0 0 64 64">
+    <ellipse cx="32" cy="48" rx="27" ry="7" fill="#633820" opacity=".22"/>
+    <path d="M7 25h50c-2 19-9 29-25 29S9 44 7 25Z" fill="#df792d" stroke="#75472d" stroke-width="3" stroke-linejoin="round"/>
+    <ellipse cx="32" cy="25" rx="26" ry="8" fill="#fff3d8" stroke="#75472d" stroke-width="3"/>
+    <path d="M14 34h36" stroke="#efa64b" stroke-width="4" stroke-linecap="round"/>
+    <path d="M18 46c7 5 20 7 29 1" stroke="#f4bd60" stroke-width="2.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="packing_machine" viewBox="0 0 96 112">
+    <path d="M20 9h56l8 12v79H12V21z" fill="#d5d5cd" stroke="#554337" stroke-width="4" stroke-linejoin="round"/>
+    <path d="M22 14h52v27H22z" fill="#fff0d1" stroke="#80624b" stroke-width="3"/>
+    <path d="M29 20h38v15H29z" fill="#d94f39" stroke="#79472d" stroke-width="2"/>
+    <path d="M18 45h60v17H18z" fill="#b87d4e" stroke="#554337" stroke-width="3"/>
+    <circle cx="67" cy="53" r="5" fill="#f1be47" stroke="#704124" stroke-width="2"/>
+    <rect x="21" y="68" width="54" height="21" rx="4" fill="#eee9dc" stroke="#554337" stroke-width="3"/>
+    <path d="M27 75h42M27 81h42" stroke="#958b7d" stroke-width="2"/>
+    <path d="M22 96h52" stroke="#554337" stroke-width="5" stroke-linecap="round"/>
+    <path d="M5 27h12m62 0h12" stroke="#554337" stroke-width="4" stroke-linecap="round"/>
+    <path d="M32 26h29" stroke="#f7d87b" stroke-width="2"/>
+  </symbol>
+  <symbol id="lock" viewBox="0 0 32 32">
+    <path d="M8 14V10a8 8 0 0 1 16 0v4" stroke="#614b3e" stroke-width="3.5" stroke-linecap="round"/>
+    <rect x="5" y="13" width="22" height="16" rx="4" fill="#f1cc82" stroke="#614b3e" stroke-width="2.5"/>
+    <circle cx="16" cy="21" r="2.2" fill="#614b3e"/>
+    <path d="M16 22v3" stroke="#614b3e" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
   <symbol id="shop-logo" viewBox="0 0 128 128">
     <circle cx="64" cy="64" r="61" fill="#fff3dc" stroke="#704124" stroke-width="5"/>
     <use href="#mixing_bowl" x="9" y="19" width="110" height="81"/>

@@ -4,7 +4,8 @@ const FOOD_ASSET_IDS = new Set([
   "rice_paper", "shrimp_salt", "satay", "tamarind_sauce", "scallion_oil", "green_mango",
   "vietnamese_coriander", "fried_shallot", "peanut", "quail_egg", "beef_jerky", "chicken_jerky",
   "dried_shrimp", "calamansi", "food_box", "mixing_bowl", "shop-logo", "product_traditional",
-  "product_beef", "product_chicken", "product_special",
+  "product_beef", "product_chicken", "product_special", "spice_jar", "size_small_bowl",
+  "size_large_bowl", "packing_machine", "lock",
 ]);
 
 export function renderFoodAsset(id, className = "food-asset", label = "") {

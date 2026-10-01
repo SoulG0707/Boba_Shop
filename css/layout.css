@@ -58,6 +58,8 @@ body::before {
 .header-day { display: grid; min-width: 0; line-height: 1.05; white-space: nowrap; }
 .header-day strong { font-size: .77rem; font-weight: 800; }
 .header-day small { margin-top: 2px; color: var(--soft); font-size: .62rem; }
+.app-shell.is-selling .header-day small { display: flex; align-items: center; gap: 4px; }
+.header-day-clock:not(:empty) { color: var(--counter); font-variant-numeric: tabular-nums; }
 .header-center { display: grid; min-width: 88px; max-width: 148px; justify-items: center; line-height: 1.05; }
 .header-center strong { max-width: 100%; overflow: hidden; font-size: .72rem; font-weight: 700; text-align: center; text-overflow: ellipsis; white-space: nowrap; }
 .header-center b { margin-top: 1px; color: var(--ink); font-size: 1.42rem; font-weight: 800; letter-spacing: -.025em; white-space: nowrap; }

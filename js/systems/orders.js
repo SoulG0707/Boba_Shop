@@ -20,6 +20,14 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
   }
   const number = state.gameplay.nextEntityId++;
   const item = { productId, size, quantity: 1 };
+  const baseRecipe = getProductRecipe(productId, { size }) ?? {};
+  const optionalToppings = ["vietnamese_coriander", "fried_shallot", "peanut", "green_mango", "calamansi"]
+    .filter((id) => Object.hasOwn(baseRecipe, id));
+  const excludedIngredients = random() > .82 && optionalToppings.length
+    ? [optionalToppings[Math.floor(random() * optionalToppings.length)]]
+    : [];
+  const heatRoll = random();
+  const heatLevel = heatRoll < .72 ? "Cay vừa" : random() < .5 ? "Ít cay" : "Cay nhiều";
   const order = {
     id: `order-${number}`,
     customerId: customer.id,
@@ -28,6 +36,7 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
     createdAt: now,
     status: "waiting",
     channel: "counter",
+    customerRequest: { excludedIngredients, heatLevel },
     preparedIngredients: {},
     preparedSize: null,
     mixed: false,
@@ -38,6 +47,20 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
   state.orders.unshift(order);
   state.orders.length = Math.min(state.orders.length, 80);
   return order;
+}
+
+export function getOrderRecipe(order, { size } = {}) {
+  const item = order?.items?.[0];
+  if (!item) return null;
+  const recipe = getProductRecipe(item.productId, { size: size ?? order.preparedSize ?? item.size }) ?? {};
+  for (const id of order.customerRequest?.excludedIngredients ?? []) delete recipe[id];
+  if (Object.hasOwn(recipe, "satay")) {
+    const baseHeat = recipe.satay;
+    const heatAdjustments = { "Không cay": -baseHeat, "Ít cay": -1, "Cay vừa": 0, "Cay nhiều": 1 };
+    recipe.satay = Math.max(0, baseHeat + (heatAdjustments[order.customerRequest?.heatLevel] ?? 0));
+    if (!recipe.satay) delete recipe.satay;
+  }
+  return recipe;
 }
 
 export function addIngredientToOrder(state, orderId, ingredientId) {
@@ -99,7 +122,7 @@ export function packOrder(state, orderId) {
 
 export function evaluatePreparedOrder(order, customer) {
   const item = order.items[0];
-  const target = getProductRecipe(item.productId, { size: order.preparedSize ?? item.size }) ?? {};
+  const target = getOrderRecipe(order) ?? {};
   delete target.food_box;
   const prepared = order.preparedIngredients ?? {};
   const ingredientIds = new Set([...Object.keys(target), ...Object.keys(prepared)]);

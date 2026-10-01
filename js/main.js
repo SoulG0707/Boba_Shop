@@ -415,13 +415,19 @@ function handleAction(action, element) {
     }
     case "serve-order": {
       let result;
-      updateState((current) => { result = serveOrder(current, element.dataset.order); });
+      let customerLabel = "";
+      updateState((current) => {
+        const order = current.orders.find((candidate) => candidate.id === element.dataset.order);
+        customerLabel = current.customers.find((candidate) => candidate.id === order?.customerId)?.label ?? "Khách";
+        result = serveOrder(current, element.dataset.order);
+      });
       if (!result?.success) notifyResult(result, "");
       if (result?.success) {
         serveFeedback = {
           revenue: result.revenue ?? result.order?.totalPrice ?? 0,
           rating: result.review?.rating ?? 5,
           customerType: result.review?.customerType ?? "regular",
+          customerLabel,
           accuracy: result.accuracy,
           createdAt: Date.now(),
         };

@@ -1,6 +1,7 @@
 import { formatDuration, GAME_CONFIG } from "../config.js";
 import { INGREDIENTS, INGREDIENT_BY_ID } from "../data/ingredients.js";
-import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getProductRecipe, getSizeLabel } from "../data/products.js";
+import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getSizeLabel } from "../data/products.js";
+import { getOrderRecipe } from "../systems/orders.js";
 import { getRemainingSeconds } from "../systems/dayCycle.js";
 import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 import { renderFoodAsset } from "./foodAssets.js";
@@ -45,20 +46,18 @@ export function renderGameplayView(state, presentation = {}) {
     <div class="customer-focus-stage" aria-label="Khách đang được phục vụ">
       <div id="focused-customer-slot" class="focused-customer-slot" data-render-signature="${customer?.id ?? "empty"}">${renderFocusedCustomer(customer)}</div>
       <div id="focused-order-slot" class="focused-order-slot" data-render-signature="${escapeHtml(`${order?.customerId ?? "empty"}:${order?.id ?? "empty"}`)}">${renderOrderDetails(order, customer)}</div>
+      <div id="serve-feedback-slot" class="serve-feedback-slot" data-render-signature="${presentation.feedback?.createdAt ?? "empty"}">${renderFeedback(presentation.feedback)}</div>
     </div>
     <div id="online-orders-slot" class="online-orders-slot" data-render-signature="${escapeHtml(getOnlineOrderSignature(state))}">${renderOnlineOrders(state)}</div>
     <section class="work-counter" aria-label="Bàn trộn bánh tráng">
-      <div class="counter-work">
-        <div class="counter-work-heading"><strong>QUẦY BÁNH TRÁNG</strong><span>PHA · TRỘN · GIAO</span></div>
-        <div class="counter-center">
-          <div id="mixing-bowl-slot" class="mixing-bowl-slot" data-render-signature="${escapeHtml(getBowlSignature(order))}">${renderMixingBowl(order)}</div>
-          <div id="work-controls-slot" class="work-controls-slot" data-render-signature="${escapeHtml(getControlsSignature(order))}">${renderWorkControls(order)}</div>
-        </div>
+      <div class="counter-nameplate"><strong>QUẦY BÁNH TRÁNG</strong><span>PHA · TRỘN · ĐÓNG HỘP</span></div>
+      <div id="work-controls-slot" class="counter-equipment-row" data-render-signature="${escapeHtml(getControlsSignature(state, order))}">${renderWorkControls(state, order)}</div>
+      <div class="counter-mix-bench">
+        <div id="mixing-bowl-slot" class="mixing-bowl-slot" data-render-signature="${escapeHtml(getBowlSignature(order))}">${renderMixingBowl(order)}</div>
+        <div id="ingredient-tools-slot" class="ingredient-tools" data-render-signature="${escapeHtml(getIngredientsSignature(state, order))}">${renderIngredientControls(state, order)}</div>
       </div>
-      <div id="ingredient-tools-slot" class="ingredient-tools" data-render-signature="${escapeHtml(getIngredientsSignature(state, order))}">${renderIngredientControls(state, order)}</div>
       <div id="selling-actions-slot" class="selling-actions-slot" data-render-signature="${escapeHtml(getActionsSignature(state, order))}">${renderSellingActions(order, state)}</div>
     </section>
-    <div id="serve-feedback-slot" class="serve-feedback-slot" data-render-signature="${presentation.feedback?.createdAt ?? "empty"}">${renderFeedback(presentation.feedback)}</div>
     <div id="pause-curtain-slot" data-render-signature="${state.gameplay.status === "paused" ? "paused" : "running"}">${state.gameplay.status === "paused" ? renderPauseCurtain() : ""}</div>
   </section>`;
 }
@@ -84,7 +83,7 @@ export function updateGameplayView(state, presentation = {}) {
   patchSlot("#focused-order-slot", `${focusedOrderCustomer?.id ?? "empty"}:${order?.id ?? "empty"}`, () => renderOrderDetails(order, focusedOrderCustomer), true);
   patchSlot("#online-orders-slot", getOnlineOrderSignature(state), () => renderOnlineOrders(state));
   patchSlot("#mixing-bowl-slot", getBowlSignature(order), () => renderMixingBowl(order));
-  patchSlot("#work-controls-slot", getControlsSignature(order), () => renderWorkControls(order));
+  patchSlot("#work-controls-slot", getControlsSignature(state, order), () => renderWorkControls(state, order));
   patchSlot("#ingredient-tools-slot", getIngredientsSignature(state, order), () => renderIngredientControls(state, order));
   patchSlot("#selling-actions-slot", getActionsSignature(state, order), () => renderSellingActions(order, state));
   patchSlot("#scene-event-slot", getEventSignature(state), () => renderEvent(state));
@@ -95,7 +94,7 @@ export function updateGameplayView(state, presentation = {}) {
 }
 
 function renderCustomerQueue(customers, focusedCustomerId) {
-  if (!customers.length) return `<div class="customer-queue-empty"><span>🥣</span><strong>Đang chờ khách ghé quầy</strong></div>`;
+  if (!customers.length) return `<div class="customer-queue-empty">${renderFoodAsset("mixing_bowl", "queue-empty-asset")}<strong>Đang chờ khách ghé quầy</strong></div>`;
   return customers.map((customer, index) => renderQueueCustomer(customer, index, customer.id === focusedCustomerId)).join("");
 }
 
@@ -121,7 +120,7 @@ function updateCustomerQueue(queue, customers, focusedCustomerId) {
 
   if (!customers.length) {
     if (!queue.querySelector(".customer-queue-empty")) {
-      queue.innerHTML = `<div class="customer-queue-empty"><span>🥣</span><strong>Đang chờ khách ghé quầy</strong></div>`;
+      queue.innerHTML = `<div class="customer-queue-empty">${renderFoodAsset("mixing_bowl", "queue-empty-asset")}<strong>Đang chờ khách ghé quầy</strong></div>`;
     }
     return;
   }
@@ -150,7 +149,7 @@ function updateCustomerQueue(queue, customers, focusedCustomerId) {
 
 function renderFocusedCustomer(customer) {
   if (!customer) {
-    return `<div class="focused-customer is-empty"><span class="empty-customer-illustration">🥣</span><strong>Quầy đang chờ khách</strong><small>Khách mới sẽ đứng ở đây khi ghé tiệm.</small></div>`;
+    return `<div class="focused-customer is-empty">${renderFoodAsset("mixing_bowl", "empty-customer-illustration")}<strong>Quầy đang chờ khách</strong><small>Khách mới sẽ đứng ở đây khi ghé tiệm.</small></div>`;
   }
   const sprite = spritePosition(customer.type);
   const patience = getPatiencePercent(customer);
@@ -171,94 +170,135 @@ function renderOrderDetails(order, customer) {
   }
   const item = order.items[0];
   const product = PRODUCT_BY_ID[item.productId];
-  const recipe = getProductRecipe(item.productId, item) ?? {};
-  const grouped = [
-    { category: "Bánh tráng", label: "NỀN" },
-    { category: "Topping", label: "TOPPING" },
-    { category: "Gia vị", label: "GIA VỊ" },
-  ].map((group) => ({
-    ...group,
-    items: Object.entries(recipe)
-      .filter(([id]) => id !== "food_box" && INGREDIENT_BY_ID[id]?.category === group.category)
-      .map(([id, quantity]) => `${INGREDIENT_BY_ID[id]?.name ?? id}${quantity > 1 ? ` ×${quantity}` : ""}`),
-  })).filter((group) => group.items.length);
-  const otherItems = Object.entries(recipe)
-    .filter(([id]) => id !== "food_box" && !["Bánh tráng", "Topping", "Gia vị"].includes(INGREDIENT_BY_ID[id]?.category))
-    .map(([id, quantity]) => `${INGREDIENT_BY_ID[id]?.name ?? id}${quantity > 1 ? ` ×${quantity}` : ""}`);
-  if (otherItems.length) grouped.push({ label: "YÊU CẦU", items: otherItems });
+  const recipe = getOrderRecipe(order, { size: item.size }) ?? {};
+  const requested = Object.entries(recipe)
+    .filter(([id]) => id !== "food_box")
+    .map(([id, quantity]) => ({
+      id,
+      quantity,
+      name: INGREDIENT_BY_ID[id]?.name ?? id,
+    }));
+  const excludedIngredients = order.customerRequest?.excludedIngredients ?? [];
+  const excluded = excludedIngredients
+    .map((id) => INGREDIENT_BY_ID[id]?.name ?? id)
+    .filter(Boolean);
+  const heatLevel = order.customerRequest?.heatLevel;
+  const requestedMarkup = requested.map(({ id, name, quantity }) =>
+    `<strong class="order-keyword">${escapeHtml(name)}${quantity > 1 ? ` ×${quantity}` : ""}</strong>`,
+  ).join(`<span class="order-word">, </span>`);
+  const exclusionsMarkup = excluded.map((name) =>
+    `<strong class="order-keyword is-excluded">KHÔNG ${escapeHtml(name.toLocaleUpperCase("vi"))}</strong>`,
+  ).join(`<span class="order-word">, </span>`);
+  const productName = product?.name ?? "Bánh tráng trộn";
+  const sizeLabel = getSizeLabel(item.size).toLocaleUpperCase("vi");
 
   return `<section class="active-order-bubble" aria-label="Đơn hàng đầy đủ của ${escapeHtml(customer.label)}" data-order-id="${escapeHtml(order.id)}">
     <span class="order-bubble-tail" aria-hidden="true"></span>
     <div class="order-bubble-kicker"><span>ĐƠN ĐANG LÀM</span><strong>${formatMoneyCompact(order.totalPrice)}</strong></div>
-    <h2 class="order-product-name">${escapeHtml(product?.name ?? "Bánh tráng trộn")}</h2>
-    <div class="order-size-line"><span>CỠ</span><strong>${escapeHtml(getSizeLabel(item.size).toUpperCase())}</strong><small>· ${item.quantity ?? 1} phần</small></div>
-    <div class="order-ingredient-groups">${grouped.map((group) => `<div class="order-ingredient-group"><span>${group.label}</span><strong>${group.items.map(escapeHtml).join(" · ")}</strong></div>`).join("")}</div>
+    <div class="order-request-copy">
+      <p>Cho mình một <strong class="order-product-name">${escapeHtml(productName)}</strong> cỡ <strong class="order-keyword">${escapeHtml(sizeLabel)}</strong>${(item.quantity ?? 1) > 1 ? `, <strong class="order-keyword">${item.quantity} phần</strong>` : ""},</p>
+      ${requestedMarkup ? `<p>thêm ${requestedMarkup}</p>` : ""}
+      ${exclusionsMarkup ? `<p>${exclusionsMarkup}</p>` : ""}
+      ${heatLevel ? `<p>nêm <strong class="order-keyword">${escapeHtml(String(heatLevel).toLocaleUpperCase("vi"))}</strong> nha!</p>` : ""}
+    </div>
   </section>`;
 }
 
 function renderMixingBowl(order) {
   const ingredients = Object.entries(order?.preparedIngredients ?? {}).filter(([, quantity]) => quantity > 0);
-  if (order?.packed) {
-    return `<div class="mixing-bowl-wrap is-packed"><div class="food-box" aria-label="Món đã đóng hộp">${renderFoodAsset("food_box", "food-box-asset", "Hộp bánh tráng trộn")}<small>ĐÃ ĐÓNG HỘP</small></div></div>`;
-  }
   const hasSatay = (order?.preparedIngredients?.satay ?? 0) > 0;
   const hasTamarind = (order?.preparedIngredients?.tamarind_sauce ?? 0) > 0;
+  const isEditable = Boolean(order && order.status === "waiting" && !order.mixed && !order.mixing && !order.packed);
   const toppings = ingredients.map(([id, quantity], index) => {
     const ingredient = INGREDIENT_BY_ID[id];
-    return `<button class="bowl-topping topping-${index % 8}" data-action="remove-bowl-ingredient" data-ingredient="${id}" ${order?.mixed || order?.mixing ? "disabled" : ""} aria-label="Bỏ ${escapeHtml(ingredient?.name ?? id)} khỏi tô">${renderFoodAsset(id, "bowl-ingredient-asset")}${quantity > 1 ? `<small>×${quantity}</small>` : ""}</button>`;
+    return `<button class="bowl-topping topping-${index % 8}" data-action="remove-bowl-ingredient" data-ingredient="${id}" ${isEditable ? "" : "disabled"} aria-label="Bỏ ${escapeHtml(ingredient?.name ?? id)} khỏi tô">${renderFoodAsset(id, "bowl-ingredient-asset")}${quantity > 1 ? `<small>×${quantity}</small>` : ""}</button>`;
   }).join("");
   const stage = order?.mixed ? "Đã trộn xong" : order?.mixing ? "Đang trộn…" : ingredients.length ? "Chạm nguyên liệu trong tô để bỏ" : "Tô đang trống";
-  return `<div class="mixing-bowl-wrap">
-    <div class="mixing-bowl ${order?.mixing ? "is-mixing" : ""} ${order?.mixed ? "is-mixed" : ""}" style="--mix-duration:${GAME_CONFIG.MIX_DURATION_MS}ms" aria-label="Tô trộn bánh tráng">
+  const bowl = `<div class="mixing-bowl ${order?.mixing ? "is-mixing" : ""} ${order?.mixed ? "is-mixed" : ""}" style="--mix-duration:${GAME_CONFIG.MIX_DURATION_MS}ms" aria-label="Tô trộn bánh tráng">
       ${renderFoodAsset("mixing_bowl", "mixing-bowl-art", "Thau trộn bánh tráng")}
       <div class="bowl-contents ${hasSatay ? "has-satay" : ""} ${hasTamarind ? "has-tamarind" : ""}">${toppings || `<span class="bowl-empty">${renderFoodAsset("rice_paper", "bowl-empty-asset")}</span>`}</div>
-    </div><small class="bowl-hint">${stage}</small>
-  </div>`;
+    </div>`;
+  if (order?.packed) {
+    return `<div class="mixing-bowl-wrap is-packed"><div class="packing-source">${bowl}</div><div class="food-box" aria-label="Món đã đóng hộp">${renderFoodAsset("food_box", "food-box-asset", "Hộp bánh tráng trộn")}<small>ĐÃ ĐÓNG HỘP</small></div></div>`;
+  }
+  return `<div class="mixing-bowl-wrap">${bowl}<small class="bowl-hint">${stage}</small></div>`;
 }
 
-function renderWorkControls(order) {
-  if (!order) return `<div class="counter-controls"><div class="counter-waiting">${renderFoodAsset("mixing_bowl", "waiting-bowl-asset")}<small>Chọn khách để bắt đầu</small></div></div>`;
-  const item = order.items[0];
-  const hasIngredients = Object.values(order.preparedIngredients ?? {}).some((quantity) => quantity > 0);
-  const sizeDisabled = order.mixed || order.mixing || hasIngredients || order.status !== "waiting";
-  const sizeButtons = Object.entries(PRODUCT_OPTIONS.sizes).map(([id, option]) =>
-    `<button class="size-choice ${order.preparedSize === id ? "is-selected" : ""}" data-action="choose-order-size" data-size="${id}" aria-pressed="${order.preparedSize === id}" ${sizeDisabled ? "disabled" : ""}>${escapeHtml(option.label.toUpperCase())}</button>`,
-  ).join("");
-  const selectedSize = order.preparedSize ? `ĐANG CHỌN · ${getSizeLabel(order.preparedSize).toUpperCase()}` : `KHÁCH GỌI · ${getSizeLabel(item.size).toUpperCase()}`;
-  return `<div class="counter-controls">
-    <span class="size-choices-label">CHỌN CỠ · ${escapeHtml(selectedSize)}</span>
-    <div class="size-choices" aria-label="Chọn cỡ bánh">${sizeButtons}</div>
-    <small class="size-hint">Cỡ Bé / Lớn</small>
+function renderWorkControls(state, order) {
+  const hasIngredients = Object.values(order?.preparedIngredients ?? {}).some((quantity) => quantity > 0);
+  const sizeDisabled = !order || order.mixed || order.mixing || hasIngredients || order.status !== "waiting";
+  const sizeButtons = Object.entries(PRODUCT_OPTIONS.sizes).map(([id, option]) => {
+    const sizeAsset = id === "M" ? "size_small_bowl" : "size_large_bowl";
+    return `<button class="size-choice ${order?.preparedSize === id ? "is-selected" : ""}" data-action="choose-order-size" data-size="${id}" aria-pressed="${order?.preparedSize === id}" ${sizeDisabled ? "disabled" : ""}>${renderFoodAsset(sizeAsset, "size-choice-asset", `Phần ${option.label}`)}<strong>${escapeHtml(option.label.toLocaleUpperCase("vi"))}</strong></button>`;
+  }).join("");
+  const primaryIngredients = ["rice_paper", "shrimp_salt", "satay", "tamarind_sauce"].map((id) => INGREDIENT_BY_ID[id]);
+  const packageStatus = !order ? "Chờ khách" : order.packed ? "Đã đóng hộp" : order.mixed ? "Sẵn sàng đóng" : "Chờ trộn";
+  return `<div class="equipment-row">
+    <section class="size-station" aria-label="Chọn cỡ phần">
+      <div class="station-caption">CỠ PHẦN</div>
+      <div class="size-choices">${sizeButtons}</div>
+    </section>
+    <section class="dispenser-station" aria-label="Hũ bánh tráng và gia vị">
+      <div class="station-caption">HŨ NỀN &amp; GIA VỊ</div>
+      <div class="ingredient-dispenser-row">${primaryIngredients.map((ingredient) => renderIngredientControl(ingredient, state, order, "jar")).join("")}</div>
+    </section>
+    <div class="pack-station ${order?.mixed ? "is-ready" : ""} ${order?.packed ? "is-packed" : ""}" aria-label="Khu đóng hộp: ${packageStatus}">
+      ${renderFoodAsset("packing_machine", "packing-machine-asset", "Máy đóng hộp bánh tráng")}
+      <strong>KHU ĐÓNG HỘP</strong><small>${escapeHtml(packageStatus)}</small>
+    </div>
   </div>`;
 }
 
 function renderSellingActions(order, state) {
-  if (!order) return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="button button-primary" disabled>TRỘN</button><button class="button button-secondary" disabled>ĐÓNG HỘP</button><button class="button button-serve" disabled>GIAO KHÁCH</button></div>`;
+  if (!order) return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action" disabled>CHỜ KHÁCH ĐẾN QUẦY</button></div>`;
   const canMix = Boolean(order.preparedSize && order.preparedIngredients?.rice_paper > 0 && order.status === "waiting" && !order.mixed && !order.mixing);
   const canPack = Boolean(order.mixed && order.status === "waiting" && (state.stock.food_box?.quantity ?? 0) > 0);
+  if (order.packed) {
+    return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-serve" data-action="serve-order" data-order="${escapeHtml(order.id)}">GIAO KHÁCH · ${formatMoneyCompact(order.totalPrice)}</button></div>`;
+  }
+  if (order.mixed) {
+    const label = canPack ? "ĐÓNG HỘP" : "THIẾU HỘP ĐỰNG";
+    return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-pack" data-action="pack-order" ${canPack ? "" : "disabled"}>${label}</button></div>`;
+  }
   const mixLabel = order.mixing ? "ĐANG TRỘN…" : "TRỘN MÓN";
-  const packLabel = order.packed ? "ĐÃ ĐÓNG HỘP" : "ĐÓNG HỘP";
-  return `<div class="selling-actions" aria-label="Thao tác đơn hàng">
-    <button class="button button-primary" data-action="mix-order" ${canMix ? "" : "disabled"}>${mixLabel}</button>
-    <button class="button button-secondary" data-action="pack-order" ${canPack ? "" : "disabled"}>${packLabel}</button>
-    <button class="button button-serve" data-action="serve-order" data-order="${escapeHtml(order.id)}" ${order.packed ? "" : "disabled"}>GIAO KHÁCH · ${formatMoneyCompact(order.totalPrice)}</button>
-  </div>`;
+  return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-mix" data-action="mix-order" ${canMix ? "" : "disabled"}>${mixLabel}</button></div>`;
 }
 
 function renderIngredientControls(state, order) {
   const prepared = order?.preparedIngredients ?? {};
-  const item = order?.items?.[0];
-  const targetRecipe = item ? getProductRecipe(item.productId, { size: order.preparedSize ?? item.size }) ?? {} : {};
-  const locked = !order || order.status !== "waiting" || order.mixed || order.mixing;
-  return `<div class="ingredient-tools-heading"><span>KHAY NGUYÊN LIỆU</span><small>${order?.preparedSize ? `${Object.values(prepared).reduce((sum, quantity) => sum + quantity, 0)} phần trong tô` : "Chọn khách và cỡ bánh"}</small></div>
-    <div class="ingredient-control-grid">${INGREDIENTS.filter((ingredient) => ingredient.id !== "food_box").map((ingredient) => {
-      const stock = state.stock[ingredient.id]?.quantity ?? 0;
-      const inBowl = prepared[ingredient.id] ?? 0;
-      const requested = targetRecipe[ingredient.id] ?? 0;
-      const unavailable = !order || locked || stock <= inBowl;
-      const stateLabel = !order ? "—" : !order.preparedSize ? `Kho ${stock}` : requested ? `${inBowl}/${requested} · kho ${stock}` : `${inBowl} · kho ${stock}`;
-      return `<button class="ingredient-control ${inBowl ? "is-active" : ""} ${stock <= inBowl ? "is-unavailable" : ""}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="Thêm ${escapeHtml(ingredient.name)}, còn ${stock}" ${unavailable ? "disabled" : ""}>${renderFoodAsset(ingredient.id, "ingredient-control-asset")}<strong>${escapeHtml(ingredient.name)}</strong><small>${stateLabel}</small></button>`;
-    }).join("")}</div>`;
+  const toppings = INGREDIENTS.filter((ingredient) => ingredient.category === "Topping");
+  const secondary = ["scallion_oil", "calamansi"].map((id) => INGREDIENT_BY_ID[id]);
+  const totalInBowl = Object.values(prepared).reduce((sum, quantity) => sum + quantity, 0);
+  return `<div class="ingredient-tools-heading"><strong>KHAY TOPPING</strong><small>${order ? `${totalInBowl} phần trong thau` : "Chọn khách để bắt đầu"}</small></div>
+    <div class="topping-tray-grid">${toppings.map((ingredient) => renderIngredientControl(ingredient, state, order, "tray")).join("")}</div>
+    <section class="secondary-shelf" aria-label="Gia vị và nguyên liệu phụ">
+      <div class="secondary-shelf-heading"><strong>KỆ GIA VỊ PHỤ</strong><span>THÊM VÀO THAU</span></div>
+      <div class="secondary-ingredient-row">${secondary.map((ingredient) => renderIngredientControl(ingredient, state, order, "secondary")).join("")}</div>
+    </section>`;
+}
+
+function renderIngredientControl(ingredient, state, order, station) {
+  const stock = state.stock[ingredient.id]?.quantity ?? 0;
+  const inBowl = order?.preparedIngredients?.[ingredient.id] ?? 0;
+  const recipe = order ? getOrderRecipe(order) ?? {} : {};
+  const requested = recipe[ingredient.id] ?? 0;
+  const isLocked = Number.isFinite(ingredient.unlockDay) && state.day < ingredient.unlockDay;
+  const unavailable = !order || order.status !== "waiting" || order.mixed || order.mixing || order.packed || stock <= inBowl || isLocked;
+  const amount = order?.preparedSize && requested ? `${inBowl}/${requested}` : `${inBowl} · kho ${stock}`;
+  const classes = [
+    `ingredient-${station}`,
+    inBowl ? "is-active" : "",
+    stock <= inBowl ? "is-unavailable" : "",
+    unavailable ? "is-disabled" : "",
+    isLocked ? "is-locked" : "",
+  ].filter(Boolean).join(" ");
+  const ingredientArt = renderFoodAsset(ingredient.id, station === "tray" ? "tray-ingredient-asset" : "station-ingredient-asset");
+  const graphic = station === "jar"
+    ? `<span class="ingredient-vessel">${renderFoodAsset("spice_jar", "jar-vessel-asset")}${ingredientArt}</span>`
+    : station === "tray"
+      ? `<span class="tray-well"><span class="tray-stock">${stock}</span>${ingredientArt}<span class="tray-lock">${isLocked ? renderFoodAsset("lock", "lock-asset") : ""}</span></span>`
+      : `<span class="secondary-vessel">${renderFoodAsset("spice_jar", "secondary-vessel-asset")}${ingredientArt}</span>`;
+  return `<button type="button" class="${classes}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="${isLocked ? `Đã khóa ${escapeHtml(ingredient.name)}` : `Thêm ${escapeHtml(ingredient.name)}, còn ${stock}`}" ${unavailable ? "disabled" : ""}>${graphic}<strong>${escapeHtml(ingredient.name)}</strong><small>${isLocked ? "Chưa mở" : escapeHtml(amount)}</small></button>`;
 }
 
 function renderOnlineOrders(state) {
@@ -279,7 +319,7 @@ function renderEvent(state) {
 }
 
 function renderPauseCurtain() {
-  return `<div class="pause-curtain"><div><span>🥣</span><h2>Quầy nghỉ một chút</h2><p>Khách sẽ chờ khi bạn quay lại.</p><button class="button button-primary" data-action="pause-day">Tiếp tục bán</button></div></div>`;
+  return `<div class="pause-curtain"><div>${renderFoodAsset("mixing_bowl", "pause-bowl-asset")}<h2>Quầy nghỉ một chút</h2><p>Khách sẽ chờ khi bạn quay lại.</p><button class="button button-primary" data-action="pause-day">Tiếp tục bán</button></div></div>`;
 }
 
 function renderFeedback(feedback) {
@@ -290,7 +330,7 @@ function renderFeedback(feedback) {
     : accuracy?.wrongIngredients?.length ? "Món hơi dư nguyên liệu nè…"
       : accuracy && !accuracy.sizeCorrect ? "Sai cỡ rồi…" : "Ngon quá!";
   const stars = `${"★".repeat(feedback.rating)}${"☆".repeat(5 - feedback.rating)}`;
-  return `<div class="serve-feedback" key="${feedback.createdAt}"><span class="feedback-box" aria-hidden="true">${renderFoodAsset("food_box", "feedback-box-asset")}</span><strong>+${formatMoneyCompact(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
+  return `<div class="serve-feedback" key="${feedback.createdAt}" aria-live="polite"><span class="feedback-box" aria-hidden="true">${renderFoodAsset("food_box", "feedback-box-asset")}</span><strong>${escapeHtml(feedback.customerLabel ?? "Khách")} · +${formatMoneyCompact(feedback.revenue)}</strong><small>${reaction}</small><span>${stars}</span></div>`;
 }
 
 function updateClock(root, state) {
@@ -372,8 +412,12 @@ function getBowlSignature(order) {
   return JSON.stringify(order ? [order.id, order.preparedIngredients, order.mixed, order.mixing, order.packed] : null);
 }
 
-function getControlsSignature(order) {
-  return JSON.stringify(order ? [order.id, order.preparedSize, order.preparedIngredients, order.mixed, order.mixing, order.status] : null);
+function getControlsSignature(state, order) {
+  return JSON.stringify([
+    order ? [order.id, order.preparedSize, order.preparedIngredients, order.mixed, order.mixing, order.packed, order.status] : null,
+    ["rice_paper", "shrimp_salt", "satay", "tamarind_sauce"].map((id) => [id, state.stock[id]?.quantity ?? 0]),
+    state.stock.food_box?.quantity ?? 0,
+  ]);
 }
 
 function getIngredientsSignature(state, order) {

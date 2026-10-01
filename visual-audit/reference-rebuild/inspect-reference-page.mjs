@@ -1,0 +1,14 @@
+const tabs = await (await fetch("http://127.0.0.1:9226/json/list")).json();
+const target = tabs.find((tab) => tab.type === "page" && tab.url.startsWith("https://tiemtramouoc.tensorship.tech/"));
+if (!target) throw new Error("Reference tab not found");
+const socket = new WebSocket(target.webSocketDebuggerUrl);
+await new Promise((resolve, reject) => { socket.addEventListener("open", resolve, { once: true }); socket.addEventListener("error", reject, { once: true }); });
+let sequence = 0;
+const pending = new Map();
+socket.addEventListener("message", (event) => { const packet = JSON.parse(event.data); const callback = pending.get(packet.id); if (!callback) return; pending.delete(packet.id); packet.error ? callback.reject(new Error(packet.error.message)) : callback.resolve(packet.result); });
+const call = (method, params = {}) => new Promise((resolve, reject) => { const id = ++sequence; pending.set(id, { resolve, reject }); socket.send(JSON.stringify({ id, method, params })); });
+const evaluate = async (expression) => { const packet = await call("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }); if (packet.exceptionDetails) throw new Error(packet.exceptionDetails.text); return packet.result.value; };
+await call("Page.enable");
+await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+console.log(await evaluate(`JSON.stringify({url:location.href,viewport:[innerWidth,innerHeight],scrollWidth:document.documentElement.scrollWidth,text:document.body.innerText.slice(0,1200),inputs:[...document.querySelectorAll('input')].map(input=>{let parent=input;const ancestors=[];for(let i=0;i<6&&parent;i++,parent=parent.parentElement)ancestors.push({tag:parent.tagName,cls:typeof parent.className==='string'?parent.className:'',html:parent.outerHTML.slice(0,400)});const r=input.getBoundingClientRect();return {aria:input.getAttribute('aria-label'),value:input.value,rect:[Math.round(r.x),Math.round(r.y),Math.round(r.width),Math.round(r.height)],ancestors}}),controls:[...document.querySelectorAll('button,[role=button]')].filter(e=>{const r=e.getBoundingClientRect();return r.width>0&&r.height>0}).map(e=>({text:e.innerText,aria:e.getAttribute('aria-label'),cls:e.className,rect:(()=>{const r=e.getBoundingClientRect();return [Math.round(r.x),Math.round(r.y),Math.round(r.width),Math.round(r.height)]})()})).slice(0,45)})`));
+socket.close();

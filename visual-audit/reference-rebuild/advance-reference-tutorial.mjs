@@ -1,0 +1,15 @@
+const target = (await (await fetch("http://127.0.0.1:9226/json/list")).json()).find((tab) => tab.type === "page" && tab.url.startsWith("https://tiemtramouoc.tensorship.tech/"));
+const socket = new WebSocket(target.webSocketDebuggerUrl);
+await new Promise((resolve, reject) => { socket.addEventListener("open", resolve, { once: true }); socket.addEventListener("error", reject, { once: true }); });
+let sequence = 0;
+const pending = new Map();
+socket.addEventListener("message", (event) => { const packet = JSON.parse(event.data); const callback = pending.get(packet.id); if (!callback) return; pending.delete(packet.id); packet.error ? callback.reject(new Error(packet.error.message)) : callback.resolve(packet.result); });
+const call = (method, params = {}) => new Promise((resolve, reject) => { const id = ++sequence; pending.set(id, { resolve, reject }); socket.send(JSON.stringify({ id, method, params })); });
+const evaluate = async (expression) => { const packet = await call("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true }); if (packet.exceptionDetails) throw new Error(packet.exceptionDetails.text); return packet.result.value; };
+const pause = (milliseconds) => new Promise((resolve) => setTimeout(resolve, milliseconds));
+await call("Emulation.setDeviceMetricsOverride", { width: 390, height: 844, deviceScaleFactor: 1, mobile: true });
+const label = process.argv[2] ?? "Lấy ly L";
+console.log("CLICK", label, await evaluate(`(() => {const button=[...document.querySelectorAll('button')].find(b=>b.getAttribute('aria-label')===${JSON.stringify(process.argv[2] ?? "Lấy ly L")});if(!button)return null;button.click();return {class:button.className,rect:(()=>{const r=button.getBoundingClientRect();return [r.x,r.y,r.width,r.height]})()}})()`));
+await pause(650);
+console.log("STATE", await evaluate(`JSON.stringify({text:document.body.innerText.slice(0,1300),buttons:[...document.querySelectorAll('button')].filter(b=>{const r=b.getBoundingClientRect();return r.width>0&&r.height>0}).map(b=>({aria:b.getAttribute('aria-label'),text:b.innerText,cls:b.className})).slice(-30)})`));
+socket.close();

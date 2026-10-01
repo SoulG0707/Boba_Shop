@@ -3,7 +3,7 @@ import fs from "node:fs/promises";
 import path from "node:path";
 import { GAME_CONFIG } from "../../js/config.js";
 import { INGREDIENTS } from "../../js/data/ingredients.js";
-import { getProductPrice, getProductRecipe, PRODUCT_BY_ID } from "../../js/data/products.js";
+import { getProductPrice, getProductRecipe, getSizeLabel, PRODUCT_BY_ID } from "../../js/data/products.js";
 import { createInitialState } from "../../js/state/initialState.js";
 import { purchaseIngredients } from "../../js/systems/inventory.js";
 import { createOrder } from "../../js/systems/orders.js";
@@ -46,6 +46,7 @@ function createState({ customers = [], spawnAccumulator = -10_000, startTime = D
     order.items[0].size = spec.size;
     order.totalPrice = getProductPrice(spec.productId, state.sellPrices, { size: spec.size });
     order.preparedIngredients = structuredClone(spec.preparedIngredients ?? {});
+    if (spec.customerRequest) order.customerRequest = structuredClone(spec.customerRequest);
     order.preparedSize = spec.preparedSize ?? null;
     order.mixed = false;
     order.mixing = false;
@@ -58,8 +59,8 @@ function createState({ customers = [], spawnAccumulator = -10_000, startTime = D
 const specs = [
   { type: "regular", label: "Khách quen", productId: "traditional", size: "M", preparedSize: "M", preparedIngredients: { rice_paper: 1, shrimp_salt: 1 } },
   { type: "student", label: "Học sinh", productId: "beef", size: "L" },
-  { type: "office", label: "Dân văn phòng", productId: "chicken", size: "M" },
-  { type: "reviewer", label: "Khách kỹ tính", productId: "special", size: "L" },
+  { type: "office", label: "Dân văn phòng", productId: "chicken", size: "M", customerRequest: { excludedIngredients: ["vietnamese_coriander"], heatLevel: "Cay vừa" } },
+  { type: "reviewer", label: "Khách kỹ tính", productId: "special", size: "L", preparedSize: "L", preparedIngredients: { rice_paper: 2, shrimp_salt: 2, satay: 2, tamarind_sauce: 2, green_mango: 2, vietnamese_coriander: 2, fried_shallot: 2, peanut: 2, quail_egg: 2, beef_jerky: 2, chicken_jerky: 2, dried_shrimp: 2, scallion_oil: 1, calamansi: 1 }, customerRequest: { excludedIngredients: [], heatLevel: "Cay vừa" } },
 ];
 const fourCustomerState = createState({ customers: specs });
 
@@ -145,12 +146,20 @@ async function screenshot(name) {
     const image=document.querySelector('.customer-main-image');
     const action=document.querySelector('.selling-actions');
     const tools=document.querySelector('.ingredient-tools');
-    const binGrid=document.querySelector('.ingredient-control-grid');
+    const bowl=document.querySelector('.mixing-bowl');
+    const binGrid=document.querySelector('.topping-tray-grid');
     const rect=(node)=>{if(!node)return null;const r=node.getBoundingClientRect();return {top:Math.round(r.top),bottom:Math.round(r.bottom),left:Math.round(r.left),right:Math.round(r.right),width:Math.round(r.width),height:Math.round(r.height)}};
-    return JSON.stringify({viewport:{width:innerWidth,height:innerHeight},documentWidth:document.documentElement.scrollWidth,scene:rect(scene),queue:rect(queue),order:rect(order),mainCustomer:rect(image),tools:rect(tools),actions:rect(action),binGrid:binGrid?{clientHeight:binGrid.clientHeight,scrollHeight:binGrid.scrollHeight}:null,queueCount:document.querySelectorAll('.customer-queue-avatar').length,orderCount:document.querySelectorAll('.active-order-bubble:not(.is-empty)').length,ingredientBins:document.querySelectorAll('.ingredient-control').length});
+    const orderCopy=order?.querySelector('.order-request-copy');
+    const orderStyle=order?getComputedStyle(order):null;
+    const sellingText=scene?.innerText??'';
+    return JSON.stringify({viewport:{width:innerWidth,height:innerHeight},documentWidth:document.documentElement.scrollWidth,scene:rect(scene),queue:rect(queue),order:rect(order),mainCustomer:rect(image),bowl:rect(bowl),tools:rect(tools),actions:rect(action),binGrid:binGrid?{clientHeight:binGrid.clientHeight,scrollHeight:binGrid.scrollHeight}:null,orderTextSize:orderCopy?parseFloat(getComputedStyle(orderCopy).fontSize):null,orderOverflow:order?{clientHeight:order.clientHeight,scrollHeight:order.scrollHeight,overflow:orderStyle.overflow}:null,queueCount:document.querySelectorAll('.customer-queue-avatar').length,orderCount:document.querySelectorAll('.active-order-bubble:not(.is-empty)').length,ingredientJars:document.querySelectorAll('.ingredient-jar').length,ingredientTrays:document.querySelectorAll('.ingredient-tray').length,secondaryIngredients:document.querySelectorAll('.ingredient-secondary').length,primaryActionCount:document.querySelectorAll('.selling-actions [data-action]').length,hasLegacyTeaText:/trà sữa|matcha|trân châu|pha ly|quầy trà|\bly\b/i.test(sellingText),showsInternalSize:/\b[ML]\b/.test(document.querySelector('.size-choices')?.innerText??'')});
   })()`));
   if (metrics.documentWidth > metrics.viewport.width) throw new Error(`${name} has horizontal overflow: ${JSON.stringify(metrics)}`);
-  if (metrics.tools && metrics.actions && metrics.tools.bottom > metrics.actions.top + 1) throw new Error(`${name} ingredient bins overlap the action bar: ${JSON.stringify(metrics)}`);
+  if (metrics.tools && metrics.actions && metrics.tools.bottom > metrics.actions.top + 1) throw new Error(`${name} ingredient trays overlap the action bar: ${JSON.stringify(metrics)}`);
+  if (metrics.binGrid && metrics.binGrid.scrollHeight > metrics.binGrid.clientHeight + 1) throw new Error(`${name} topping trays are clipped: ${JSON.stringify(metrics)}`);
+  if (metrics.scene && metrics.hasLegacyTeaText) throw new Error(`${name} still shows tea-domain text`);
+  if (metrics.scene && metrics.showsInternalSize) throw new Error(`${name} still exposes internal M/L size codes`);
+  if (metrics.scene && metrics.orderCount && metrics.primaryActionCount !== 1) throw new Error(`${name} emphasizes more than one action`);
   results.checks[name] = metrics;
   console.log(`${name}: ${JSON.stringify(metrics)}`);
   return file;
@@ -189,16 +198,19 @@ await call("Runtime.enable");
 await call("Network.enable");
 await call("Log.enable");
 await call("Network.setBypassServiceWorker", { bypass: true });
+await call("Network.setCacheDisabled", { cacheDisabled: true });
+await call("Network.clearBrowserCache");
 await setViewport(390, 844);
 await seedAndEnter(fourCustomerState);
 
-const initial = JSON.parse(await evaluate(`JSON.stringify({customers:window.gameDebug.getState().customers.map((customer)=>({id:customer.id,orderId:customer.orderId,patience:customer.patience,maxPatience:customer.maxPatience})),orders:window.gameDebug.getState().orders.map((order)=>({id:order.id,customerId:order.customerId,productId:order.items[0].productId,size:order.items[0].size,prepared:order.preparedIngredients}))})`));
+const initial = JSON.parse(await evaluate(`JSON.stringify({customers:window.gameDebug.getState().customers.map((customer)=>({id:customer.id,orderId:customer.orderId,patience:customer.patience,maxPatience:customer.maxPatience})),orders:window.gameDebug.getState().orders.map((order)=>({id:order.id,customerId:order.customerId,productId:order.items[0].productId,size:order.items[0].size,prepared:order.preparedIngredients,customerRequest:order.customerRequest}))})`));
 assert.equal(initial.customers.length, 4, "Four customers are present in the queue");
 assert.equal(await evaluate("document.querySelectorAll('.customer-queue-avatar').length"), 4, "Four waiting customers are visible as avatars");
 assert.equal(await evaluate("document.querySelectorAll('.active-order-bubble:not(.is-empty)').length"), 1, "Exactly one full order bubble is rendered");
 await screenshot("queue-four-customers-390x844");
 
 const orderByCustomer = new Map(initial.orders.map((order) => [order.customerId, order]));
+const displayedOrders = new Map();
 for (const [index, customer] of initial.customers.entries()) {
   await click(`[data-action="select-customer"][data-customer="${customer.id}"]`);
   const currentOrder = orderByCustomer.get(customer.id);
@@ -206,6 +218,10 @@ for (const [index, customer] of initial.customers.entries()) {
   assert.equal(shownOrderId, currentOrder.id, `Focus ${index + 1} opens that customer's saved order`);
   const focusClass = await evaluate(`document.querySelector('[data-customer="${customer.id}"]')?.classList.contains('is-focused')`);
   assert.equal(focusClass, true, `Focus ${index + 1} highlights the selected avatar`);
+  const shownText = await evaluate("document.querySelector('.active-order-bubble').innerText");
+  displayedOrders.set(customer.id, shownText);
+  assert.ok(shownText.includes(PRODUCT_BY_ID[currentOrder.productId].name), `Focus ${index + 1} keeps that customer's original product request`);
+  assert.ok(shownText.includes(getSizeLabel(currentOrder.size).toLocaleUpperCase("vi")), `Focus ${index + 1} keeps that customer's original size request`);
   if (index === 0) {
     const bowlIngredients = await evaluate("[...document.querySelectorAll('.bowl-topping')].map((item)=>item.dataset.ingredient)");
     assert.ok(bowlIngredients.includes("rice_paper") && bowlIngredients.includes("shrimp_salt"), "A's prepared bowl is restored after focusing A again");
@@ -213,6 +229,17 @@ for (const [index, customer] of initial.customers.entries()) {
   const screenshotName = `focus-customer-${index + 1}-390x844`;
   await screenshot(screenshotName);
 }
+
+for (const index of [0, 1, 2, 0, 1]) {
+  const customer = initial.customers[index];
+  await click(`[data-action="select-customer"][data-customer="${customer.id}"]`);
+  const shownText = await evaluate("document.querySelector('.active-order-bubble').innerText");
+  assert.equal(shownText, displayedOrders.get(customer.id), `A → B → C → A → B preserves all original order wording (${index + 1})`);
+}
+await click(`[data-action="select-customer"][data-customer="${initial.customers[2].id}"]`);
+const excludedOrderText = await evaluate("document.querySelector('.active-order-bubble').innerText");
+assert.ok(excludedOrderText.includes("KHÔNG RAU RĂM") && excludedOrderText.includes("CAY VỪA"), "Exclusions and heat requests are bold, readable order terms");
+assert.equal(await evaluate("document.querySelectorAll('.active-order-bubble').length"), 1, "Only the focused customer's complete speech bubble exists in the DOM");
 
 await click(`[data-action="select-customer"][data-customer="${initial.customers[0].id}"]`);
 const restoredBowl = await evaluate("[...document.querySelectorAll('.bowl-topping')].map((item)=>item.dataset.ingredient)");
@@ -222,6 +249,7 @@ assert.deepEqual(unchangedQueueIds, initial.customers.map((customer) => customer
 
 const specialOrder = orderByCustomer.get(initial.customers[3].id);
 await click(`[data-action="select-customer"][data-customer="${initial.customers[3].id}"]`);
+await pause(260);
 const specialRecipe = getProductRecipe("special", { size: "L" });
 const renderedOrderText = await evaluate("document.querySelector('.active-order-bubble').innerText");
 for (const [id, quantity] of Object.entries(specialRecipe)) {
@@ -231,10 +259,12 @@ for (const [id, quantity] of Object.entries(specialRecipe)) {
 }
 assert.ok(renderedOrderText.includes("LỚN"), "Large order uses the Vietnamese size label");
 assert.equal(await evaluate("document.querySelectorAll('.active-order-bubble').length"), 1, "Only the focused customer's full order exists in the DOM");
-const longOrderStyles = JSON.parse(await evaluate(`(() => {const order=document.querySelector('.active-order-bubble').getBoundingClientRect();const image=document.querySelector('.customer-main-image').getBoundingClientRect();const font=parseFloat(getComputedStyle(document.querySelector('.order-ingredient-group > strong')).fontSize);return JSON.stringify({orderWidth:order.width,orderTop:order.top,orderBottom:order.bottom,mainCustomerHeight:image.height,ingredientFontSize:font})})()`));
-assert.ok(longOrderStyles.orderWidth >= 260 && longOrderStyles.orderBottom <= 844, "Long order bubble is wide enough and fully inside the mobile viewport");
-assert.ok(longOrderStyles.mainCustomerHeight >= 110 && longOrderStyles.mainCustomerHeight <= 150, "Main customer illustration stays between 110 and 150 pixels tall");
-assert.ok(longOrderStyles.ingredientFontSize >= 14, "Order ingredients meet the 14px readability target");
+const longOrderStyles = JSON.parse(await evaluate(`(() => {const order=document.querySelector('.active-order-bubble').getBoundingClientRect();const image=document.querySelector('.customer-main-image').getBoundingClientRect();const bowl=document.querySelector('.mixing-bowl').getBoundingClientRect();const copy=document.querySelector('.order-request-copy');const font=parseFloat(getComputedStyle(copy).fontSize);const bubble=document.querySelector('.active-order-bubble');return JSON.stringify({orderWidth:order.width,orderTop:order.top,orderBottom:order.bottom,mainCustomerHeight:image.height,bowlWidth:bowl.width,bowlHeight:bowl.height,ingredientFontSize:font,bubbleClientHeight:bubble.clientHeight,bubbleScrollHeight:bubble.scrollHeight})})()`));
+assert.ok(longOrderStyles.orderWidth >= 245 && longOrderStyles.orderBottom <= 844, "Long order bubble is wide enough and fully inside the mobile viewport");
+assert.ok(longOrderStyles.mainCustomerHeight >= 145 && longOrderStyles.mainCustomerHeight <= 165, "Main customer illustration meets the 145–165px mobile target");
+assert.ok(longOrderStyles.bowlWidth >= 140 && longOrderStyles.bowlHeight >= 140, "Mixing bowl occupies a large, stable workstation area");
+assert.ok(longOrderStyles.ingredientFontSize >= 14, "Order wording meets the 14px readability target");
+assert.equal(longOrderStyles.bubbleClientHeight, longOrderStyles.bubbleScrollHeight, "Long order text is not clipped or put in an inner scroll region");
 results.checks.longOrderLayout = longOrderStyles;
 await screenshot("selling-long-order-focused-customer-4-390x844");
 
@@ -305,18 +335,27 @@ assert.ok(readyAfterConfirm?.includes("Đủ sau khi xác nhận nhập"), "Pend
 await screenshot("inventory-cart-persists-after-tabs-390x844");
 results.checks.inventoryCategories = { baseRows, seasoningRows, toppingRows, cartSummary, stockBeforeConfirm };
 
-// Record an 18-second focused serving flow from a clean one-customer state.
-const recordingState = createState({ customers: [specs[0]], spawnAccumulator: -10_000 });
+// Save a desktop viewport capture, then record A's service while B, C, and D keep their original orders.
+await seedAndEnter(fourCustomerState);
+await setViewport(1366, 768);
+await screenshot("selling-desktop-1366x768");
+
+// Record a 20-second flow with four waiting customers and one later arrival.
+const recordingSpecs = specs.map((spec) => ({ ...spec, preparedIngredients: { ...(spec.preparedIngredients ?? {}) } }));
+recordingSpecs[0] = { ...recordingSpecs[0], preparedIngredients: {}, preparedSize: null, customerRequest: { excludedIngredients: [], heatLevel: "Cay vừa" } };
+const recordingState = createState({ customers: recordingSpecs, spawnAccumulator: -10_000 });
+await setViewport(390, 844);
 await seedAndEnter(recordingState);
-assert.equal(await evaluate("document.querySelectorAll('.customer-queue-avatar').length"), 1, "Recording starts with one waiting customer");
+assert.equal(await evaluate("document.querySelectorAll('.customer-queue-avatar').length"), 4, "Recording starts with customers A, B, C, and D");
 const recordingType = await installRecorder();
 const recordingStartedAt = Date.now();
 await hold(1_150);
 await evaluate("(() => { const random=Math.random;Math.random=()=>0;window.gameDebug.spawnCustomer();Math.random=random; })()");
-await waitFor("document.querySelectorAll('.customer-queue-avatar').length === 2");
+await waitFor("document.querySelectorAll('.customer-queue-avatar').length === 5");
 await hold(1_450);
 const recordingCustomers = JSON.parse(await evaluate("JSON.stringify(window.gameDebug.getState().customers.map((customer)=>({id:customer.id,orderId:customer.orderId,label:customer.label})))"));
-const servedCustomer = recordingCustomers[1];
+const ordersBeforeServing = JSON.parse(await evaluate("JSON.stringify(window.gameDebug.getState().orders.filter((order)=>order.customerId).map((order)=>({id:order.id,customerId:order.customerId,request:order.customerRequest,productId:order.items[0].productId,size:order.items[0].size})))"));
+const servedCustomer = recordingCustomers[0];
 await click(`[data-action="select-customer"][data-customer="${servedCustomer.id}"]`);
 await hold(950);
 await click('[data-action="choose-order-size"][data-size="M"]');
@@ -334,22 +373,34 @@ await hold(1_850);
 await waitFor("Boolean(document.querySelector('[data-action=pack-order]') && !document.querySelector('[data-action=pack-order]').disabled)", 2_500);
 await click('[data-action="pack-order"]');
 await hold(1_650);
+const packedState = JSON.parse(await evaluate(`JSON.stringify({packed:window.gameDebug.getState().orders.find((order)=>order.id===${JSON.stringify(servedCustomer.orderId)})?.packed,source:!!document.querySelector('.packing-source'),box:!!document.querySelector('.food-box'),next:document.querySelector('.next-work-action')?.textContent})`));
+assert.equal(packedState.packed, true, "Packing changes the business order state");
+assert.ok(packedState.source && packedState.box && packedState.next === "GIAO KHÁCH · 25k", "Packing animates the bowl into a box and exposes only the serve action");
 await click(`[data-action="serve-order"][data-order="${servedCustomer.orderId}"]`);
-await waitFor(`document.querySelector('.active-order-bubble')?.dataset.orderId === ${JSON.stringify(recordingCustomers[0].orderId)}`);
-await hold(5_300);
+await waitFor(`document.querySelector('.active-order-bubble')?.dataset.orderId === ${JSON.stringify(recordingCustomers[1].orderId)}`);
+const afterServingA = JSON.parse(await evaluate("JSON.stringify({customers:window.gameDebug.getState().customers.map((customer)=>({id:customer.id,orderId:customer.orderId})),orders:window.gameDebug.getState().orders.filter((order)=>order.customerId).map((order)=>({id:order.id,customerId:order.customerId,request:order.customerRequest,productId:order.items[0].productId,size:order.items[0].size}))})"));
+assert.ok(!afterServingA.customers.some((customer) => customer.id === servedCustomer.id), "Serving A removes only A from the waiting queue");
+assert.deepEqual(afterServingA.customers.slice(0, 3).map((customer) => customer.id), recordingCustomers.slice(1, 4).map((customer) => customer.id), "B, C, and D keep their queue order");
+for (const customer of recordingCustomers.slice(1, 4)) {
+  const before = ordersBeforeServing.find((order) => order.customerId === customer.id);
+  const after = afterServingA.orders.find((order) => order.customerId === customer.id);
+  assert.deepEqual(after, before, `${customer.label} retains its original immutable order after serving A`);
+}
+await hold(9_800);
 const recordingSeconds = (Date.now() - recordingStartedAt) / 1000;
+assert.ok(recordingSeconds >= 20, `Selling video must cover at least 20 seconds, got ${recordingSeconds.toFixed(1)}`);
 const recording = JSON.parse(await evaluate("window.__stopSellingRecording()"));
-assert.ok(recordingSeconds >= 15 && recordingSeconds <= 20, `Recording duration should be 15–20 seconds, got ${recordingSeconds.toFixed(1)}s`);
-const videoPath = path.join(outputDirectory, "focused-selling-flow-16s.webm");
+assert.ok(recordingSeconds >= 19 && recordingSeconds <= 21, `Recording duration should be 19–21 seconds, got ${recordingSeconds.toFixed(1)}s`);
+const videoPath = path.join(outputDirectory, "focused-selling-flow-20s.webm");
 await fs.writeFile(videoPath, Buffer.from(recording.base64, "base64"));
-await fs.writeFile(path.join(outputDirectory, "focused-selling-flow-preview.html"), `<!doctype html><meta charset="utf-8"><title>Quầy bánh tráng · video</title><video src="./focused-selling-flow-16s.webm" controls preload="metadata" style="width:min(100vw,390px);height:auto"></video>`);
+await fs.writeFile(path.join(outputDirectory, "focused-selling-flow-preview.html"), `<!doctype html><meta charset="utf-8"><link rel="icon" href="data:,"><title>Quầy bánh tráng · video</title><video src="./focused-selling-flow-20s.webm" controls preload="metadata" style="width:min(100vw,390px);height:auto"></video>`);
 results.video = { file: path.basename(videoPath), durationSeconds: Number(recordingSeconds.toFixed(1)), bytes: recording.bytes, mimeType: recordingType };
 console.log(`Recorded ${videoPath} (${recording.bytes} bytes, ${recordingSeconds.toFixed(1)} seconds).`);
 
 await call("Page.navigate", { url: "http://127.0.0.1:8125/visual-audit/selling-rework/focused-selling-flow-preview.html" });
 await waitFor("Boolean(document.querySelector('video') && document.querySelector('video').readyState >= 1)", 10_000);
 const playback = JSON.parse(await evaluate(`(async()=>{const video=document.querySelector('video');video.muted=true;await video.play();await new Promise((resolve)=>setTimeout(resolve,700));const state={duration:video.duration,currentTime:video.currentTime,error:video.error?.message??null};video.pause();return JSON.stringify(state)})()`));
-const durationMetadataValid = playback.duration == null || (playback.duration >= 15 && playback.duration <= 20);
+const durationMetadataValid = playback.duration == null || (playback.duration >= 19 && playback.duration <= 21);
 assert.ok(durationMetadataValid && playback.currentTime > 0 && playback.error === null, `Video playback check failed: ${JSON.stringify(playback)}`);
 results.checks.videoPlayback = playback;
 assert.deepEqual(consoleErrors, [], `Browser console errors: ${consoleErrors.join(" | ")}`);

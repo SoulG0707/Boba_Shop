@@ -9,7 +9,8 @@
     "selling-desktop-1366x768.png",
     "inventory-base-only-390x844.png",
     "inventory-seasoning-only-390x844.png",
-    "inventory-cart-persists-after-tabs-390x844.png"
+    "inventory-cart-persists-after-tabs-390x844.png",
+    "selling-desktop-1366x768.png"
   ],
   "checks": {
     "queue-four-customers-390x844": {
@@ -19,60 +20,79 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 192,
-        "bottom": 356,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 164
+        "top": 162,
+        "bottom": 324,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 162
       },
       "mainCustomer": {
-        "top": 197,
-        "bottom": 316,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 150,
+        "bottom": 300,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 562,
+        "bottom": 705,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 510,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 280
+        "top": 502,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 272
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 198,
+        "scrollHeight": 198
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 158,
+        "scrollHeight": 158,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "focus-customer-1-390x844": {
       "viewport": {
@@ -81,60 +101,79 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 192,
-        "bottom": 356,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 164
+        "top": 162,
+        "bottom": 324,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 162
       },
       "mainCustomer": {
-        "top": 197,
-        "bottom": 316,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 150,
+        "bottom": 300,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 562,
+        "bottom": 705,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 510,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 280
+        "top": 502,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 272
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 198,
+        "scrollHeight": 198
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 158,
+        "scrollHeight": 158,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "focus-customer-2-390x844": {
       "viewport": {
@@ -143,60 +182,79 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 191,
-        "bottom": 391,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 200
+        "top": 152,
+        "bottom": 333,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 182
       },
       "mainCustomer": {
-        "top": 215,
-        "bottom": 334,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 150,
+        "bottom": 300,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 562,
+        "bottom": 705,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 544,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 246
+        "top": 502,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 272
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 198,
+        "scrollHeight": 198
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 178,
+        "scrollHeight": 178,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "focus-customer-3-390x844": {
       "viewport": {
@@ -205,60 +263,79 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 192,
-        "bottom": 356,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 164
+        "top": 150,
+        "bottom": 335,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 185
       },
       "mainCustomer": {
-        "top": 197,
-        "bottom": 316,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 150,
+        "bottom": 300,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 562,
+        "bottom": 705,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 510,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 280
+        "top": 502,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 272
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 198,
+        "scrollHeight": 198
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 181,
+        "scrollHeight": 181,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "focus-customer-4-390x844": {
       "viewport": {
@@ -267,67 +344,90 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 191,
-        "bottom": 409,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 218
+        "top": 150,
+        "bottom": 351,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 201
       },
       "mainCustomer": {
-        "top": 224,
-        "bottom": 343,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 158,
+        "bottom": 308,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 570,
+        "bottom": 713,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 562,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 228
+        "top": 518,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 256
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 182,
+        "scrollHeight": 182
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 197,
+        "scrollHeight": 197,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "longOrderLayout": {
-      "orderWidth": 262.7867431640625,
-      "orderTop": 191.3984832763672,
-      "orderBottom": 409.4090576171875,
-      "mainCustomerHeight": 118.90350341796875,
-      "ingredientFontSize": 14.4
+      "orderWidth": 248.84375,
+      "orderTop": 150,
+      "orderBottom": 351.0625,
+      "mainCustomerHeight": 150,
+      "bowlWidth": 158.34375,
+      "bowlHeight": 143,
+      "ingredientFontSize": 14.4,
+      "bubbleClientHeight": 197,
+      "bubbleScrollHeight": 197
     },
     "selling-long-order-focused-customer-4-390x844": {
       "viewport": {
@@ -336,65 +436,84 @@
       },
       "documentWidth": 390,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 844,
         "left": 0,
         "right": 390,
         "width": 390,
-        "height": 776
+        "height": 769
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 53
+        "top": 96,
+        "bottom": 147,
+        "left": 11,
+        "right": 379,
+        "width": 368,
+        "height": 51
       },
       "order": {
-        "top": 191,
-        "bottom": 409,
-        "left": 119,
-        "right": 382,
-        "width": 263,
-        "height": 218
+        "top": 150,
+        "bottom": 351,
+        "left": 129,
+        "right": 378,
+        "width": 249,
+        "height": 201
       },
       "mainCustomer": {
-        "top": 224,
-        "bottom": 343,
-        "left": 9,
-        "right": 111,
-        "width": 102,
-        "height": 119
+        "top": 158,
+        "bottom": 308,
+        "left": 12,
+        "right": 128,
+        "width": 116,
+        "height": 150
+      },
+      "bowl": {
+        "top": 570,
+        "bottom": 713,
+        "left": 14,
+        "right": 172,
+        "width": 158,
+        "height": 143
       },
       "tools": {
-        "top": 562,
-        "bottom": 790,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 228
+        "top": 518,
+        "bottom": 774,
+        "left": 177,
+        "right": 376,
+        "width": 199,
+        "height": 256
       },
       "actions": {
-        "top": 795,
-        "bottom": 832,
-        "left": 8,
-        "right": 382,
-        "width": 374,
-        "height": 37
+        "top": 789,
+        "bottom": 834,
+        "left": 31,
+        "right": 359,
+        "width": 328,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 182,
+        "scrollHeight": 182
+      },
+      "orderTextSize": 14.4,
+      "orderOverflow": {
+        "clientHeight": 197,
+        "scrollHeight": 197,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "focusAndPatience": {
       "customerId": "customer-3",
       "orderId": "order-4",
-      "patience": 72.225,
+      "patience": 71.148,
       "maxPatience": 85,
       "prepared": {},
       "size": null
@@ -406,60 +525,79 @@
       },
       "documentWidth": 1366,
       "scene": {
-        "top": 68,
+        "top": 75,
         "bottom": 768,
         "left": 403,
         "right": 963,
         "width": 560,
-        "height": 700
+        "height": 693
       },
       "queue": {
-        "top": 134,
-        "bottom": 187,
-        "left": 411,
-        "right": 955,
-        "width": 544,
-        "height": 53
+        "top": 96,
+        "bottom": 151,
+        "left": 416,
+        "right": 950,
+        "width": 534,
+        "height": 55
       },
       "order": {
-        "top": 192,
-        "bottom": 356,
-        "left": 522,
-        "right": 955,
-        "width": 433,
-        "height": 164
+        "top": 180,
+        "bottom": 328,
+        "left": 583,
+        "right": 949,
+        "width": 366,
+        "height": 148
       },
       "mainCustomer": {
-        "top": 197,
-        "bottom": 316,
-        "left": 412,
-        "right": 514,
-        "width": 102,
-        "height": 119
+        "top": 154,
+        "bottom": 319,
+        "left": 431,
+        "right": 559,
+        "width": 128,
+        "height": 165
+      },
+      "bowl": {
+        "top": 531,
+        "bottom": 689,
+        "left": 444,
+        "right": 628,
+        "width": 184,
+        "height": 158
       },
       "tools": {
-        "top": 510,
-        "bottom": 714,
-        "left": 411,
-        "right": 955,
-        "width": 544,
-        "height": 204
+        "top": 526,
+        "bottom": 702,
+        "left": 657,
+        "right": 944,
+        "width": 287,
+        "height": 176
       },
       "actions": {
-        "top": 719,
-        "bottom": 756,
-        "left": 411,
-        "right": 955,
-        "width": 544,
-        "height": 37
+        "top": 713,
+        "bottom": 758,
+        "left": 443,
+        "right": 923,
+        "width": 480,
+        "height": 45
       },
       "binGrid": {
-        "clientHeight": 183,
-        "scrollHeight": 183
+        "clientHeight": 102,
+        "scrollHeight": 102
+      },
+      "orderTextSize": 15.2,
+      "orderOverflow": {
+        "clientHeight": 144,
+        "scrollHeight": 144,
+        "overflow": "visible"
       },
       "queueCount": 4,
       "orderCount": 1,
-      "ingredientBins": 14
+      "ingredientJars": 4,
+      "ingredientTrays": 8,
+      "secondaryIngredients": 2,
+      "primaryActionCount": 1,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "idleTenSeconds": {
       "fullRenderCount": 0,
@@ -481,12 +619,20 @@
       "queue": null,
       "order": null,
       "mainCustomer": null,
+      "bowl": null,
       "tools": null,
       "actions": null,
       "binGrid": null,
+      "orderTextSize": null,
+      "orderOverflow": null,
       "queueCount": 0,
       "orderCount": 0,
-      "ingredientBins": 0
+      "ingredientJars": 0,
+      "ingredientTrays": 0,
+      "secondaryIngredients": 0,
+      "primaryActionCount": 0,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "inventory-seasoning-only-390x844": {
       "viewport": {
@@ -498,12 +644,20 @@
       "queue": null,
       "order": null,
       "mainCustomer": null,
+      "bowl": null,
       "tools": null,
       "actions": null,
       "binGrid": null,
+      "orderTextSize": null,
+      "orderOverflow": null,
       "queueCount": 0,
       "orderCount": 0,
-      "ingredientBins": 0
+      "ingredientJars": 0,
+      "ingredientTrays": 0,
+      "secondaryIngredients": 0,
+      "primaryActionCount": 0,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "inventory-cart-persists-after-tabs-390x844": {
       "viewport": {
@@ -515,12 +669,20 @@
       "queue": null,
       "order": null,
       "mainCustomer": null,
+      "bowl": null,
       "tools": null,
       "actions": null,
       "binGrid": null,
+      "orderTextSize": null,
+      "orderOverflow": null,
       "queueCount": 0,
       "orderCount": 0,
-      "ingredientBins": 0
+      "ingredientJars": 0,
+      "ingredientTrays": 0,
+      "secondaryIngredients": 0,
+      "primaryActionCount": 0,
+      "hasLegacyTeaText": false,
+      "showsInternalSize": false
     },
     "inventoryCategories": {
       "baseRows": [
@@ -548,15 +710,15 @@
     },
     "videoPlayback": {
       "duration": null,
-      "currentTime": 0.707533,
+      "currentTime": 0.710231,
       "error": null
     },
     "consoleErrors": []
   },
   "video": {
-    "file": "focused-selling-flow-16s.webm",
-    "durationSeconds": 16.1,
-    "bytes": 668335,
+    "file": "focused-selling-flow-20s.webm",
+    "durationSeconds": 20.8,
+    "bytes": 1042720,
     "mimeType": "video/webm;codecs=vp9"
   }
 }
