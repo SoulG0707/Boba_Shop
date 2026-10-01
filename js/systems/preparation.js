@@ -21,6 +21,27 @@ export function getProducibleCount(product, inventory) {
   return Number.isFinite(count) ? Math.max(0, count) : 0;
 }
 
+export function getIngredientPreparationStatus(ingredientId, currentStock, pendingQuantity, preparationRequirements = []) {
+  const requirement = preparationRequirements.find((item) => item.id === ingredientId);
+  if (!requirement) return { required: 0, missing: 0, projectedMissing: 0, status: "not-required", message: "" };
+
+  const required = Math.max(0, Math.ceil(Number(requirement.quantityNeeded) || 0));
+  const current = Math.max(0, Number(currentStock) || 0);
+  const pending = Math.max(0, Number(pendingQuantity) || 0);
+  const missing = Math.max(0, required - current);
+  const projectedMissing = Math.max(0, required - current - pending);
+  if (missing === 0) return { required, missing, projectedMissing, status: "ready", message: "" };
+  if (projectedMissing === 0) {
+    return { required, missing, projectedMissing, status: "pending-ready", message: "✓ Đủ sau khi xác nhận nhập" };
+  }
+  const message = pending > 0
+    ? `⚠ Còn thiếu ${projectedMissing} ${requirement.unit ?? "phần"} để đủ chuẩn bị hôm nay`
+    : current === 0
+      ? `⚠ Chưa nhập hôm nay · cần ${required} ${requirement.unit ?? "phần"}`
+      : `⚠ Thiếu ${missing} ${requirement.unit ?? "phần"} để đủ chuẩn bị hôm nay`;
+  return { required, missing, projectedMissing, status: "missing", message };
+}
+
 function getMenuSelection(state) {
   const arraySelection = [
     state.menuProductIds,
@@ -82,6 +103,14 @@ export function getShopPreparationStatus(state = {}) {
     const bUnits = b.missingIngredients.reduce((sum, item) => sum + item.missingQuantity, 0);
     return aUnits - bUnits;
   })[0] ?? null;
+  const recommendedRequirements = recommended
+    ? Object.entries(getProductRecipe(recommended.productId) ?? {}).map(([id, quantity]) => ({
+      id,
+      name: INGREDIENT_BY_ID[id]?.name ?? id,
+      unit: INGREDIENT_BY_ID[id]?.unit ?? "phần",
+      quantityNeeded: Math.max(1, Math.ceil(Number(quantity) || 0)),
+    }))
+    : [];
   const totalStock = INGREDIENTS.reduce((sum, ingredient) => sum + getInventoryQuantity(state.stock, ingredient.id), 0);
   const missingIngredients = recommended?.missingIngredients ?? [];
   const canOpen = sellableProducts.length > 0;
@@ -104,6 +133,7 @@ export function getShopPreparationStatus(state = {}) {
     sellableProducts,
     missingByProduct,
     recommendedProduct: recommended,
+    recommendedRequirements,
     missingIngredients,
     warnings,
     hasAnyStock: totalStock > 0,

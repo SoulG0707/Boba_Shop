@@ -3,12 +3,13 @@ import { getState, updateState, replaceState } from "./state/store.js";
 import { saveGame, resetGame } from "./state/persistence.js";
 import { navigate, renderApp } from "./ui/router.js";
 import { setInventoryCategory } from "./ui/inventoryView.js";
+import { INGREDIENT_BY_ID } from "./data/ingredients.js";
 import { renderHeader } from "./ui/header.js";
 import { renderSplashView } from "./ui/splashView.js";
 import { renderTutorialView } from "./ui/tutorialView.js";
 import { hideModal, showEndDayModal, showModal } from "./ui/modal.js";
 import { showToast } from "./ui/toast.js";
-import { purchaseIngredient } from "./systems/inventory.js";
+import { purchaseIngredients } from "./systems/inventory.js";
 import { buyUpgrade } from "./systems/upgrades.js";
 import { hireEmployee, fireEmployee } from "./systems/employees.js";
 import { addIngredientToOrder, createOrder, finishMixingOrder, mixOrder, packOrder, removeIngredientFromOrder, serveOrder, setOrderSize } from "./systems/orders.js";
@@ -34,6 +35,43 @@ let tutorialPage = 0;
 let selectedCustomerId = null;
 let serveFeedback = null;
 let serveFeedbackTimer = null;
+const PENDING_PURCHASE_STORAGE_KEY = "banh-trang-pending-purchase-v1";
+
+function loadPendingPurchase() {
+  try {
+    const stored = JSON.parse(sessionStorage.getItem(PENDING_PURCHASE_STORAGE_KEY) ?? "{}");
+    if (!stored || typeof stored !== "object" || Array.isArray(stored)) return Object.create(null);
+    return Object.fromEntries(Object.entries(stored).filter(([ingredientId, quantity]) =>
+      INGREDIENT_BY_ID[ingredientId] && Number.isInteger(quantity) && quantity > 0 &&
+      quantity <= GAME_CONFIG.MAX_PENDING_PURCHASE_PER_ITEM && quantity % GAME_CONFIG.PURCHASE_STEP === 0,
+    ));
+  } catch {
+    return Object.create(null);
+  }
+}
+
+function savePendingPurchase() {
+  try {
+    if (Object.values(pendingPurchase).some((quantity) => Number(quantity) > 0)) {
+      sessionStorage.setItem(PENDING_PURCHASE_STORAGE_KEY, JSON.stringify(pendingPurchase));
+    } else {
+      sessionStorage.removeItem(PENDING_PURCHASE_STORAGE_KEY);
+    }
+  } catch {
+    // The purchase cart stays usable for this page even if session storage is unavailable.
+  }
+}
+
+function clearPendingPurchase() {
+  pendingPurchase = Object.create(null);
+  try {
+    sessionStorage.removeItem(PENDING_PURCHASE_STORAGE_KEY);
+  } catch {
+    // Reset the in-memory cart even if session storage is unavailable.
+  }
+}
+
+let pendingPurchase = loadPendingPurchase();
 
 function refreshUI() {
   const state = getState();
@@ -50,7 +88,7 @@ function refreshUI() {
   appShell.hidden = false;
   appShell.setAttribute("aria-hidden", "false");
   header.innerHTML = renderHeader(state);
-  renderApp(state, { selectedCustomerId, feedback: serveFeedback });
+  renderApp(state, { selectedCustomerId, feedback: serveFeedback, pendingPurchase });
 }
 
 function enterGame() {
@@ -233,6 +271,7 @@ function handleAction(action, element) {
     case "restore-backup": {
       const backupText = document.querySelector("#backup-text")?.value ?? "";
       restoreBackup(backupText).then((restoredState) => {
+        clearPendingPurchase();
         replaceState(restoredState);
         hideModal();
         refreshUI();
@@ -241,6 +280,7 @@ function handleAction(action, element) {
       break;
     }
     case "reset-game":
+      clearPendingPurchase();
       replaceState(resetGame());
       hideModal();
       navigate("inventory");
@@ -257,14 +297,17 @@ function handleAction(action, element) {
       refreshUI();
       if (getState().gameplay.status === "summary") showEndDayModal(getState().dailyStats, getState().day);
       break;
-    case "start-day":
-      {
-        let started = false;
-        updateState((current) => { started = startDay(current); });
-        if (!started) showToast(getShopPreparationStatus(getState()).message, "error");
+    case "start-day": {
+      if (Object.values(pendingPurchase).some((quantity) => Number(quantity) > 0)) {
+        showToast("Hãy nhập hàng hoặc giảm giỏ nhập về 0 trước khi mở cửa.", "error");
+        break;
       }
+      let started = false;
+      updateState((current) => { started = startDay(current); });
+      if (!started) showToast(getShopPreparationStatus(getState()).message, "error");
       refreshUI();
       break;
+    }
     case "show-summary":
       showEndDayModal(state.dailyStats, state.day);
       break;
@@ -285,13 +328,34 @@ function handleAction(action, element) {
       setInventoryCategory(element.dataset.category);
       refreshUI();
       break;
-    case "buy-stock":
-      updateState((current) => {
-        const result = purchaseIngredient(current, element.dataset.ingredient, Number(element.dataset.quantity));
-        if (!result.success) showToast(result.reason ?? "Không thể nhập nguyên liệu.", "error");
-      });
+    case "change-pending-purchase": {
+      if (state.gameplay.status === "summary") break;
+      const ingredientId = element.dataset.ingredient;
+      const direction = Number(element.dataset.direction) < 0 ? -1 : 1;
+      const currentQuantity = Math.max(0, Number(pendingPurchase[ingredientId]) || 0);
+      const nextQuantity = Math.max(0, Math.min(
+        GAME_CONFIG.MAX_PENDING_PURCHASE_PER_ITEM,
+        currentQuantity + direction * GAME_CONFIG.PURCHASE_STEP,
+      ));
+      if (nextQuantity === 0) delete pendingPurchase[ingredientId];
+      else pendingPurchase[ingredientId] = nextQuantity;
+      savePendingPurchase();
       refreshUI();
       break;
+    }
+    case "commit-purchase": {
+      const pending = { ...pendingPurchase };
+      let result;
+      updateState((current) => { result = purchaseIngredients(current, pending); });
+      if (result?.success) {
+        clearPendingPurchase();
+        showToast(`Đã nhập hàng · ${formatMoneyCompact(result.totalCost, { maximumFractionDigits: 2 })}.`, "success");
+      } else {
+        showToast(result?.reason ?? "Không thể nhập hàng.", "error");
+      }
+      refreshUI();
+      break;
+    }
     case "buy-upgrade":
       updateState((current) => notifyResult(buyUpgrade(current, element.dataset.upgrade), "Nâng cấp tiệm thành công!"));
       refreshUI();

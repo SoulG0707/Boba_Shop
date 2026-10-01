@@ -2,12 +2,13 @@ export function escapeHtml(value) {
   return String(value ?? "").replace(/[&<>"']/g, (character) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
 }
 
-export function formatMoneyCompact(value) {
+export function formatMoneyCompact(value, options = {}) {
   const numeric = Number(value);
   const amount = Number.isFinite(numeric) ? Math.round(numeric) : 0;
   const sign = amount < 0 ? "−" : "";
   const absolute = Math.abs(amount);
-  const compact = (number) => number.toFixed(1).replace(".", ",").replace(/,0$/, "");
+  const maximumFractionDigits = Math.max(0, Math.min(2, Number(options.maximumFractionDigits ?? 1) || 0));
+  const compact = (number) => number.toFixed(maximumFractionDigits).replace(/\.?0+$/, "").replace(".", ",");
 
   if (absolute >= 1_000_000) return `${sign}${compact(absolute / 1_000_000)}tr`;
   if (absolute >= 1_000) {

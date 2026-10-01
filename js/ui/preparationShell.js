@@ -1,4 +1,5 @@
 import { PRODUCTS, PRODUCT_OPTIONS } from "../data/products.js";
+import { getPendingPurchaseSummary } from "../systems/inventory.js";
 import { estimateCustomerDemand } from "../systems/preparation.js";
 import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
@@ -52,13 +53,20 @@ function renderBowlMark() {
   return `<svg viewBox="0 0 180 128" aria-hidden="true"><use href="./img/food-assets.svg#mixing_bowl"></use></svg>`;
 }
 
-export function renderPreparationAction(state, preparation) {
+export function renderPreparationAction(state, preparation, presentation = {}) {
   if (state.gameplay.status === "summary") {
     return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="show-summary">Xem tổng kết ngày</button></div>`;
   }
 
-  const label = preparation.canOpen
-    ? `Mở cửa ngày ${state.day}`
-    : `Nhập nguyên liệu để mở cửa`;
-  return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action" data-action="start-day" ${preparation.canOpen ? "" : "disabled aria-disabled=\"true\""}>${label}</button></div>`;
+  const pending = getPendingPurchaseSummary(presentation.pendingPurchase);
+  if (pending.itemCount > 0) {
+    const enoughMoney = pending.totalCost <= state.money;
+    const label = enoughMoney
+      ? `Nhập hàng · ${formatMoneyCompact(pending.totalCost, { maximumFractionDigits: 2 })}`
+      : `Không đủ tiền · ${formatMoneyCompact(pending.totalCost, { maximumFractionDigits: 2 })}`;
+    return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action ${enoughMoney ? "is-purchase-action" : "is-insufficient-action"}" data-action="commit-purchase" ${enoughMoney ? "" : "disabled aria-disabled=\"true\""}>${label}</button></div>`;
+  }
+
+  const label = preparation.canOpen ? `Mở cửa ngày ${state.day}` : "Chọn nguyên liệu cần nhập";
+  return `<div class="prep-bottom-action"><button class="button button-primary prep-primary-action ${preparation.canOpen ? "" : "is-empty-action"}" data-action="start-day" ${preparation.canOpen ? "" : "disabled aria-disabled=\"true\""}>${label}</button></div>`;
 }

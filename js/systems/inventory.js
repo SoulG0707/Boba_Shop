@@ -1,5 +1,20 @@
 import { INGREDIENT_BY_ID } from "../data/ingredients.js";
 
+export function getPendingPurchaseSummary(pendingPurchase = {}) {
+  let totalCost = 0;
+  let itemCount = 0;
+  let totalQuantity = 0;
+  for (const [ingredientId, rawQuantity] of Object.entries(pendingPurchase ?? {})) {
+    const quantity = Math.max(0, Number(rawQuantity) || 0);
+    const definition = INGREDIENT_BY_ID[ingredientId];
+    if (!definition || quantity <= 0) continue;
+    itemCount += 1;
+    totalQuantity += quantity;
+    totalCost += quantity * definition.purchasePrice;
+  }
+  return { totalCost, itemCount, totalQuantity };
+}
+
 function normalizeStockEntry(stock, ingredientId) {
   const definition = INGREDIENT_BY_ID[ingredientId];
   const entry = stock[ingredientId] ?? {
@@ -53,24 +68,49 @@ export function consumeIngredients(state, recipe) {
   return { success: true, cost };
 }
 
-export function purchaseIngredient(state, ingredientId, quantity, currentDay = state.day) {
-  if (state.gameplay.status === "summary") return { success: false, reason: "Chuyển sang ngày tiếp theo rồi hãy mua nguyên liệu." };
-  const definition = INGREDIENT_BY_ID[ingredientId];
-  const amount = Math.floor(Number(quantity));
-  if (!definition || !Number.isFinite(amount) || amount <= 0) return { success: false, reason: "Số lượng mua không hợp lệ." };
-  const totalCost = definition.purchasePrice * amount;
-  if (state.money < totalCost) return { success: false, reason: "Tiệm chưa đủ tiền để mua." };
+export function purchaseIngredients(state, pendingPurchase, currentDay = state.day) {
+  if (state.gameplay.status === "summary") return { success: false, reason: "Chuyển sang ngày tiếp theo rồi hãy nhập hàng." };
+  if (!pendingPurchase || typeof pendingPurchase !== "object" || Array.isArray(pendingPurchase)) {
+    return { success: false, reason: "Giỏ nhập hàng không hợp lệ." };
+  }
 
-  const entry = normalizeStockEntry(state.stock, ingredientId);
+  const selections = [];
+  let totalCost = 0;
+  for (const [ingredientId, rawQuantity] of Object.entries(pendingPurchase)) {
+    const quantity = Number(rawQuantity);
+    if (!Number.isFinite(quantity) || !Number.isInteger(quantity) || quantity < 0) {
+      return { success: false, reason: "Số lượng nhập không hợp lệ." };
+    }
+    if (quantity === 0) continue;
+    const definition = INGREDIENT_BY_ID[ingredientId];
+    if (!definition) return { success: false, reason: "Có nguyên liệu không còn tồn tại trong danh mục." };
+    selections.push({ ingredientId, definition, quantity });
+    totalCost += definition.purchasePrice * quantity;
+  }
+
+  if (!selections.length) return { success: false, reason: "Hãy chọn nguyên liệu cần nhập." };
+  if (state.money < totalCost) return { success: false, reason: "Tiệm chưa đủ tiền để nhập toàn bộ giỏ hàng." };
+
   const shelfLifeBonus = Math.max(0, Number(state.upgrades?.airConditioner) || 0) * 0.2;
-  const expirationDays = definition.expirationDays + Math.round(definition.expirationDays * shelfLifeBonus);
+  const batches = selections.map(({ ingredientId, definition, quantity }) => {
+    const entry = normalizeStockEntry(state.stock, ingredientId);
+    const expirationDays = definition.expirationDays + Math.round(definition.expirationDays * shelfLifeBonus);
+    return { entry, definition, quantity, expirationDays };
+  });
+
   state.money -= totalCost;
-  entry.purchasePrice = definition.purchasePrice;
-  entry.expirationDays = expirationDays;
-  entry.batches.push({ quantity: amount, boughtDay: currentDay, expireDay: currentDay + expirationDays, unitPrice: definition.purchasePrice });
-  entry.quantity += amount;
+  for (const { entry, definition, quantity, expirationDays } of batches) {
+    entry.purchasePrice = definition.purchasePrice;
+    entry.expirationDays = expirationDays;
+    entry.batches.push({ quantity, boughtDay: currentDay, expireDay: currentDay + expirationDays, unitPrice: definition.purchasePrice });
+    entry.quantity += quantity;
+  }
   state.dailyStats.stockPurchases = (state.dailyStats.stockPurchases ?? 0) + totalCost;
-  return { success: true, totalCost, quantity: amount };
+  return {
+    success: true,
+    totalCost,
+    items: selections.map(({ ingredientId, quantity }) => ({ ingredientId, quantity })),
+  };
 }
 
 export function expireIngredients(state, currentDay = state.day) {

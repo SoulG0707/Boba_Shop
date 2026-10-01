@@ -69,7 +69,7 @@ export function renderApp(state, presentation = {}) {
 
   const preparation = getShopPreparationStatus(state);
   prepActionRoot.hidden = false;
-  prepActionRoot.innerHTML = renderPreparationAction(state, preparation);
+  prepActionRoot.innerHTML = renderPreparationAction(state, preparation, presentation);
   const content = renderCurrentView(state, { ...presentation, preparation });
   document.querySelector("#view").innerHTML = renderPreparationShell(
     state,
