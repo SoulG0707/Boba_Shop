@@ -2,6 +2,7 @@ import { GAME_CONFIG } from "../config.js";
 import { INGREDIENTS } from "../data/ingredients.js";
 import { PRODUCTS } from "../data/products.js";
 import { UPGRADES } from "../data/upgrades.js";
+import { PRODUCT_UNLOCK_DAYS } from "../data/difficulty.js";
 import { createInitialState } from "./initialState.js";
 
 function getStorage() {
@@ -30,7 +31,7 @@ export function validateSaveSchema(candidate) {
     stockIsValid &&
     pricesAreValid &&
     candidate.upgrades && typeof candidate.upgrades === "object" &&
-    UPGRADES.every(({ id }) => Number.isInteger(candidate.upgrades[id]) && candidate.upgrades[id] >= 0) &&
+    UPGRADES.every(({ id }) => (id === "onlineChannel" && candidate.upgrades[id] === undefined) || (Number.isInteger(candidate.upgrades[id]) && candidate.upgrades[id] >= 0)) &&
     Array.isArray(candidate.unlockedItems) &&
     Array.isArray(candidate.employees) &&
     Array.isArray(candidate.reviews) &&
@@ -70,6 +71,8 @@ export function loadGame() {
         parsed.tutorialCompleted = true;
         saveGame(parsed);
       }
+      for (const upgrade of UPGRADES) parsed.upgrades[upgrade.id] ??= 0;
+      parsed.tutorialSellingCompleted ??= Boolean(parsed.sellingTutorialCompleted);
       return parsed;
     }
     const migrated = migrateLegacySave(parsed);
@@ -89,6 +92,7 @@ function migrateLegacySave(candidate) {
   migrated.tutorialCompleted = true;
   migrated.money = Math.max(0, candidate.money);
   migrated.day = Math.max(1, candidate.day);
+  migrated.unlockedItems = Object.entries(PRODUCT_UNLOCK_DAYS).filter(([, unlockDay]) => unlockDay <= migrated.day).map(([id]) => id);
   migrated.settings = {
     ...migrated.settings,
     music: typeof candidate.settings?.music === "boolean" ? candidate.settings.music : migrated.settings.music,

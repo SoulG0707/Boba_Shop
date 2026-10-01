@@ -1,5 +1,12 @@
 import { INGREDIENT_BY_ID, INGREDIENTS } from "../data/ingredients.js";
 import { getProductRecipe, PRODUCTS } from "../data/products.js";
+import { getDifficultyForDay } from "../data/difficulty.js";
+
+function getOpeningRecipe(productId, day) {
+  const recipe = getProductRecipe(productId) ?? {};
+  const allowed = getDifficultyForDay(day).recipeIngredients;
+  return allowed ? Object.fromEntries(Object.entries(recipe).filter(([id]) => id === "food_box" || allowed.includes(id))) : recipe;
+}
 
 function getInventoryQuantity(inventory, ingredientId) {
   const stock = inventory?.stock ?? inventory;
@@ -8,9 +15,9 @@ function getInventoryQuantity(inventory, ingredientId) {
   return Number.isFinite(quantity) ? Math.max(0, quantity) : 0;
 }
 
-export function getProducibleCount(product, inventory) {
+export function getProducibleCount(product, inventory, day = 5) {
   if (!product?.id) return 0;
-  const recipe = getProductRecipe(product.id);
+  const recipe = getOpeningRecipe(product.id, day);
   if (!recipe || !Object.keys(recipe).length) return 0;
 
   let count = Number.POSITIVE_INFINITY;
@@ -57,8 +64,8 @@ function getMenuSelection(state) {
   return null;
 }
 
-function getMissingForProduct(product, inventory) {
-  const recipe = getProductRecipe(product.id);
+function getMissingForProduct(product, inventory, day) {
+  const recipe = getOpeningRecipe(product.id, day);
   return Object.entries(recipe ?? {}).flatMap(([ingredientId, required]) => {
     const quantityNeeded = Math.max(1, Math.ceil(Number(required) || 0));
     const quantityAvailable = getInventoryQuantity(inventory, ingredientId);
@@ -78,12 +85,13 @@ function getMissingForProduct(product, inventory) {
 export function getShopPreparationStatus(state = {}) {
   if (!state || typeof state !== "object") state = {};
   const unlocked = new Set(Array.isArray(state.unlockedItems) ? state.unlockedItems : []);
+  const allowedProducts = new Set(getDifficultyForDay(state.day).allowedProducts);
   const menuSelection = getMenuSelection(state);
   const activeProducts = PRODUCTS.filter((product) =>
-    unlocked.has(product.id) && (menuSelection === null || menuSelection.has(product.id)),
+    unlocked.has(product.id) && allowedProducts.has(product.id) && (menuSelection === null || menuSelection.has(product.id)),
   );
   const sellableProducts = activeProducts.flatMap((product) => {
-    const producibleCount = getProducibleCount(product, state.stock);
+    const producibleCount = getProducibleCount(product, state.stock, state.day);
     return producibleCount >= 1 ? [{ ...product, producibleCount }] : [];
   });
   const missingByProduct = activeProducts
@@ -92,7 +100,7 @@ export function getShopPreparationStatus(state = {}) {
       productId: product.id,
       name: product.name,
       producibleCount: 0,
-      missingIngredients: getMissingForProduct(product, state.stock),
+      missingIngredients: getMissingForProduct(product, state.stock, state.day),
     }));
   const recommended = [...missingByProduct].sort((a, b) => {
     const missingCount = a.missingIngredients.length - b.missingIngredients.length;
@@ -102,7 +110,7 @@ export function getShopPreparationStatus(state = {}) {
     return aUnits - bUnits;
   })[0] ?? null;
   const recommendedRequirements = recommended
-    ? Object.entries(getProductRecipe(recommended.productId) ?? {}).map(([id, quantity]) => ({
+    ? Object.entries(getOpeningRecipe(recommended.productId, state.day)).map(([id, quantity]) => ({
       id,
       name: INGREDIENT_BY_ID[id]?.name ?? id,
       unit: INGREDIENT_BY_ID[id]?.unit ?? "phần",
@@ -141,10 +149,5 @@ export function getShopPreparationStatus(state = {}) {
 }
 
 export function estimateCustomerDemand(state = {}) {
-  const recentDays = Array.isArray(state.history)
-    ? state.history.slice(0, 3).map((day) => Number(day.customersServed)).filter(Number.isFinite)
-    : [];
-  if (!recentDays.length) return 18;
-  const average = recentDays.reduce((sum, customers) => sum + customers, 0) / recentDays.length;
-  return Math.max(5, Math.round(average * 1.15));
+  return getDifficultyForDay(state.day).targetCustomers;
 }

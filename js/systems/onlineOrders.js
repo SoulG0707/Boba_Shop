@@ -1,9 +1,12 @@
 import { PRODUCTS, getProductPrice } from "../data/products.js";
+import { getDifficultyForDay, isOnlineOrderingUnlocked } from "../data/difficulty.js";
 import { consumeIngredients } from "./inventory.js";
 import { addReview } from "./reviews.js";
 
 export function spawnOnlineOrder(state, now = Date.now(), random = Math.random) {
-  const availableProducts = PRODUCTS.filter((candidate) => state.unlockedItems.includes(candidate.id));
+  if (!isOnlineOrderingUnlocked(state)) return null;
+  const difficulty = getDifficultyForDay(state.day);
+  const availableProducts = PRODUCTS.filter((candidate) => state.unlockedItems.includes(candidate.id) && difficulty.allowedProducts.includes(candidate.id));
   const product = availableProducts[Math.floor(random() * availableProducts.length)];
   if (!product) return null;
   const size = random() > 0.75 ? "L" : "M";

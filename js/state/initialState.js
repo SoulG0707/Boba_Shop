@@ -58,12 +58,16 @@ export function createInitialState() {
     history: [],
     settings: { music: true, sound: true, theme: "warm" },
     tutorialCompleted: false,
+    tutorialSellingCompleted: false,
     gameplay: {
       status: "preparation",
       elapsedMs: 0,
       lastTickAt: null,
       customerSpawnAccumulator: 0,
       onlineSpawnAccumulator: 0,
+      nextCustomerSpawnAtMs: 0,
+      nextOnlineSpawnAtMs: 0,
+      spawnedCustomersToday: 0,
       nextEntityId: 1,
     },
   };

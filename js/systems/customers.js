@@ -1,5 +1,6 @@
 import { GAME_CONFIG } from "../config.js";
 import { PRODUCTS } from "../data/products.js";
+import { getDifficultyForDay } from "../data/difficulty.js";
 import { calculateDemandModifier } from "./economy.js";
 import { getGameplayModifiers } from "./modifiers.js";
 
@@ -23,16 +24,18 @@ function weightedPick(items, weightOf, random = Math.random) {
 }
 
 export function spawnCustomer(state, now = Date.now(), random = Math.random) {
-  const capacity = GAME_CONFIG.MAX_CUSTOMERS + getGameplayModifiers(state).capacity;
+  const difficulty = getDifficultyForDay(state.day);
+  const capacity = Math.min(GAME_CONFIG.MAX_CUSTOMERS, difficulty.maxConcurrentCustomers + (difficulty.allowCapacityUpgrades ? getGameplayModifiers(state).capacity : 0));
   if (state.customers.length >= capacity) return null;
 
   const type = weightedPick(CUSTOMER_TYPES, (candidate) => candidate.weight, random);
-  const products = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id));
+  const products = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id) && difficulty.allowedProducts.includes(product.id));
   const preferredProduct = weightedPick(products, (product) => calculateDemandModifier(state, product.id), random);
   if (!type || !preferredProduct) return null;
 
   const number = state.gameplay.nextEntityId++;
-  const maxPatience = type.patience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * getGameplayModifiers(state).patience;
+  const tutorial = !state.tutorialSellingCompleted && state.day === 1 && (state.gameplay.spawnedCustomersToday ?? state.gameplay.customersSpawnedToday ?? 0) === 0;
+  const maxPatience = type.patience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * difficulty.patienceMultiplier * getGameplayModifiers(state).patience;
   const customer = {
     id: `customer-${number}`,
     type: type.id,
@@ -46,6 +49,7 @@ export function spawnCustomer(state, now = Date.now(), random = Math.random) {
     elapsedWait: 0,
     orderId: null,
     status: "waiting",
+    tutorial,
   };
   state.customers.push(customer);
   return customer;
@@ -69,7 +73,7 @@ export function advanceCustomerQueue(state, deltaSeconds) {
       continue;
     }
     customer.elapsedWait += deltaSeconds;
-    customer.patience -= deltaSeconds;
+    if (!customer.tutorial) customer.patience -= deltaSeconds;
     if (customer.patience <= 0) {
       customer.status = "left";
       customer.patience = 0;
@@ -90,7 +94,7 @@ export function migrateCustomerPatience(state) {
   for (const customer of state.customers) {
     if (customer.status !== "waiting" || Number.isFinite(customer.maxPatience)) continue;
     const basePatience = CUSTOMER_TYPE_BY_ID[customer.type]?.patience ?? Math.max(1, customer.patience ?? 1);
-    const maxPatience = basePatience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * patienceModifier;
+    const maxPatience = basePatience * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER * getDifficultyForDay(state.day).patienceMultiplier * patienceModifier;
     customer.patience = Math.min(maxPatience, Math.max(0, Number(customer.patience) || 0) * GAME_CONFIG.CUSTOMER_PATIENCE_MULTIPLIER);
     customer.maxPatience = maxPatience;
     migrated = true;

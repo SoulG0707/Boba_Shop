@@ -1,4 +1,5 @@
 import { formatDuration, GAME_CONFIG } from "../config.js";
+import { getDifficultyForDay, INGREDIENT_UNLOCK_DAYS } from "../data/difficulty.js";
 import { INGREDIENTS, INGREDIENT_BY_ID } from "../data/ingredients.js";
 import { PRODUCT_BY_ID, PRODUCT_OPTIONS, getSizeLabel } from "../data/products.js";
 import { getOrderRecipe } from "../systems/orders.js";
@@ -40,7 +41,7 @@ export function renderGameplayView(state, presentation = {}) {
       <span id="scene-event-slot" data-render-signature="${escapeHtml(getEventSignature(state))}">${renderEvent(state)}</span>
     </div>
     <div class="customer-queue-section">
-      <div class="customer-queue-heading"><span>KHÁCH ĐANG CHỜ</span><strong id="customer-queue-count">${customers.length}</strong></div>
+      <div class="customer-queue-heading"><span>KHÁCH ĐANG CHỜ · <span id="day-customer-goal">${Math.min(state.dailyStats.customersServed - state.dailyStats.onlineOrders, getDifficultyForDay(state.day).targetCustomers)} / ${getDifficultyForDay(state.day).targetCustomers} KHÁCH HÔM NAY</span></span><strong id="customer-queue-count">${customers.length}</strong></div>
       <div id="customer-queue" class="customer-queue" aria-label="Hàng khách đang chờ">${renderCustomerQueue(customers, customer?.id)}</div>
     </div>
     <div class="customer-focus-stage" aria-label="Khách đang được phục vụ">
@@ -50,7 +51,8 @@ export function renderGameplayView(state, presentation = {}) {
     </div>
     <div id="online-orders-slot" class="online-orders-slot" data-render-signature="${escapeHtml(getOnlineOrderSignature(state))}">${renderOnlineOrders(state)}</div>
     <section class="work-counter" aria-label="Bàn trộn bánh tráng">
-      <div class="counter-nameplate"><strong>QUẦY BÁNH TRÁNG</strong><span>PHA · TRỘN · ĐÓNG HỘP</span></div>
+      <div class="counter-nameplate"><strong>QUẦY BÁNH TRÁNG</strong><span>CHỌN CỠ · THÊM · TRỘN · GIAO</span></div>
+      <div id="tutorial-hint-slot" class="tutorial-hint-slot" data-render-signature="${escapeHtml(getTutorialSignature(state, order))}">${renderTutorialHint(state, order)}</div>
       <div id="work-controls-slot" class="counter-equipment-row" data-render-signature="${escapeHtml(getControlsSignature(state, order))}">${renderWorkControls(state, order)}</div>
       <div class="counter-mix-bench">
         <div id="mixing-bowl-slot" class="mixing-bowl-slot" data-render-signature="${escapeHtml(getBowlSignature(order))}">${renderMixingBowl(order)}</div>
@@ -75,6 +77,9 @@ export function updateGameplayView(state, presentation = {}) {
   if (queue) updateCustomerQueue(queue, customers, customer?.id);
   const count = document.querySelector("#customer-queue-count");
   if (count && count.textContent !== String(customers.length)) count.textContent = String(customers.length);
+  const goal = document.querySelector("#day-customer-goal");
+  const goalText = `${Math.min(state.dailyStats.customersServed - state.dailyStats.onlineOrders, getDifficultyForDay(state.day).targetCustomers)} / ${getDifficultyForDay(state.day).targetCustomers} KHÁCH HÔM NAY`;
+  if (goal && goal.textContent !== goalText) goal.textContent = goalText;
 
   updateClock(root, state);
   updatePatienceIndicators(root, customers, customer);
@@ -86,6 +91,7 @@ export function updateGameplayView(state, presentation = {}) {
   patchSlot("#work-controls-slot", getControlsSignature(state, order), () => renderWorkControls(state, order));
   patchSlot("#ingredient-tools-slot", getIngredientsSignature(state, order), () => renderIngredientControls(state, order));
   patchSlot("#selling-actions-slot", getActionsSignature(state, order), () => renderSellingActions(order, state));
+  patchSlot("#tutorial-hint-slot", getTutorialSignature(state, order), () => renderTutorialHint(state, order));
   patchSlot("#scene-event-slot", getEventSignature(state), () => renderEvent(state));
   patchSlot("#serve-feedback-slot", presentation.feedback?.createdAt ?? "empty", () => renderFeedback(presentation.feedback));
   patchSlot("#pause-curtain-slot", state.gameplay.status === "paused" ? "paused" : "running", () => state.gameplay.status === "paused" ? renderPauseCurtain() : "");
@@ -229,10 +235,10 @@ function renderWorkControls(state, order) {
   const sizeDisabled = !order || order.mixed || order.mixing || hasIngredients || order.status !== "waiting";
   const sizeButtons = Object.entries(PRODUCT_OPTIONS.sizes).map(([id, option]) => {
     const sizeAsset = id === "M" ? "size_small_bowl" : "size_large_bowl";
-    return `<button class="size-choice ${order?.preparedSize === id ? "is-selected" : ""}" data-action="choose-order-size" data-size="${id}" aria-pressed="${order?.preparedSize === id}" ${sizeDisabled ? "disabled" : ""}>${renderFoodAsset(sizeAsset, "size-choice-asset", `Phần ${option.label}`)}<strong>${escapeHtml(option.label.toLocaleUpperCase("vi"))}</strong></button>`;
+    const locked = !getDifficultyForDay(state.day).allowedSizes.includes(id) && order?.items[0]?.size !== id;
+    return `<button class="size-choice ${order?.preparedSize === id ? "is-selected" : ""} ${locked ? "is-locked" : ""}" data-action="choose-order-size" data-size="${id}" aria-pressed="${order?.preparedSize === id}" ${sizeDisabled || locked ? "disabled" : ""}>${renderFoodAsset(sizeAsset, "size-choice-asset", `Phần ${option.label}`)}<strong>${locked ? "🔒 " : ""}${escapeHtml(option.label.toLocaleUpperCase("vi"))}</strong></button>`;
   }).join("");
   const primaryIngredients = ["rice_paper", "shrimp_salt", "satay", "tamarind_sauce"].map((id) => INGREDIENT_BY_ID[id]);
-  const packageStatus = !order ? "Chờ khách" : order.packed ? "Đã đóng hộp" : order.mixed ? "Sẵn sàng đóng" : "Chờ trộn";
   return `<div class="equipment-row">
     <section class="size-station" aria-label="Chọn cỡ phần">
       <div class="station-caption">CỠ PHẦN</div>
@@ -242,26 +248,22 @@ function renderWorkControls(state, order) {
       <div class="station-caption">HŨ NỀN &amp; GIA VỊ</div>
       <div class="ingredient-dispenser-row">${primaryIngredients.map((ingredient) => renderIngredientControl(ingredient, state, order, "jar")).join("")}</div>
     </section>
-    <div class="pack-station ${order?.mixed ? "is-ready" : ""} ${order?.packed ? "is-packed" : ""}" aria-label="Khu đóng hộp: ${packageStatus}">
-      ${renderFoodAsset("packing_machine", "packing-machine-asset", "Máy đóng hộp bánh tráng")}
-      <strong>KHU ĐÓNG HỘP</strong><small>${escapeHtml(packageStatus)}</small>
-    </div>
   </div>`;
 }
 
 function renderSellingActions(order, state) {
-  if (!order) return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action" disabled>CHỜ KHÁCH ĐẾN QUẦY</button></div>`;
-  const canMix = Boolean(order.preparedSize && order.preparedIngredients?.rice_paper > 0 && order.status === "waiting" && !order.mixed && !order.mixing);
-  const canPack = Boolean(order.mixed && order.status === "waiting" && (state.stock.food_box?.quantity ?? 0) > 0);
-  if (order.packed) {
-    return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-serve" data-action="serve-order" data-order="${escapeHtml(order.id)}">GIAO KHÁCH · ${formatMoneyCompact(order.totalPrice)}</button></div>`;
-  }
-  if (order.mixed) {
-    const label = canPack ? "ĐÓNG HỘP" : "THIẾU HỘP ĐỰNG";
-    return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-pack" data-action="pack-order" ${canPack ? "" : "disabled"}>${label}</button></div>`;
-  }
-  const mixLabel = order.mixing ? "ĐANG TRỘN…" : "TRỘN MÓN";
-  return `<div class="selling-actions" aria-label="Thao tác đơn hàng"><button class="next-work-action is-mix" data-action="mix-order" ${canMix ? "" : "disabled"}>${mixLabel}</button></div>`;
+  const canMix = Boolean(order?.preparedSize && order.preparedIngredients?.rice_paper > 0 && order.status === "waiting" && !order.mixed && !order.mixing);
+  const canPack = Boolean(order?.mixed && order.status === "waiting" && (state.stock.food_box?.quantity ?? 0) > 0);
+  const boxStatus = !order ? "Chờ khách" : order.packed ? "Hộp đã hoàn thành" : canPack ? "Sẵn sàng đóng" : "Chờ trộn món";
+  return `<div class="selling-actions" aria-label="Khu trộn và đóng hộp">
+    <button class="mix-paddle" data-action="mix-order" ${canMix ? "" : "disabled"} aria-label="Trộn món">🥄 <strong>${order?.mixing ? "ĐANG TRỘN…" : "TRỘN MÓN"}</strong></button>
+    <button class="pack-station ${canPack ? "is-ready" : ""} ${order?.packed ? "is-packed" : ""}" data-action="pack-order" ${canPack ? "" : "disabled"} aria-label="Đóng hộp: ${boxStatus}">
+      ${renderFoodAsset("packing_machine", "packing-machine-asset", "Máy đóng hộp bánh tráng")}
+      ${renderFoodAsset("food_box", "pack-box-asset", "Hộp bánh tráng")}
+      <span class="pack-caption"><strong>${order?.packed ? "ĐÃ ĐÓNG HỘP" : "ĐÓNG HỘP"}</strong><small>${boxStatus}</small></span>
+    </button>
+    <button class="serve-counter" data-action="serve-order" data-order="${escapeHtml(order?.id ?? "")}" ${order?.packed ? "" : "disabled"}>${order?.packed ? `GIAO KHÁCH · ${formatMoneyCompact(order.totalPrice)}` : "GIAO KHÁCH"}</button>
+  </div>`;
 }
 
 function renderIngredientControls(state, order) {
@@ -282,9 +284,9 @@ function renderIngredientControl(ingredient, state, order, station) {
   const inBowl = order?.preparedIngredients?.[ingredient.id] ?? 0;
   const recipe = order ? getOrderRecipe(order) ?? {} : {};
   const requested = recipe[ingredient.id] ?? 0;
-  const isLocked = Number.isFinite(ingredient.unlockDay) && state.day < ingredient.unlockDay;
+  const unlockDay = INGREDIENT_UNLOCK_DAYS[ingredient.id] ?? ingredient.unlockDay;
+  const isLocked = Number.isFinite(unlockDay) && state.day < unlockDay && requested <= 0;
   const unavailable = !order || order.status !== "waiting" || order.mixed || order.mixing || order.packed || stock <= inBowl || isLocked;
-  const amount = order?.preparedSize && requested ? `${inBowl}/${requested}` : `${inBowl} · kho ${stock}`;
   const classes = [
     `ingredient-${station}`,
     inBowl ? "is-active" : "",
@@ -294,11 +296,11 @@ function renderIngredientControl(ingredient, state, order, station) {
   ].filter(Boolean).join(" ");
   const ingredientArt = renderFoodAsset(ingredient.id, station === "tray" ? "tray-ingredient-asset" : "station-ingredient-asset");
   const graphic = station === "jar"
-    ? `<span class="ingredient-vessel">${renderFoodAsset("spice_jar", "jar-vessel-asset")}${ingredientArt}</span>`
+    ? `<span class="ingredient-vessel">${renderFoodAsset("spice_jar", "jar-vessel-asset")}${ingredientArt}<span class="jar-label">${escapeHtml(ingredient.name)}</span></span>`
     : station === "tray"
-      ? `<span class="tray-well"><span class="tray-stock">${stock}</span>${ingredientArt}<span class="tray-lock">${isLocked ? renderFoodAsset("lock", "lock-asset") : ""}</span></span>`
+      ? `<span class="tray-well">${ingredientArt}<span class="tray-lock">${isLocked ? renderFoodAsset("lock", "lock-asset") : ""}</span></span>`
       : `<span class="secondary-vessel">${renderFoodAsset("spice_jar", "secondary-vessel-asset")}${ingredientArt}</span>`;
-  return `<button type="button" class="${classes}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="${isLocked ? `Đã khóa ${escapeHtml(ingredient.name)}` : `Thêm ${escapeHtml(ingredient.name)}, còn ${stock}`}" ${unavailable ? "disabled" : ""}>${graphic}<strong>${escapeHtml(ingredient.name)}</strong><small>${isLocked ? "Chưa mở" : escapeHtml(amount)}</small></button>`;
+  return `<button type="button" class="${classes}" data-action="add-order-ingredient" data-ingredient="${ingredient.id}" aria-label="${isLocked ? `Đã khóa ${escapeHtml(ingredient.name)}` : `Thêm ${escapeHtml(ingredient.name)}, còn ${stock - inBowl}${requested ? `, cần ${requested}` : ""}`}" ${unavailable ? "disabled" : ""}>${graphic}${station === "jar" ? "" : `<strong>${escapeHtml(ingredient.name)}</strong>`}${isLocked ? "" : `<small>${stock - inBowl}</small>`}</button>`;
 }
 
 function renderOnlineOrders(state) {
@@ -312,6 +314,22 @@ function renderOnlineOrders(state) {
       : `<button data-action="complete-online" data-order="${escapeHtml(order.id)}" ${employee ? "disabled" : ""}>Giao hộp</button>`;
     return `<div class="delivery-order"><span class="delivery-face" aria-hidden="true"></span><span><strong>${escapeHtml(product?.name ?? "Đơn bánh tráng")}</strong><small>${formatMoneyCompact(order.totalPrice)}</small></span>${action}</div>`;
   }).join("")}</div>`;
+}
+
+function getTutorialSignature(state, order) {
+  return state.day === 1 && state.customers.some((customer) => customer.id === order?.customerId && customer.tutorial)
+    ? JSON.stringify([order?.id, order?.preparedSize, order?.preparedIngredients, order?.mixed, order?.mixing, order?.packed]) : "hidden";
+}
+
+function renderTutorialHint(state, order) {
+  if (state.day !== 1 || !state.customers.some((customer) => customer.id === order?.customerId && customer.tutorial)) return "";
+  const recipe = getOrderRecipe(order) ?? {};
+  const missing = Object.keys(recipe).filter((id) => id !== "food_box" && (order.preparedIngredients?.[id] ?? 0) < recipe[id]);
+  const hint = !order.preparedSize ? "1 · Chọn tô BÉ trên kệ" :
+    missing.length ? `2 · Chạm ${INGREDIENT_BY_ID[missing[0]]?.name ?? "nguyên liệu"} để cho vào thau` :
+      !order.mixed ? "3 · Trộn món trong thau" :
+        !order.packed ? "4 · Đóng hộp ở trạm bên dưới" : "5 · Giao hộp cho khách";
+  return `<span>HƯỚNG DẪN NGÀY ĐẦU</span><strong>${escapeHtml(hint)}</strong>`;
 }
 
 function renderEvent(state) {

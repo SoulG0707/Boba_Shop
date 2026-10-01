@@ -1,4 +1,5 @@
 import { GAME_CONFIG } from "../config.js";
+import { getDifficultyForDay, isOnlineOrderingUnlocked, PRODUCT_UNLOCK_DAYS, randomIntervalMs } from "../data/difficulty.js";
 import { createDailyStats, settleDay } from "./economy.js";
 import { advanceCustomerQueue, spawnCustomer } from "./customers.js";
 import { createOrder } from "./orders.js";
@@ -10,7 +11,7 @@ import { processEmployeeAutomation } from "./employees.js";
 import { addDepartureReview } from "./reviews.js";
 import { getShopPreparationStatus } from "./preparation.js";
 
-export function startDay(state, now = Date.now()) {
+export function startDay(state, now = Date.now(), random = Math.random) {
   if (state.gameplay.status !== "preparation") return false;
   if (!getShopPreparationStatus(state).canOpen) return false;
   state.orders = state.orders.filter((order) => !["served", "cancelled"].includes(order.status));
@@ -21,9 +22,15 @@ export function startDay(state, now = Date.now()) {
   state.gameplay.status = "running";
   state.gameplay.elapsedMs = 0;
   state.gameplay.lastTickAt = now;
-  state.gameplay.customerSpawnAccumulator = GAME_CONFIG.CUSTOMER_SPAWN_INTERVAL_SECONDS * 500;
-  state.gameplay.onlineSpawnAccumulator = GAME_CONFIG.ONLINE_SPAWN_INTERVAL_SECONDS * 500;
-  startRandomEvent(state, now);
+  state.gameplay.customerSpawnAccumulator = 0;
+  state.gameplay.onlineSpawnAccumulator = 0;
+  const difficulty = getDifficultyForDay(state.day);
+  state.gameplay.spawnedCustomersToday = 0;
+  state.gameplay.nextCustomerSpawnAtMs = randomIntervalMs(difficulty.firstCustomerDelayMin, difficulty.firstCustomerDelayMax, random);
+  state.gameplay.nextOnlineSpawnAtMs = isOnlineOrderingUnlocked(state)
+    ? randomIntervalMs(difficulty.onlineIntervalMin, difficulty.onlineIntervalMax, random)
+    : 0;
+  startRandomEvent(state, now, random);
   return true;
 }
 
@@ -81,6 +88,9 @@ export function endDay(state) {
 export function nextDay(state) {
   if (state.gameplay.status !== "summary") return false;
   state.day += 1;
+  for (const [id, unlockDay] of Object.entries(PRODUCT_UNLOCK_DAYS)) {
+    if (state.day >= unlockDay && !state.unlockedItems.includes(id)) state.unlockedItems.push(id);
+  }
   state.gameplay.status = "preparation";
   state.gameplay.elapsedMs = 0;
   createDailyStats(state);
@@ -94,30 +104,37 @@ export function tickDay(state, now = Date.now(), random = Math.random) {
   state.gameplay.elapsedMs += deltaMs;
   const deltaSeconds = deltaMs / 1000;
   const timedOutCustomers = advanceCustomerQueue(state, deltaSeconds);
+  const difficulty = getDifficultyForDay(state.day);
+  if (timedOutCustomers.length && difficulty.waitAfterService) {
+    state.gameplay.nextCustomerSpawnAtMs = state.gameplay.elapsedMs + randomIntervalMs(difficulty.customerIntervalMin, difficulty.customerIntervalMax, random);
+  }
   for (const customer of timedOutCustomers) {
     const order = state.orders.find((candidate) => candidate.id === customer.orderId);
     if (order) addDepartureReview(state, customer, order, now);
   }
 
   const modifiers = getGameplayModifiers(state);
-  const spawnModifier = modifiers.customerSpawn;
-  const onlineModifier = modifiers.onlineOrders;
-  state.gameplay.customerSpawnAccumulator += deltaSeconds * 1000 * spawnModifier;
-  state.gameplay.onlineSpawnAccumulator += deltaSeconds * 1000 * onlineModifier;
-
+  const gameplay = state.gameplay;
   let spawned = 0;
-  const customerIntervalMs = GAME_CONFIG.CUSTOMER_SPAWN_INTERVAL_SECONDS * 1000;
-  while (state.gameplay.customerSpawnAccumulator >= customerIntervalMs) {
-    state.gameplay.customerSpawnAccumulator -= customerIntervalMs;
+  if (gameplay.spawnedCustomersToday == null) {
+    gameplay.spawnedCustomersToday = gameplay.customersSpawnedToday ?? state.orders.filter((order) => order.channel === "counter" && order.createdAt >= now - gameplay.elapsedMs).length;
+  }
+  gameplay.nextCustomerSpawnAtMs ??= gameplay.elapsedMs + randomIntervalMs(difficulty.customerIntervalMin, difficulty.customerIntervalMax, random);
+  if (gameplay.spawnedCustomersToday < difficulty.targetCustomers && gameplay.elapsedMs >= gameplay.nextCustomerSpawnAtMs) {
     const customer = spawnCustomer(state, now, random);
     if (customer) {
       createOrder(state, customer, now, random);
+      gameplay.spawnedCustomersToday += 1;
+      gameplay.nextCustomerSpawnAtMs = gameplay.elapsedMs + randomIntervalMs(difficulty.customerIntervalMin, difficulty.customerIntervalMax, random) / Math.max(.5, modifiers.customerSpawn);
       spawned += 1;
     }
   }
-  while (state.gameplay.onlineSpawnAccumulator >= GAME_CONFIG.ONLINE_SPAWN_INTERVAL_SECONDS * 1000) {
-    state.gameplay.onlineSpawnAccumulator -= GAME_CONFIG.ONLINE_SPAWN_INTERVAL_SECONDS * 1000;
+  if (isOnlineOrderingUnlocked(state) && gameplay.nextOnlineSpawnAtMs === 0) {
+    gameplay.nextOnlineSpawnAtMs = gameplay.elapsedMs + randomIntervalMs(difficulty.onlineIntervalMin, difficulty.onlineIntervalMax, random);
+  }
+  if (isOnlineOrderingUnlocked(state) && gameplay.elapsedMs >= gameplay.nextOnlineSpawnAtMs) {
     spawnOnlineOrder(state, now, random);
+    gameplay.nextOnlineSpawnAtMs = gameplay.elapsedMs + randomIntervalMs(difficulty.onlineIntervalMin, difficulty.onlineIntervalMax, random) / Math.max(.5, modifiers.onlineOrders);
   }
   processEmployeeAutomation(state, now, modifiers.serviceSpeed);
 
@@ -125,7 +142,10 @@ export function tickDay(state, now = Date.now(), random = Math.random) {
     state.currentEvent = null;
     state.eventEndsAt = null;
   }
-  const ended = state.gameplay.elapsedMs >= GAME_CONFIG.DAY_DURATION_SECONDS * 1000;
+  const ended = gameplay.elapsedMs >= GAME_CONFIG.DAY_DURATION_SECONDS * 1000 ||
+    (gameplay.spawnedCustomersToday >= difficulty.targetCustomers &&
+      state.dailyStats.customersServed - state.dailyStats.onlineOrders >= difficulty.targetCustomers &&
+      state.customers.length === 0);
   if (ended) endDay(state);
   return { ended, spawned };
 }

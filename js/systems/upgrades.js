@@ -12,6 +12,7 @@ export function buyUpgrade(state, upgradeId) {
   const definition = UPGRADE_BY_ID[upgradeId];
   const cost = getUpgradeCost(state, upgradeId);
   if (!definition || !Number.isFinite(cost)) return { success: false, reason: "Nâng cấp đã đạt cấp tối đa." };
+  if (state.day < (definition.minDay ?? 1)) return { success: false, reason: `Mở từ ngày ${definition.minDay}.` };
   if (state.money < cost) return { success: false, reason: "Tiệm chưa đủ tiền để nâng cấp." };
   state.money -= cost;
   state.upgrades[upgradeId] = (state.upgrades[upgradeId] ?? 0) + 1;

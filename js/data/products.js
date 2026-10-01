@@ -19,7 +19,7 @@ const baseProducts = [
     basePrice: 32_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, beef_jerky: 1, ...foodBox },
     description: "Thêm khô bò dai thơm, đậm đà.",
-    unlockedByDefault: true,
+    unlockedByDefault: false,
   },
   {
     id: "chicken",
@@ -29,7 +29,7 @@ const baseProducts = [
     basePrice: 32_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, chicken_jerky: 1, ...foodBox },
     description: "Khô gà lá chanh thơm nhẹ, cay vừa.",
-    unlockedByDefault: true,
+    unlockedByDefault: false,
   },
   {
     id: "special",
@@ -39,7 +39,7 @@ const baseProducts = [
     basePrice: 40_000,
     baseRecipe: { rice_paper: 1, shrimp_salt: 1, satay: 1, tamarind_sauce: 1, green_mango: 1, vietnamese_coriander: 1, fried_shallot: 1, peanut: 1, calamansi: 1, quail_egg: 1, beef_jerky: 1, dried_shrimp: 1, ...foodBox },
     description: "Đủ vị sốt me, trứng cút, khô bò và tép khô.",
-    unlockedByDefault: true,
+    unlockedByDefault: false,
   },
 ];
 

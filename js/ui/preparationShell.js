@@ -1,15 +1,17 @@
 import { PRODUCTS, PRODUCT_OPTIONS } from "../data/products.js";
 import { getPendingPurchaseSummary } from "../systems/inventory.js";
 import { estimateCustomerDemand } from "../systems/preparation.js";
+import { getDifficultyForDay } from "../data/difficulty.js";
 import { escapeHtml, formatMoneyCompact } from "./helpers.js";
 
 export function renderPreparationShell(state, navigation, content, preparation) {
   const sellable = new Map(preparation.sellableProducts.map((product) => [product.id, product]));
-  const productLines = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id)).map((product) => {
+  const productLines = PRODUCTS.filter((product) => state.unlockedItems.includes(product.id) && getDifficultyForDay(state.day).allowedProducts.includes(product.id)).map((product) => {
     const current = sellable.get(product.id);
     return `<div class="menu-board-item"><span>${escapeHtml(product.name)}</span><strong>${formatMoneyCompact(state.sellPrices[product.id] ?? product.basePrice)}</strong>${current ? `<small>~${current.producibleCount} phần</small>` : ""}</div>`;
   }).join("");
-  const extraLines = `<div class="menu-board-item"><span>Thêm trứng cút</span><strong>+${formatMoneyCompact(5_000)}</strong></div><div class="menu-board-item"><span>Size Lớn</span><strong>+${formatMoneyCompact(PRODUCT_OPTIONS.sizes.L.priceModifier)}</strong></div>`;
+  const difficulty = getDifficultyForDay(state.day);
+  const extraLines = `${state.day >= 4 ? `<div class="menu-board-item"><span>Thêm trứng cút</span><strong>+${formatMoneyCompact(5_000)}</strong></div>` : ""}${difficulty.allowedSizes.includes("L") ? `<div class="menu-board-item"><span>Size Lớn</span><strong>+${formatMoneyCompact(PRODUCT_OPTIONS.sizes.L.priceModifier)}</strong></div>` : ""}`;
 
   let statusTitle;
   let statusCopy;

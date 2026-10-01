@@ -2,6 +2,7 @@ import { EMPLOYEE_ROLE_BY_ID } from "../data/employees.js";
 import { completeOnlineOrder } from "./onlineOrders.js";
 
 export function hireEmployee(state, roleId) {
+  if (state.day < 3) return { success: false, reason: "Nhân viên mở từ ngày 3." };
   const role = EMPLOYEE_ROLE_BY_ID[roleId];
   if (!role) return { success: false, reason: "Không tìm thấy vị trí nhân viên." };
   if (state.employees.some((employee) => employee.role === roleId)) return { success: false, reason: "Tiệm đã có nhân viên ở vị trí này." };
@@ -39,6 +40,7 @@ export function getEmployeeEffects(state) {
 }
 
 export function processEmployeeAutomation(state, now = Date.now(), serviceSpeed = 1) {
+  if (state.day < 3) return [];
   const onlineEmployee = state.employees.find((employee) => employee.role === "online");
   if (!onlineEmployee) return [];
   const completed = [];

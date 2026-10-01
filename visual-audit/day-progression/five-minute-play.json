@@ -1,0 +1,63 @@
+{
+  "realSeconds": 300.308,
+  "daysSeen": [
+    1,
+    2
+  ],
+  "dayOneOrders": [
+    {
+      "productId": "traditional",
+      "size": "M",
+      "ingredients": [
+        "rice_paper",
+        "shrimp_salt",
+        "green_mango"
+      ]
+    },
+    {
+      "productId": "traditional",
+      "size": "M",
+      "ingredients": [
+        "rice_paper",
+        "shrimp_salt",
+        "green_mango"
+      ]
+    },
+    {
+      "productId": "traditional",
+      "size": "M",
+      "ingredients": [
+        "rice_paper",
+        "shrimp_salt",
+        "green_mango"
+      ]
+    },
+    {
+      "productId": "traditional",
+      "size": "M",
+      "ingredients": [
+        "rice_paper",
+        "shrimp_salt",
+        "green_mango"
+      ]
+    },
+    {
+      "productId": "traditional",
+      "size": "M",
+      "ingredients": [
+        "rice_paper",
+        "shrimp_salt",
+        "green_mango"
+      ]
+    }
+  ],
+  "maxConcurrentDayOne": 1,
+  "onlineDayOne": 0,
+  "timeoutsDayOne": 0,
+  "servedDayOne": 5,
+  "dayOneEndSecond": 140,
+  "uiErrors": [],
+  "finalDay": 2,
+  "finalStatus": "running",
+  "finalServed": 4
+}

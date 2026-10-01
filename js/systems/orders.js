@@ -1,18 +1,15 @@
 import { INGREDIENT_BY_ID } from "../data/ingredients.js";
 import { PRODUCT_OPTIONS, getProductPrice, getProductRecipe } from "../data/products.js";
+import { getDifficultyForDay, INGREDIENT_UNLOCK_DAYS, randomIntervalMs } from "../data/difficulty.js";
 import { consumeIngredients, getStockQuantity } from "./inventory.js";
 import { addReview } from "./reviews.js";
 
 const BOWL_INGREDIENTS = Object.freeze(Object.keys(INGREDIENT_BY_ID).filter((id) => id !== "food_box"));
 
-function pickOption(options, random = Math.random) {
-  const keys = Object.keys(options);
-  return keys[Math.floor(random() * keys.length)] ?? keys[0];
-}
-
 export function createOrder(state, customer, now = Date.now(), random = Math.random) {
   const productId = customer.preferredProduct;
-  let size = pickOption(PRODUCT_OPTIONS.sizes, random);
+  const difficulty = getDifficultyForDay(state.day);
+  let size = difficulty.allowedSizes[Math.floor(random() * difficulty.allowedSizes.length)] ?? "M";
   let totalPrice = getProductPrice(productId, state.sellPrices, { size });
   if (totalPrice > customer.maxPrice) {
     size = "M";
@@ -21,13 +18,24 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
   const number = state.gameplay.nextEntityId++;
   const item = { productId, size, quantity: 1 };
   const baseRecipe = getProductRecipe(productId, { size }) ?? {};
-  const optionalToppings = ["vietnamese_coriander", "fried_shallot", "peanut", "green_mango", "calamansi"]
-    .filter((id) => Object.hasOwn(baseRecipe, id));
-  const excludedIngredients = random() > .82 && optionalToppings.length
+  const allowed = difficulty.recipeIngredients;
+  const requestedRecipe = allowed ? Object.fromEntries(Object.entries(baseRecipe).filter(([id]) => id === "food_box" || allowed.includes(id))) : { ...baseRecipe };
+  if (customer.tutorial) {
+    for (const id of Object.keys(requestedRecipe)) if (!["rice_paper", "shrimp_salt", "green_mango", "food_box"].includes(id)) delete requestedRecipe[id];
+  }
+  const optionalIds = ["vietnamese_coriander", "fried_shallot", "peanut", "calamansi"]
+    .filter((id) => Object.hasOwn(requestedRecipe, id));
+  while (optionalIds.length > difficulty.maxOptionalToppings) {
+    const removed = optionalIds.splice(Math.floor(random() * optionalIds.length), 1)[0];
+    delete requestedRecipe[removed];
+  }
+  const optionalToppings = ["vietnamese_coriander", "fried_shallot", "peanut", "calamansi"]
+    .filter((id) => Object.hasOwn(requestedRecipe, id));
+  const excludedIngredients = !customer.tutorial && random() < difficulty.exclusionChance && optionalToppings.length
     ? [optionalToppings[Math.floor(random() * optionalToppings.length)]]
     : [];
-  const heatRoll = random();
-  const heatLevel = heatRoll < .72 ? "Cay vừa" : random() < .5 ? "Ít cay" : "Cay nhiều";
+  const heatLevel = !customer.tutorial && Object.hasOwn(requestedRecipe, "satay")
+    ? difficulty.heatLevels[Math.floor(random() * difficulty.heatLevels.length)] ?? null : null;
   const order = {
     id: `order-${number}`,
     customerId: customer.id,
@@ -37,6 +45,7 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
     status: "waiting",
     channel: "counter",
     customerRequest: { excludedIngredients, heatLevel },
+    requestedRecipe,
     preparedIngredients: {},
     preparedSize: null,
     mixed: false,
@@ -52,7 +61,10 @@ export function createOrder(state, customer, now = Date.now(), random = Math.ran
 export function getOrderRecipe(order, { size } = {}) {
   const item = order?.items?.[0];
   if (!item) return null;
-  const recipe = getProductRecipe(item.productId, { size: size ?? order.preparedSize ?? item.size }) ?? {};
+  const targetSize = size ?? item.size;
+  const recipe = order.requestedRecipe && targetSize === item.size
+    ? { ...order.requestedRecipe }
+    : getProductRecipe(item.productId, { size: targetSize }) ?? {};
   for (const id of order.customerRequest?.excludedIngredients ?? []) delete recipe[id];
   if (Object.hasOwn(recipe, "satay")) {
     const baseHeat = recipe.satay;
@@ -68,6 +80,7 @@ export function addIngredientToOrder(state, orderId, ingredientId) {
   if (!order || order.status !== "waiting" || order.mixed || order.mixing) return { success: false, reason: "Tô đã trộn hoặc đơn không còn hoạt động." };
   if (!order.preparedSize) return { success: false, reason: "Chọn size trước khi thêm nguyên liệu." };
   if (!BOWL_INGREDIENTS.includes(ingredientId)) return { success: false, reason: "Nguyên liệu này không dùng để trộn." };
+  if (state.day < (INGREDIENT_UNLOCK_DAYS[ingredientId] ?? 1) && !(getOrderRecipe(order)?.[ingredientId] > 0)) return { success: false, reason: "Nguyên liệu chưa được mở khóa." };
   const quantity = order.preparedIngredients?.[ingredientId] ?? 0;
   if (getStockQuantity(state, ingredientId) <= quantity) return { success: false, reason: `Kho không còn ${INGREDIENT_BY_ID[ingredientId]?.name ?? "nguyên liệu"} để thêm.` };
   order.preparedIngredients ??= {};
@@ -77,7 +90,7 @@ export function addIngredientToOrder(state, orderId, ingredientId) {
 
 export function setOrderSize(state, orderId, size) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
-  if (!order || order.status !== "waiting" || order.mixed || order.mixing || !PRODUCT_OPTIONS.sizes[size]) return false;
+  if (!order || order.status !== "waiting" || order.mixed || order.mixing || !PRODUCT_OPTIONS.sizes[size] || !(getDifficultyForDay(state.day).allowedSizes.includes(size) || order.items[0]?.size === size)) return false;
   if (Object.values(order.preparedIngredients ?? {}).some((quantity) => quantity > 0)) return false;
   order.preparedSize = size;
   return true;
@@ -145,7 +158,7 @@ export function evaluatePreparedOrder(order, customer) {
   return { correctIngredients, missingIngredients, wrongIngredients, sizeCorrect, waitingTime, satisfaction };
 }
 
-export function serveOrder(state, orderId, now = Date.now()) {
+export function serveOrder(state, orderId, now = Date.now(), random = Math.random) {
   const order = state.orders.find((candidate) => candidate.id === orderId);
   if (!order || order.status !== "ready" || !order.packed) return { success: false, reason: "Hãy trộn và đóng hộp món trước khi giao khách." };
   const customer = state.customers.find((candidate) => candidate.id === order.customerId);
@@ -166,9 +179,14 @@ export function serveOrder(state, orderId, now = Date.now()) {
   state.dailyStats.revenue += order.totalPrice;
   state.dailyStats.customersServed += 1;
   state.customersServed += 1;
+  if (customer.tutorial) state.tutorialSellingCompleted = true;
   const review = addReview(state, customer, order, now);
   customer.status = "served";
   state.customers = state.customers.filter((candidate) => candidate.id !== customer.id);
+  const difficulty = getDifficultyForDay(state.day);
+  if (difficulty.waitAfterService && state.gameplay.status === "running") {
+    state.gameplay.nextCustomerSpawnAtMs = state.gameplay.elapsedMs + randomIntervalMs(difficulty.customerIntervalMin, difficulty.customerIntervalMax, random);
+  }
   return { success: true, order, review, accuracy, revenue: order.totalPrice, ingredientCost: consumed.cost };
 }
 

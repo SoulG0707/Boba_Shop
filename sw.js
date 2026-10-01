@@ -1,4 +1,4 @@
-const CACHE_NAME = "banh-trang-tron-v16";
+const CACHE_NAME = "banh-trang-tron-v18";
 const STATIC_ASSETS = [
   "./", "./index.html", "./manifest.webmanifest",
   "./img/banh-trang.svg",
@@ -9,7 +9,7 @@ const STATIC_ASSETS = [
   "./fonts/Baloo2-latin.woff2", "./fonts/Baloo2-latin-ext.woff2", "./fonts/Baloo2-vietnamese.woff2",
   "./css/reset.css", "./css/variables.css", "./css/layout.css", "./css/components.css", "./css/preparation.css", "./css/selling.css", "./css/game.css", "./css/splash.css",
   "./js/config.js", "./js/main.js",
-  "./js/data/ingredients.js", "./js/data/products.js", "./js/data/upgrades.js", "./js/data/employees.js", "./js/data/events.js", "./js/data/bauCua.js",
+  "./js/data/ingredients.js", "./js/data/products.js", "./js/data/upgrades.js", "./js/data/employees.js", "./js/data/events.js", "./js/data/bauCua.js", "./js/data/difficulty.js",
   "./js/state/initialState.js", "./js/state/store.js", "./js/state/persistence.js",
   "./js/systems/inventory.js", "./js/systems/preparation.js", "./js/systems/economy.js", "./js/systems/customers.js", "./js/systems/orders.js", "./js/systems/onlineOrders.js", "./js/systems/reviews.js", "./js/systems/upgrades.js", "./js/systems/employees.js", "./js/systems/events.js", "./js/systems/modifiers.js", "./js/systems/dayCycle.js", "./js/systems/audioManager.js", "./js/systems/bauCua.js", "./js/systems/xidach.js",
   "./js/ui/helpers.js", "./js/ui/foodAssets.js", "./js/ui/router.js", "./js/ui/header.js", "./js/ui/modal.js", "./js/ui/toast.js", "./js/ui/inventoryView.js", "./js/ui/upgradesView.js", "./js/ui/pricesView.js", "./js/ui/employeesView.js", "./js/ui/gameplayView.js", "./js/ui/preparationShell.js", "./js/ui/splashView.js", "./js/ui/tutorialView.js", "./js/ui/moreView.js", "./js/ui/reviewsView.js", "./js/ui/statsView.js", "./js/ui/bauCuaView.js", "./js/ui/xidachView.js",

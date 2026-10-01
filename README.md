@@ -26,7 +26,7 @@ js/backup/           Tạo/khôi phục backup có SHA-256
 sw.js                PWA cache
 ```
 
-Inventory, economy, customer spawning, day cycle, reviews, employees, upgrades, events, online orders, persistence, backup và PWA được giữ lại. `gameplayView.js` dùng tô trộn và lưới nguyên liệu; `orders.js` theo dõi size, nguyên liệu đã cho vào tô, trạng thái trộn/đóng hộp và độ chính xác của đơn.
+Inventory, economy, reviews, persistence, backup và PWA được giữ lại. `gameplayView.js` dựng quầy với hũ, khay inox, thau trộn và trạm đóng hộp; `orders.js` theo dõi size, nguyên liệu đã cho vào thau, trạng thái trộn/đóng hộp và độ chính xác của đơn.
 
 ## Nội dung game
 
@@ -37,6 +37,12 @@ Inventory, economy, customer spawning, day cycle, reviews, employees, upgrades, 
 - Thứ tự làm món: chọn khách → chọn size → thêm/bỏ nguyên liệu → trộn → đóng hộp → giao khách.
 - Đơn được chấm theo nguyên liệu đúng, thiếu/thừa, size và thời gian chờ. Review dùng chung hệ thống hiện có.
 - Các mini game Bầu Cua và Xì Dách vẫn hoạt động như nội dung phụ.
+
+## Độ khó theo ngày
+
+`js/data/difficulty.js` chứa `DAY_DIFFICULTY` và `getDifficultyForDay(day)`. Ngày 1 có 5 khách, khoảng cách 28–35 giây, tối đa 1 khách cùng lúc, chỉ món truyền thống cỡ Bé và ba nguyên liệu; khách hướng dẫn đầu tiên đến sau 3–5 giây và không giảm kiên nhẫn. Ngày 3 mở khô bò và cỡ Lớn, ngày 4 mở khô gà, ngày 6 mở món đặc biệt. Từ ngày 5 có thể mua Điện thoại nhận đơn để mở online với khoảng cách 60–90 giây. Ngày 7 trở đi tăng dần theo công thức fallback. Công thức yêu cầu được lưu trong đơn khi khách xuất hiện, nên đơn cũ không thay đổi khi tiến trình mở khóa.
+
+Kiểm tra nhanh: `node visual-audit/day-progression-check.mjs`. Ảnh Day 1/3/5 và clip 70 giây ở `visual-audit/day-progression/`.
 
 ## Tiến trình và backup
 
